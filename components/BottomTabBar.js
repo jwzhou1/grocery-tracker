@@ -6,8 +6,7 @@ import GlobalStyles from '../styles/StylesHelper';
 import PressableButton from './PressableButton';
 import { Ionicons } from '@expo/vector-icons';
 
-function BottomTabBar({ state, descriptors, navigation }) {
-  
+export default function BottomTabBar({ state, descriptors, navigation }) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
 
@@ -73,5 +72,3 @@ function BottomTabBar({ state, descriptors, navigation }) {
     </View>
   );
 }
-
-export default BottomTabBar;

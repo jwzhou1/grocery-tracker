@@ -6,7 +6,6 @@ import { Dimensions } from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 
 export default function LineChartManager({ selectedDuration }) {
-
   const [expenseData, setExpenseData] = useState({});
   const [accumulatedExpenseData, setAccumulatedExpenseData] = useState({});
 

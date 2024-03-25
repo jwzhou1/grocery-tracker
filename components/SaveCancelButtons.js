@@ -3,7 +3,7 @@ import { View, Text,StyleSheet, } from 'react-native';
 import PressableButton from './PressableButton';
 import Colors from '../styles/Colors';
 
-const SaveCancelButtons = ({ onCancel, onSave }) => {
+export default function SaveCancelButtons({ onCancel, onSave }) {
   return (
     <View style={styles.buttonContainer}>
       <PressableButton
@@ -23,8 +23,6 @@ const SaveCancelButtons = ({ onCancel, onSave }) => {
     </View>
   );
 };
-
-export default SaveCancelButtons;
 
 const styles = StyleSheet.create({
       buttonContainer: {

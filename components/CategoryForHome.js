@@ -6,37 +6,9 @@ import Colors from '../styles/Colors';
 import * as Animatable from 'react-native-animatable';
 import { Dimensions } from 'react-native';
 
-const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const CategoryForHome = ({ selectedMonth }) => {
-  const userUid = auth.currentUser.uid;
-  const [budgetLimit, setBudgetLimit] = useState(0);
-
-  // Get budgetLimit
-  useEffect(() => {
-    const budgetsQuery = query(
-      collection(database, 'Budgets'),
-      where('user', '==', userUid)
-    );
-
-    const unsubscribeBudgets = onSnapshot(budgetsQuery, (budgetSnapshot) => {
-      if (!budgetSnapshot.empty) {
-        const latestBudget = budgetSnapshot.docs[budgetSnapshot.docs.length - 1].data();
-        setBudgetLimit(latestBudget.limit || 0);
-      } else {
-        setBudgetLimit(0);
-      }
-    });
-
-    return () => {
-      unsubscribeBudgets();
-    };
-  }, [userUid]);
-
-  // Assuming we only want the current month, format it to 'YYYY-MM' string
-  const currentMonth = new Date().toISOString().slice(0, 7);
-
   // Define your categories here
   const categories = [
     { name: 'Category 1' },

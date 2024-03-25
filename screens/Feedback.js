@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
-const Feedback = () => {
+export default function Feedback() {
   const [imageUri, setImageUri] = useState(null);
 
   // Function to handle image selection from camera
@@ -154,5 +154,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default Feedback;

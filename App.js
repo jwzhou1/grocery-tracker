@@ -1,105 +1,62 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { auth } from './firebase/firebaseSetup';
-import { onAuthStateChanged } from 'firebase/auth';
-import { Text,TouchableOpacity,Alert } from 'react-native';
+import React from "react";
+import { useState, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { auth } from "./firebase/firebaseSetup";
+import { onAuthStateChanged } from "firebase/auth";
+import { Text, TouchableOpacity, Alert } from "react-native";
 
-import WelcomePage from './screens/WelcomePage';
-import Signup from './screens/Signup';
-import Login from './screens/Login';
-import Search from './screens/Search';
-import Home from './screens/Home';
-import ShoppingList from './screens/ShoppingList';
-import Profile from './screens/Profile';
-import SearchResult from './screens/SearchResult';
-import Feedback from './screens/Feedback';
-import EditProfile from './screens/EditProfile';
-import WatchList from './screens/WatchList';
-import Map from './screens/Map';
-import MyContributions from './screens/MyContributions';
-import ProductDetail from './screens/ProductDetail';
-import BottomTabBar from './components/BottomTabBar';
-import Colors from './styles/Colors';
-import PressableButton from './components/PressableButton';
-import { Ionicons } from '@expo/vector-icons';
-import { Foundation } from '@expo/vector-icons';
-import ChangePassword from './screens/ChangePassword';
-import * as Notifications from "expo-notifications";
-
-
+import WelcomePage from "./screens/WelcomePage";
+import Signup from "./screens/Signup";
+import Login from "./screens/Login";
+import Search from "./screens/Search";
+import Home from "./screens/Home";
+import ShoppingList from "./screens/ShoppingList";
+import Profile from "./screens/Profile";
+import SearchResult from "./screens/SearchResult";
+import Feedback from "./screens/Feedback";
+import EditProfile from "./screens/EditProfile";
+import WatchList from "./screens/WatchList";
+import Map from "./screens/Map";
+import MyContributions from "./screens/MyContributions";
+import ProductDetail from "./screens/ProductDetail";
+import BottomTabBar from "./components/BottomTabBar";
+import Colors from "./styles/Colors";
+import PressableButton from "./components/PressableButton";
+import { Ionicons } from "@expo/vector-icons";
+import ChangePassword from "./screens/ChangePassword";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-Notifications.setNotificationHandler({
-  handleNotification: async function (notification) {
-    return {
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: true,
-    };
-  },
-});
-
-const cancelNotification = async () => {
-  setIsNotificationEnabled(false);
-  await cancelPriceChangeNotification();
-  Alert.alert('Notification Canceled', 'You will no longer receive notifications for price changes.');
-};
-
-
-const handleNotification = () => {
-  Alert.alert(
-    'Enable Price Change Notification',
-    'Do you want to receive notifications for price changes?',
-    [
-      {
-        text: 'No',
-        style: 'cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: async () => {
-          setIsNotificationEnabled(true);
-          await schedulePriceChangeNotification(item, price, supermarket);
-          Alert.alert('Notification Enabled', 'You will receive notifications for price changes.');
-        },
-      },
-    ],
-    { cancelable: false }
-  );
-};
-
-
 // Auth Screens
-const AuthStack = <>
-  <Stack.Screen
+const AuthStack = (
+  <>
+    <Stack.Screen
       name="Welcome"
       component={WelcomePage}
-      options={{ title: 'Welcome'}}
+      options={{ title: "Welcome" }}
     />
-  <Stack.Screen
-    name="Signup"
-    component={Signup}
-    options={{ title: 'Sign Up'}}
+    <Stack.Screen
+      name="Signup"
+      component={Signup}
+      options={{ title: "Sign Up" }}
     />
-  <Stack.Screen
-    name="Login"
-    component={Login}
-    options={{ title: 'Log In'}}
+    <Stack.Screen
+      name="Login"
+      component={Login}
+      options={{ title: "Log In" }}
     />
-</>
-
+  </>
+);
 
 // Tab Screens
 function TabNavigator() {
   return (
     <Tab.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={Home}
         options={({ navigation }) => ({
           headerStyle: {
@@ -107,16 +64,14 @@ function TabNavigator() {
           },
           headerTintColor: Colors.headerText,
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
             fontSize: 20,
           },
-
-        })
-      }
+        })}
       />
 
-<Tab.Screen 
-        name="ShoppingList" 
+      <Tab.Screen
+        name="ShoppingList"
         component={ShoppingList}
         options={({ navigation }) => ({
           headerStyle: {
@@ -124,33 +79,34 @@ function TabNavigator() {
           },
           headerTintColor: Colors.headerText,
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
             fontSize: 20,
           },
-
-        })
-      }
+        })}
       />
 
-      <Tab.Screen 
-        name="Profile" 
+      <Tab.Screen
+        name="Profile"
         component={Profile}
         options={({ navigation }) => ({
           headerRight: () => (
             <PressableButton
               pressedFunction={() => auth.signOut()}
-              pressedStyle={{ 
+              pressedStyle={{
                 backgroundColor: Colors.header,
                 marginRight: 10,
                 opacity: 0.5,
               }}
-              defaultStyle={{ 
+              defaultStyle={{
                 backgroundColor: Colors.header,
                 marginRight: 10,
               }}
             >
-              <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', }}
-              >Log Out</Text>
+              <Text
+                style={{ color: "white", fontSize: 16, fontWeight: "bold" }}
+              >
+                Log Out
+              </Text>
             </PressableButton>
           ),
           headerStyle: {
@@ -158,105 +114,92 @@ function TabNavigator() {
           },
           headerTintColor: Colors.headerText,
           headerTitleStyle: {
-            fontWeight: 'bold',
+            fontWeight: "bold",
             fontSize: 20,
-          }
+          },
         })}
       />
-      
     </Tab.Navigator>
   );
 }
 
 // App Screens
-const AppStack = 
+const AppStack = (
   <>
-    <Stack.Screen
-      name="Tabs" 
-      component={TabNavigator} 
-    />
-
+    <Stack.Screen name="Tabs" component={TabNavigator} />
 
     <Stack.Screen
       name="Edit Profile"
       component={EditProfile}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
 
-<Stack.Screen
+    <Stack.Screen
       name="Search"
       component={Search}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
 
-<Stack.Screen
+    <Stack.Screen
       name="SearchResult"
       component={SearchResult}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
 
-<Stack.Screen 
-  name="ProductDetail" 
-  component={ProductDetail}
-  options={{ 
-    headerShown: true,
-    headerRight: () => (
-      <TouchableOpacity onPress={handleNotification}>
-        <Ionicons name="notifications-outline" size={24} color="black" style={{ marginRight: 15 }} /> 
-      </TouchableOpacity>
-    ),
-    handleNotification: handleNotification,
-    cancelNotification: cancelNotification, 
-  }} 
-/>
+    <Stack.Screen
+      name="ProductDetail"
+      component={ProductDetail}
+      options={{
+        headerShown: true
+      }}
+    />
 
-<Stack.Screen 
-      name="Feedback" 
+    <Stack.Screen
+      name="Feedback"
       component={Feedback}
-      options={{ 
+      options={{
         headerShown: true,
-        }} 
+      }}
     />
 
     <Stack.Screen
       name="Change Password"
       component={ChangePassword}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
-<Stack.Screen 
-      name="Watch List" 
+    <Stack.Screen
+      name="Watch List"
       component={WatchList}
-      options={{ 
+      options={{
         headerShown: true,
-        }} 
+      }}
     />
 
-  <Stack.Screen
+    <Stack.Screen
       name="Map"
       component={Map}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
 
-  <Stack.Screen
+    <Stack.Screen
       name="My Contributions"
       component={MyContributions}
-      options={{ 
+      options={{
         headerShown: true,
-        }}
+      }}
     />
-
   </>
-
+);
 
 // Default Header Options
 const defaultHeaderOptions = {
@@ -266,11 +209,10 @@ const defaultHeaderOptions = {
   },
   headerTintColor: Colors.headerText,
   headerTitleStyle: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
   },
 };
-
 
 // App
 export default function App() {
@@ -283,16 +225,13 @@ export default function App() {
       } else {
         setLoggedIn(false);
       }
-    })
+    });
   }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={defaultHeaderOptions}>
-
-      { loggedIn ? AppStack : AuthStack }
-
-      
+        {loggedIn ? AppStack : AuthStack}
       </Stack.Navigator>
     </NavigationContainer>
   );

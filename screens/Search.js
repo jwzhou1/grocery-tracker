@@ -1,33 +1,31 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { searchProductsByName } from '../firebase/firebaseHelper';
+import React, { useState } from "react";
+import { View, StyleSheet, TextInput, TouchableOpacity, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { searchProductsByName } from "../firebase/firebaseHelper";
 
-const SearchScreen = () => {
+export default function SearchScreen() {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
 
   const handleSearch = async () => {
     try {
-      if (searchText.trim() !== '') { // Check if searchText is not empty
+      if (searchText.trim() !== "") {
+        // Check if searchText is not empty
         const searchResults = await searchProductsByName(searchText);
         if (searchResults.length > 0) {
-          console.log('Search results:', searchResults);
-          navigation.navigate('SearchResult', { searchText }); // Pass searchText as parameter
+          console.log("Search results:", searchResults);
+          navigation.navigate("SearchResult", { searchText }); // Pass searchText as parameter
         } else {
-          console.log('No products found for:', searchText);
+          console.log("No products found for:", searchText);
         }
       } else {
-        console.log('Search text is empty');
+        console.log("Search text is empty");
       }
     } catch (error) {
-      console.error('Error searching products:', error);
+      console.error("Error searching products:", error);
     }
   };
-  
-  
-  
 
   return (
     <View style={styles.container}>
@@ -50,24 +48,22 @@ const SearchScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingTop: 10,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#309797',
-    backgroundColor: '#FFFBF5',
+    borderBottomColor: "#309797",
+    backgroundColor: "#FFFBF5",
     marginBottom: 10,
   },
   input: {
     flex: 1,
     fontSize: 18,
-    color: 'black',
+    color: "black",
     paddingHorizontal: 10,
   },
 });
-
-export default SearchScreen;

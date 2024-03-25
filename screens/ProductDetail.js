@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { schedulePriceChangeNotification, cancelPriceChangeNotification } from '../components/NotificationManager';
 import LineChartManager from '../components/LineChartManager';
 
 const ProductDetail = ({ route }) => {

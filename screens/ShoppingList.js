@@ -3,8 +3,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import DeleteButton from '../components/DeleteButton';
 
-const ShoppingList = () => {
-
+export default function ShoppingList() {
   // Function to handle item deletion
   const handleDeleteItem = () => {
     // Implement your logic to delete the item here
@@ -92,5 +91,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default ShoppingList;

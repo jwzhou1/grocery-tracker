@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 
-const WatchList = () => {
+export default function WatchList() {
   return (
     <View style={styles.container}>
       {/* Watch List Items */}
@@ -79,5 +79,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default WatchList;

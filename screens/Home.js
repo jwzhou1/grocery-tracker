@@ -7,7 +7,7 @@ import CategoryForHome from '../components/CategoryForHome';
 import LinearGradientComp from '../components/LinearGradient';
 import * as Location from 'expo-location';
 
-const Home = () => {
+export default function Home() {
   const navigation = useNavigation();
   const currentCategory = "Fruit";
   const selectedCategory = currentCategory;
@@ -87,8 +87,6 @@ const Home = () => {
     </LinearGradientComp>
   );
 };
-
-export default Home;
 
 const styles = StyleSheet.create({
   container: {
