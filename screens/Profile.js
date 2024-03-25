@@ -5,13 +5,11 @@ import { database,auth } from "../firebase/firebaseSetup";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../styles/Colors';
-import { Entypo } from '@expo/vector-icons';
 import LottieView from "lottie-react-native";
 import { Dimensions } from 'react-native';
 import LinearGradientComp from '../components/LinearGradient';
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-import * as Animatable from 'react-native-animatable';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -47,18 +45,7 @@ const Profile = ({navigation,route}) => {
     navigation.navigate('Watch List');
   };
 
-  
 
-  const handleChangePasswordPress = () => {
-    // Navigate to the "Edit Profile" screen
-    navigation.navigate('Change Password');
-  };
-
-
-  const handleMyVisitedPlacesPress = () => {
-    // Navigate to the "Visited Places" screen
-    navigation.navigate('Visited Places');
-  }
 
   const handleMyContributionsPress = () => {
     // Navigate to the "My Contributions" screen
@@ -69,47 +56,35 @@ const Profile = ({navigation,route}) => {
   return (
     <LinearGradientComp>
     <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around' }}>
-      <Animatable.View
-        animation="fadeInDownBig"
-        >
-         <View style={styles.userInfoContainer}>
-        <View style={styles.leftContent}>
-          <View style={styles.displayNameContainer}>
-            {/* Welcome message */}
-            <Text style={[styles.displayNameText, { fontSize: 20 }]}>
-              Welcome, {user.displayName || updatedUsername}
+    <View style={styles.userInfoContainer}>
+      {/* Left side: Display Name */}
+      <View style={styles.leftContent}>
+        <View style={styles.displayNameContainer}>
+          {/* Welcome message */}
+          <Text style={[styles.displayNameText, { fontSize: 20 }]}>
+            Hello, {user.displayName || updatedUsername}
+          </Text>
+        </View>
+        <View style={styles.emailContainer}>
+          {/* User's email */}
+          <View style={styles.emailButton}>
+            <MaterialIcons name="email" size={24} />
+            <Text style={[styles.myEmailText, { fontSize: 16 }]}>
+              {auth.currentUser.email}
             </Text>
           </View>
-          <View style={styles.visitedContainer}>
-            {/* User's username */}
-            <TouchableOpacity style={styles.visitedButton} onPress={() => handleMyVisitedPlacesPress()}>
-            <Entypo name="user" size={24} color="#EAD33A" />
-              <Text style={[styles.myVisitedPlacesText, { fontSize: 18 }]}>
-                {user.displayName || updatedUsername}
-              </Text>
-            </TouchableOpacity>
-
-            {/* User's email */}
-            <View style={styles.visitedButton}>
-            <MaterialIcons name="email" size={24} color="#EAD33A" />
-       <Text style={[styles.myVisitedPlacesText, { fontSize: 16 }]}>
-          {auth.currentUser.email}
-     </Text>
+        </View>
       </View>
-          </View>
 
-          </View>
-
-          {/* Right side: Avatar */}
-          <View style={styles.avatarContainer}>
-            {auth.currentUser.photoURL ? (
-              <Image source={{ uri: auth.currentUser.photoURL }} style={styles.avatarImage} />
-            ) : (
-              <Image source={require('../assets/default-avatar.jpg')} style={styles.avatarImage} />
-            )}
-          </View>
+      {/* Right side: Avatar */}
+      <View style={styles.avatarContainer}>
+        {auth.currentUser.photoURL ? (
+          <Image source={{ uri: auth.currentUser.photoURL }} style={styles.avatarImage} />
+        ) : (
+          <Image source={require('../images/default-avatar.jpg')} style={styles.avatarImage} />
+        )}
       </View>
-      </Animatable.View>
+    </View>
 
       
       <View style={{flex:0.1, justifyContent:'space-between', width:'100%', alignSelf:'center'}}>
@@ -119,19 +94,6 @@ const Profile = ({navigation,route}) => {
           <View style={{flexDirection:'row', alignItems:'center'}}>
           <AntDesign name="edit" size={24} color="#163020" />
           <Text style={styles.EditLimitText}> Edit Profile</Text>
-          </View>
-          <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
-        </TouchableOpacity>
-      </View>
-
-
-      <View style={{flex:0.1,justifyContent:'space-between', width:'100%', alignSelf:'center'}}>
-        <TouchableOpacity 
-        onPress={() => handleChangePasswordPress()} 
-        style={styles.EditLimitContainer}>
-          <View style={{flexDirection:'row', alignItems:'center'}}>
-          <Ionicons name="key-outline" size={24} color="#163020" />
-          <Text style={styles.EditLimitText}> Change Password</Text>
           </View>
           <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
         </TouchableOpacity>
@@ -155,7 +117,7 @@ const Profile = ({navigation,route}) => {
     style={styles.EditLimitContainer}
   >
     <View style={{flexDirection:'row', alignItems:'center'}}>
-      <AntDesign name="star" size={24} color="#EAD33A" />
+      <AntDesign name="star" size={24}  />
       <Text style={styles.EditLimitText}> My Contributions</Text>
     </View>
     <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
@@ -189,12 +151,8 @@ const styles = StyleSheet.create({
     marginTop: "3%",
     // marginBottom: "5%",
     alignSelf:'center',
-    backgroundColor: '#309797', 
+    backgroundColor: '#fff', 
     borderRadius: 8,
-    shadowColor: 'gray',
-    shadowOffset: { width: 0, height: 1 }, 
-    shadowOpacity: 0.8, 
-    shadowRadius: 8, 
     elevation: 4,
   },
   leftContent: {
@@ -208,12 +166,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginLeft: '5%',
-    color: 'white',
+    color: 'black',
   },
-  visitedContainer:{
+  emailContainer:{
     marginBottom: '3%',
   },
-  visitedButton: {
+  emailButton: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
@@ -223,37 +181,36 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding:5,
     marginLeft: '5%',
-    marginTop: '5%',
-    backgroundColor: '#acd5d5',
+    marginTop: '-35%',
+    backgroundColor: 'white',
     shadowColor: 'gray',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
     elevation: 4,
   },
-  myVisitedPlacesText: {
+  myEmailText: {
     fontSize: 14,
     marginLeft: '2%',
     color: '#163020',
   },
 
-avatarContainer: {
-  width: 120,
-  height: 120,
-  borderRadius: 60, // half of the width and height to make it a circle
-  borderWidth: 3,
-  borderColor: 'white',
-  overflow: 'hidden', // hides the content outside the borderRadius
-  marginVertical: '6%',
-  marginRight: '3%',
-  //alignSelf: 'center',
-  backgroundColor: 'gray',
-  elevation: 5, // for Android shadows
-  shadowColor: 'black', // for iOS shadows
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.5,
-  shadowRadius: 5,
-},
+  avatarContainer: {
+    width: 120, 
+    height: 120, 
+    borderRadius: 10, 
+    borderWidth: 3,
+    borderColor: 'white',
+    overflow: 'hidden',
+    marginVertical: '6%',
+    marginRight: '3%',
+    backgroundColor: 'gray',
+    elevation: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+  },
 
 avatarImage: {
   width: '100%',
@@ -262,7 +219,7 @@ avatarImage: {
 },
   EditLimitContainer: {
     flexDirection: 'row',
-    backgroundColor: '#83c1c1',
+    backgroundColor: '#fff',
     padding: 6,
     width: "90%",
     height: 50,

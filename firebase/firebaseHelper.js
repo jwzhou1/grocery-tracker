@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, query,where, addDoc, deleteDoc, doc, setDoc, getDocs } from 'firebase/firestore';
 import { database } from './firebaseSetup';
 import { auth } from './firebaseSetup';
 import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -45,15 +45,42 @@ export async function updateInUsersDB(entryId, updateEntry) {
   
 
 
-export async function updateInDB(entryId, updateEntry) {
-  try {
-      const entryRef = doc(database, 'Expenses', entryId);
-      await setDoc(entryRef, updateEntry,  { merge: true });
-      console.log('Updated');
-  } catch (err) {
-      console.log('error in updateInDB: ', err);
+  export async function searchProductsByName(productName) {
+    try {
+      const productsRef = collection(database, 'Products'); // Reference to the 'Products' collection
+      const q = query(productsRef, where('name', '==', productName)); // Query for products with matching name
+      const querySnapshot = await getDocs(q); // Get the query snapshot
+      const results = []; // Array to store search results
+      querySnapshot.forEach((doc) => {
+        results.push(doc.data()); // Add each document's data to the results array
+      });
+      return results; // Return the array of search results
+    } catch (error) {
+      console.error('Error searching products:', error);
+      return []; // Return an empty array if there's an error
+    }
   }
-}
+
+  export async function getProductsByName(name) {
+    try {
+      const productsRef = collection(database, 'Products');
+      const q = query(productsRef, where('name', '==', name));
+      const querySnapshot = await getDocs(q);
+      const products = [];
+      querySnapshot.forEach((doc) => {
+        // Check if the document data exists and has all required fields
+        const data = doc.data();
+        if (data && typeof data === 'object' && data.name && data.price && data.store && data.weight) {
+          products.push(data);
+        }
+      });
+      return products;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  
 
 export async function writeToBudgetsDB(budget) {
   try {

@@ -5,9 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { schedulePriceChangeNotification, cancelPriceChangeNotification } from '../components/NotificationManager';
 import LineChartManager from '../components/LineChartManager';
 
-const ProductDetail = ({ route, handleNotification, cancelNotification }) => {
-  // Extracting parameters from the route
-  const { item, weight, price, supermarket } = route.params;
+const ProductDetail = ({ route }) => {
+  // Extracting product information from the route
+  const { name, price, store, weight } = route.params;
   const navigation = useNavigation();
 
   // Function to navigate to Feedback screen
@@ -27,18 +27,18 @@ const ProductDetail = ({ route, handleNotification, cancelNotification }) => {
       <View style={styles.infoContainer}>
         {/* Product Name and Weight */}
         <View style={styles.nameAndWeight}>
-          <Text style={styles.productName}>{item}</Text>
-          <Text style={styles.weight}>{weight}</Text>
+          <Text style={styles.productName}>{name}</Text>
+          <Text style={styles.weight}>{weight}g</Text>
         </View>
 
         {/* Price and Supermarket */}
         <View style={styles.priceAndSupermarket}>
-          <Text style={styles.price}>Price: {price} at {supermarket}</Text>
+          <Text style={styles.price}>Price: ${price} at {store}</Text>
           <Text style={styles.unitPrice}>Unit Price: ${parseFloat(price) / parseFloat(weight)} per g</Text>
         </View>
 
-  {/* Line Chart */}
-  <View style={styles.lineChartContainer}>
+        {/* Line Chart */}
+        <View style={styles.lineChartContainer}>
           <LineChartManager selectedDuration="1 Month" /> 
         </View>
         
@@ -51,8 +51,6 @@ const ProductDetail = ({ route, handleNotification, cancelNotification }) => {
         <TouchableOpacity onPress={goToFeedback} style={styles.feedbackLink}>
           <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
         </TouchableOpacity>
-
-      
       </View>
     </View>
   );

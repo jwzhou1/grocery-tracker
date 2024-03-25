@@ -1,43 +1,52 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Text, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { getProductsByName } from '../firebase/firebaseHelper';
 
-const SearchResult = () => {
+const SearchResult = ({ route }) => {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState(''); // State to hold search text
+  const [searchResults, setSearchResults] = useState([]);
+  const { searchText } = route.params;
+  
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const products = await getProductsByName(searchText);
+        setSearchResults(products);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    fetchProducts();
+  }, [searchText]);
 
-  // Function to handle going back
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
-  // Function to navigate to product detail screen
-  const handleProductDetail = () => {
+  const handleProductDetail = (name, price, store, weight) => {
     navigation.navigate('ProductDetail', {
-      item: 'Product Name',
-      weight: '100g',
-      price: '$1',
-      supermarket: 'Your Supermarket'
+      name,
+      price,
+      store,
+      weight,
     });
   };
+  
 
   return (
     <View style={styles.container}>
-      {/* Search Result */}
-      <TouchableOpacity onPress={handleProductDetail}>
-        <View style={styles.searchResult}>
-          {/* Image */}
+      {searchResults.map((item, index) => (
+       <TouchableOpacity key={index} onPress={() => handleProductDetail(item.name, item.price, item.store, item.weight)}>
+          <View style={styles.searchResult}>
           <Image
-            style={styles.image}
-            source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder image URL
+         style={styles.image}
+        source={{ uri: 'https://via.placeholder.com/150' }} 
           />
-          {/* Description */}
-          <View style={styles.description}>
-            <Text style={styles.price}>From $1 dollar</Text>
-            <Text style={styles.item}>Item1 100g</Text>
+            <View style={styles.description}>
+              <Text style={styles.price}>From ${item.price}</Text>
+              <Text style={styles.item}>{item.name} {item.weight}</Text>
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -45,23 +54,14 @@ const SearchResult = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF', // Update with your desired background color
+    backgroundColor: '#FFF',
     paddingTop: 10,
-  },
-  searchBar: {
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  input: {
-    fontSize: 18,
-    color: 'black',
-    borderBottomWidth: 1,
-    borderBottomColor: '#309797',
   },
   searchResult: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
+    marginBottom: 10,
   },
   image: {
     width: 100,

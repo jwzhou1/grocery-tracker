@@ -1,33 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { searchProductsByName } from '../firebase/firebaseHelper';
 
 const SearchScreen = () => {
   const navigation = useNavigation();
+  const [searchText, setSearchText] = useState('');
 
-  const handleBack = () => {
-    navigation.goBack();
+  const handleSearch = async () => {
+    try {
+      if (searchText.trim() !== '') { // Check if searchText is not empty
+        const searchResults = await searchProductsByName(searchText);
+        if (searchResults.length > 0) {
+          console.log('Search results:', searchResults);
+          navigation.navigate('SearchResult', { searchText }); // Pass searchText as parameter
+        } else {
+          console.log('No products found for:', searchText);
+        }
+      } else {
+        console.log('Search text is empty');
+      }
+    } catch (error) {
+      console.error('Error searching products:', error);
+    }
   };
-
-  const handleItem1Press = () => {
-    navigation.navigate('SearchResult', { searchText: 'Item1' });
-  };
+  
+  
+  
 
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
         <TextInput
           style={styles.input}
-          placeholder="Search by video price..."
+          placeholder="Search by product name..."
           placeholderTextColor="#b3b3b3"
+          value={searchText}
+          onChangeText={setSearchText}
         />
-        <Ionicons name="search" size={24} color="#309797" />
+        <TouchableOpacity onPress={handleSearch}>
+          <Ionicons name="search" size={24} color="#309797" />
+        </TouchableOpacity>
       </View>
-      {/* TouchableOpacity wraps around Item1 text */}
-      <TouchableOpacity onPress={handleItem1Press}>
-        <Text style={styles.defaultSearchItem}>Item1</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -52,14 +67,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'black',
     paddingHorizontal: 10,
-  },
-  backButton: {
-    padding: 10,
-  },
-  defaultSearchItem: {
-    fontSize: 16,
-    color: '#309797',
-    marginLeft: 10,
   },
 });
 
