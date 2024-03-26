@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import PressableButton from "./PressableButton";
 
 export default function SearchBarForHome({ onSearch }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ export default function SearchBarForHome({ onSearch }) {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={handleSearch}>
+    <PressableButton customStyle={styles.container} pressedFunction={handleSearch}>
       <TextInput
         style={styles.input}
         placeholder="Search..."
@@ -23,7 +24,7 @@ export default function SearchBarForHome({ onSearch }) {
         editable={false} // Disable editing
       />
       <Ionicons name="search" size={24} color="#309797" />
-    </TouchableOpacity>
+    </PressableButton>
   );
 }
 

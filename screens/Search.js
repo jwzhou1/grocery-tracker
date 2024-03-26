@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { searchProductsByName } from "../firebase/firebaseHelper";
 
-export default function SearchScreen() {
+export default function Search() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
 

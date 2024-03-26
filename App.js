@@ -19,7 +19,7 @@ import WatchList from "./screens/WatchList";
 import Map from "./screens/Map";
 import MyContributions from "./screens/MyContributions";
 import ProductDetail from "./screens/ProductDetail";
-import BottomTabBar from "./components/BottomTabBar";
+import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 
 const Tab = createBottomTabNavigator();
@@ -43,52 +43,43 @@ const AuthStack = (
 
 // Tab Screens
 function TabNavigator() {
+  const options = {
+    headerStyle: {
+      backgroundColor: Colors.header,
+    },
+    headerTintColor: Colors.headerText,
+    headerTitleStyle: {
+      fontWeight: "bold",
+      fontSize: 20,
+    },
+    tabBarActiveTintColor: Colors.iconFocused,
+    tabBarInactiveTintColor: Colors.iconDefault,
+    tabBarLabelStyle: {
+      fontSize: 11,
+    },
+    tabBarStyle: { backgroundColor: Colors.header, borderTopWidth: 0}, // remove default gap    
+  }
+  const homeOptions = {
+    tabBarIcon: ({ focused }) => (
+      <FontAwesome5 name="home" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+    ),
+  }
+  const listOptions = {
+    tabBarIcon: ({ focused }) => (
+      <FontAwesome5 name="list" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+    ),
+  }
+  const profileOptions = {
+    tabBarIcon: ({ focused }) => (
+      <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+    ),
+  }
+
   return (
-    <Tab.Navigator tabBar={(props) => <BottomTabBar {...props} />}>
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={({ navigation }) => ({
-          headerStyle: {
-            backgroundColor: Colors.header,
-          },
-          headerTintColor: Colors.headerText,
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-        })}
-      />
-
-      <Tab.Screen
-        name="ShoppingList"
-        component={ShoppingList}
-        options={({ navigation }) => ({
-          headerStyle: {
-            backgroundColor: Colors.header,
-          },
-          headerTintColor: Colors.headerText,
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-        })}
-      />
-
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={({ navigation }) => ({
-          headerStyle: {
-            backgroundColor: Colors.header,
-          },
-          headerTintColor: Colors.headerText,
-          headerTitleStyle: {
-            fontWeight: "bold",
-            fontSize: 20,
-          },
-        })}
-      />
+    <Tab.Navigator screenOptions={options}>
+      <Tab.Screen name="Home" component={Home} options={homeOptions}/>
+      <Tab.Screen name="Shopping List" component={ShoppingList} options={listOptions}/>
+      <Tab.Screen name="Profile" component={Profile} options={profileOptions}/>
     </Tab.Navigator>
   );
 }
@@ -96,11 +87,8 @@ function TabNavigator() {
 // App Screens
 const AppStack = (
   <>
-    <Stack.Screen name="Tabs" component={TabNavigator} />
-
-    <Stack.Screen
-      name="Edit Profile"
-      component={EditProfile}
+    <Stack.Screen name="Tabs" component={TabNavigator}/>
+    <Stack.Screen name="Edit Profile" component={EditProfile}
       options={{
         headerShown: true,
       }}

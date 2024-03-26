@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import SearchBarForHome from '../components/SearchBarForHome';
 import CategoryForHome from '../components/CategoryForHome';
+import PressableButton from '../components/PressableButton';
 import * as Location from 'expo-location';
 
 export default function Home() {
@@ -66,9 +67,9 @@ export default function Home() {
         </View>
 
         {/* Map Icon */}
-        <TouchableOpacity style={styles.mapIconContainer} onPress={handleMapPress}>
+        <PressableButton customStyle={styles.mapIconContainer} pressedFunction={handleMapPress}>
           <Ionicons name="map-outline" size={24} color="#309797" />
-        </TouchableOpacity>
+        </PressableButton>
       </View>
 
       {/* Category */}
