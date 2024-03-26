@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
-import DeleteButton from '../components/DeleteButton';
 
 export default function ShoppingList() {
   // Function to handle item deletion
@@ -40,7 +38,6 @@ export default function ShoppingList() {
         </View>
 
         {/* Delete Button */}
-        <DeleteButton entryId="your_entry_id" onDeleteSuccess={handleDeleteItem} />
       </View>
     </View>
   );

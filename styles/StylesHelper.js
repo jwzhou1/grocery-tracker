@@ -44,7 +44,6 @@ export default GlobalStyles = StyleSheet.create({
 
   // entry
   entryContainer: {
-    // backgroundColor: '#7895CB',
     flexDirection: "row",
     marginBottom: 20,
     alignItems: "center",

@@ -1,10 +1,8 @@
-import * as React from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity} from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from '../styles/Colors';
 import GlobalStyles from '../styles/StylesHelper';
-import PressableButton from './PressableButton';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function BottomTabBar({ state, descriptors, navigation }) {
   return (

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import LineChartManager from '../components/LineChartManager';
 
 const ProductDetail = ({ route }) => {
   // Extracting product information from the route
@@ -38,7 +36,6 @@ const ProductDetail = ({ route }) => {
 
         {/* Line Chart */}
         <View style={styles.lineChartContainer}>
-          <LineChartManager selectedDuration="1 Month" /> 
         </View>
         
         {/* Add to List Button */}

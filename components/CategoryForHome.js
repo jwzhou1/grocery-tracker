@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { collection, query, where, onSnapshot, sum } from 'firebase/firestore';
 import { database, auth } from "../firebase/firebaseSetup";
 import Colors from '../styles/Colors';
-import * as Animatable from 'react-native-animatable';
 import { Dimensions } from 'react-native';
 
 const windowHeight = Dimensions.get('window').height;
@@ -26,10 +25,7 @@ const CategoryForHome = ({ selectedMonth }) => {
   const secondRowCategories = categories.slice(4);
 
   return (
-    <Animatable.View
-      style={styles.container}
-      animation="flipInX"
-    >
+    <View style={styles.container}>
       <View style={styles.rowContainer}>
         {firstRowCategories.map((category, index) => (
           <View key={index} style={styles.categoryContainer}>
@@ -46,7 +42,7 @@ const CategoryForHome = ({ selectedMonth }) => {
           </View>
         ))}
       </View>
-    </Animatable.View>
+    </View>
   );
 };
 

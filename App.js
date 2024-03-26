@@ -5,9 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { auth } from "./firebase/firebaseSetup";
 import { onAuthStateChanged } from "firebase/auth";
-import { Text, TouchableOpacity, Alert } from "react-native";
 
-import WelcomePage from "./screens/WelcomePage";
 import Signup from "./screens/Signup";
 import Login from "./screens/Login";
 import Search from "./screens/Search";
@@ -23,9 +21,6 @@ import MyContributions from "./screens/MyContributions";
 import ProductDetail from "./screens/ProductDetail";
 import BottomTabBar from "./components/BottomTabBar";
 import Colors from "./styles/Colors";
-import PressableButton from "./components/PressableButton";
-import { Ionicons } from "@expo/vector-icons";
-import ChangePassword from "./screens/ChangePassword";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -33,11 +28,6 @@ const Stack = createNativeStackNavigator();
 // Auth Screens
 const AuthStack = (
   <>
-    <Stack.Screen
-      name="Welcome"
-      component={WelcomePage}
-      options={{ title: "Welcome" }}
-    />
     <Stack.Screen
       name="Signup"
       component={Signup}
@@ -89,26 +79,6 @@ function TabNavigator() {
         name="Profile"
         component={Profile}
         options={({ navigation }) => ({
-          headerRight: () => (
-            <PressableButton
-              pressedFunction={() => auth.signOut()}
-              pressedStyle={{
-                backgroundColor: Colors.header,
-                marginRight: 10,
-                opacity: 0.5,
-              }}
-              defaultStyle={{
-                backgroundColor: Colors.header,
-                marginRight: 10,
-              }}
-            >
-              <Text
-                style={{ color: "white", fontSize: 16, fontWeight: "bold" }}
-              >
-                Log Out
-              </Text>
-            </PressableButton>
-          ),
           headerStyle: {
             backgroundColor: Colors.header,
           },
@@ -135,7 +105,6 @@ const AppStack = (
         headerShown: true,
       }}
     />
-
     <Stack.Screen
       name="Search"
       component={Search}
@@ -143,7 +112,6 @@ const AppStack = (
         headerShown: true,
       }}
     />
-
     <Stack.Screen
       name="SearchResult"
       component={SearchResult}
@@ -151,7 +119,6 @@ const AppStack = (
         headerShown: true,
       }}
     />
-
     <Stack.Screen
       name="ProductDetail"
       component={ProductDetail}
@@ -159,18 +126,9 @@ const AppStack = (
         headerShown: true
       }}
     />
-
     <Stack.Screen
       name="Feedback"
       component={Feedback}
-      options={{
-        headerShown: true,
-      }}
-    />
-
-    <Stack.Screen
-      name="Change Password"
-      component={ChangePassword}
       options={{
         headerShown: true,
       }}
@@ -182,7 +140,6 @@ const AppStack = (
         headerShown: true,
       }}
     />
-
     <Stack.Screen
       name="Map"
       component={Map}
@@ -190,7 +147,6 @@ const AppStack = (
         headerShown: true,
       }}
     />
-
     <Stack.Screen
       name="My Contributions"
       component={MyContributions}

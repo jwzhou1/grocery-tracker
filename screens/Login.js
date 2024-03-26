@@ -34,7 +34,7 @@ export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.text_header}>Let's get started!</Text>
+        <Text style={styles.text_header}>Log in</Text>
       </View>
       <View style={styles.footerContainer}>
         <View style={styles.footer}>
@@ -59,21 +59,17 @@ export default function Login({ navigation }) {
           />
 
           <PressableButton
+            customStyle={styles.buttonDefault}
             pressedFunction={loginHandler}
-            pressedStyle={styles.buttonLoginPressed}
-            defaultStyle={styles.buttonLoginDefault}
           >
-            <Text style={styles.buttonLoginText}>
-              Already Registered? Login
-            </Text>
+            <Text style={styles.buttonText}>Continue</Text>
           </PressableButton>
 
           <PressableButton
-            pressedFunction={() => navigation.navigate("Signup")}
-            pressedStyle={styles.buttonSignupPressed}
-            defaultStyle={styles.buttonSignupDefault}
+            customStyle={styles.buttonDefault}
+            pressedFunction={() => navigation.replace("Signup")}
           >
-            <Text style={styles.buttonSignupText}>Register</Text>
+            <Text style={styles.buttonText}>Not registered yet?</Text>
           </PressableButton>
         </View>
       </View>
@@ -88,10 +84,11 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
+    width: "80%",
     justifyContent: "flex-end",
-    paddingHorizontal: 20,
-    paddingBottom: 50,
-    alignItems: "center",
+    alignSelf: "center",
+    padding: 5,
+    alignItems: "flex-start",
   },
   footerContainer: {
     flex: 3,
@@ -107,7 +104,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text_header: {
-    marginLeft: "5%",
     color: "#000",
     fontWeight: "bold",
     fontSize: 30,
@@ -130,7 +126,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 20,
   },
-  buttonLoginDefault: {
+  buttonDefault: {
     backgroundColor: "#F2FFE9",
     width: "80%",
     padding: 10,
@@ -140,46 +136,9 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 1,
   },
-  buttonLoginPressed: {
-    backgroundColor: "#000",
-    width: "80%",
-    padding: 10,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 30,
-    borderColor: "#000",
-    borderWidth: 1,
-    opacity: 0.5,
-  },
-  buttonSignupDefault: {
-    backgroundColor: "#F2FFE9",
-    borderWidth: 1,
-    borderColor: "#000",
-    width: "80%",
-    padding: 10,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 30,
-  },
-  buttonSignupPressed: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
-    width: "80%",
-    padding: 10,
-    alignItems: "center",
-    borderRadius: 5,
-    marginTop: 30,
-    opacity: 0.5,
-  },
-  buttonLoginText: {
+  buttonText: {
     color: "#000",
     fontWeight: "bold",
     fontSize: 20,
-  },
-  buttonSignupText: {
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  }
 });

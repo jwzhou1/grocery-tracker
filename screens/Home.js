@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import SearchBarForHome from '../components/SearchBarForHome';
 import CategoryForHome from '../components/CategoryForHome';
-import LinearGradientComp from '../components/LinearGradient';
 import * as Location from 'expo-location';
 
 export default function Home() {
@@ -47,44 +46,42 @@ export default function Home() {
   };
 
   return (
-    <LinearGradientComp>
-      <View style={styles.container}>
-        {/* Display current address */}
-        <View style={styles.addressContainer}>
-          {/* Icon for coordinates */}
-          <Ionicons name="location" size={24} color="#309797" style={styles.icon} />
+    <View style={styles.container}>
+      {/* Display current address */}
+      <View style={styles.addressContainer}>
+        {/* Icon for coordinates */}
+        <Ionicons name="location" size={24} color="#309797" style={styles.icon} />
 
-          {/* Text for current address */}
-          {currentAddress && (
-            <Text style={styles.addressText}>{currentAddress}</Text>
-          )}
-        </View>
-
-        {/* Search Bar and Map Icon */}
-        <View style={styles.searchAndMapContainer}>
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <SearchBarForHome onSearch={handleSearch} />
-          </View>
-
-          {/* Map Icon */}
-          <TouchableOpacity style={styles.mapIconContainer} onPress={handleMapPress}>
-            <Ionicons name="map-outline" size={24} color="#309797" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Category */}
-        <View style={styles.categoryContainer}>
-          <CategoryForHome selectedCategory={selectedCategory}/>
-        </View>
-
-        {/* Hot Deal Banner */}
-        <Text style={styles.hotDealText}>Hot Deal</Text>
-        <View style={styles.bannerContainer}>
-          <ImageBackground source={require('../images/hotdeal.jpg')} style={styles.bannerImage} />
-        </View>
+        {/* Text for current address */}
+        {currentAddress && (
+          <Text style={styles.addressText}>{currentAddress}</Text>
+        )}
       </View>
-    </LinearGradientComp>
+
+      {/* Search Bar and Map Icon */}
+      <View style={styles.searchAndMapContainer}>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <SearchBarForHome onSearch={handleSearch} />
+        </View>
+
+        {/* Map Icon */}
+        <TouchableOpacity style={styles.mapIconContainer} onPress={handleMapPress}>
+          <Ionicons name="map-outline" size={24} color="#309797" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Category */}
+      <View style={styles.categoryContainer}>
+        <CategoryForHome selectedCategory={selectedCategory}/>
+      </View>
+
+      {/* Hot Deal Banner */}
+      <Text style={styles.hotDealText}>Hot Deal</Text>
+      <View style={styles.bannerContainer}>
+        <ImageBackground source={require('../images/hotdeal.jpg')} style={styles.bannerImage} />
+      </View>
+    </View>
   );
 };
 

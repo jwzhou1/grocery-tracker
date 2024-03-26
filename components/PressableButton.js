@@ -1,24 +1,26 @@
-import React from "react";
-import { Pressable } from "react-native";
-import GlobalStyles from "../styles/StylesHelper";
+import { StyleSheet, Pressable } from 'react-native'
+import React from 'react'
 
-const PressableButton = ({
-  children,
-  pressedFunction,
-  pressedStyle,
-  defaultStyle,
-}) => {
+export default function PressableButton({ customStyle, pressedFunction, disabled, children }) {
   return (
-    <Pressable
+    <Pressable 
+      style={({ pressed }) => {
+        return [customStyle, pressed && styles.pressed, disabled && styles.disabled]
+      }}
       onPress={pressedFunction}
-      style={({ pressed }) => [
-        GlobalStyles.styleDefault,
-        pressed ? pressedStyle : defaultStyle,
-      ]}
+      disabled={disabled}
     >
       {children}
     </Pressable>
-  );
-};
+  )
+}
 
-export default PressableButton;
+const styles = StyleSheet.create({
+  pressed: {
+    backgroundColor: "#fff",
+    opacity: 0.5
+  },
+  disabled: {
+    backgroundColor: 'grey'
+  }
+})
