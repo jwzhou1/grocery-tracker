@@ -1,31 +1,26 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { auth, firestore } from '../firebase/firebaseSetup';
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, storage } from '../firebase/firebaseSetup';
+import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
-import { ref, uploadBytesResumable, uploadBytes } from "firebase/storage";
-import { getDownloadURL } from "firebase/storage";
-import { storage } from "../firebase/firebaseSetup";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { updateToUsersDB } from '../firebase/firebaseHelper';
 
-
-const EditProfile = ({navigation}) => {
+const EditProfile = ({ navigation }) => {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [newUsername, setNewUsername] = useState('');
+  const [imageUri, setImageUri] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
-  const initialImageUri=null;
-  const [imageUri, setImageUri] = useState(initialImageUri);
-  const [avatarUri, setavatarUri] = useState(null);
 
+  
   useEffect(() => {
-    // Fetch the current user's information when the component mounts
     const fetchUserData = async () => {
       try {
         setEmail(user.email);
         setUsername(user.displayName);
         setAvatarUrl(user.photoURL);
-
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -36,26 +31,10 @@ const EditProfile = ({navigation}) => {
 
   const handleSave = async () => {
     try {
-      // Update the username (displayName) in the Firebase Authentication
       await updateProfile(user, {
         displayName: newUsername,
+        photoURL: avatarUrl, // Set the avatar URL if it exists
       });
-
-      // Update the local state
-      setUsername(newUsername);
-      // Reset the newUsername state
-      setNewUsername('');
-
-      // Handle image uploading
-      if (imageUri) {
-        const imageRef = await fetchImage(imageUri,);
-        if (imageRef) {
-          // update user's profile photo
-          await updateProfile(user, {
-            photoURL: imageRef,
-          });
-        }
-      }
 
       alert('Profile updated successfully!');
       navigation.goBack();
@@ -65,34 +44,41 @@ const EditProfile = ({navigation}) => {
     }
   };
 
-  async function fetchImage(uri) {
-    try{
-    const response = await fetch(uri);
-    const imageBlob = await response.blob();
-    const imageName = uri.substring(uri.lastIndexOf('/') + 1);
-    const imageRef = await ref(storage, `images/${imageName}`);
-    const uploadResult = await uploadBytesResumable(imageRef, imageBlob);
-    const downloadURL = await getDownloadURL(uploadResult.ref);
-    return(downloadURL);
-    }
-    catch(err) {
+  async function uploadImage(uri) {
+    try {
+      const response = await fetch(uri);
+      const imageBlob = await response.blob();
+      const imageName = uri.substring(uri.lastIndexOf('/') + 1);
+      const imageRef = ref(storage, `images/${imageName}`);
+      const uploadTask = uploadBytesResumable(imageRef, imageBlob);
+  
+      uploadTask.on('state_changed',
+        null,
+        (error) => {
+          console.error('Error uploading image:', error);
+        },
+        () => {
+          // Upload completed successfully, get the download URL
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setAvatarUrl(downloadURL); // Set the avatar URL
+            if (user) {
+              let newuser = {
+                email: user.email,
+                uid:user.uid,
+              }
+              console.log("newuser")
+              console.log(newuser)
+              updateToUsersDB(newuser, downloadURL); 
+            }
+          });
+        }
+      );
+    } catch (err) {
       console.log(err);
     }
   }
 
-  function getImageUri(uri) {
-    setImageUri(uri);
-    onImageTaken && onImageTaken(uri);
-  }
-
-
-  function cancelHandler() {
-    navigation.goBack(); 
-  }
-
-  
   return (
-
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
@@ -104,13 +90,18 @@ const EditProfile = ({navigation}) => {
           onChangeText={(text) => setNewUsername(text)}
         />
         <Text style={styles.label}>Upload New Avatar: </Text>
-        <ImageManager onImageTaken={getImageUri} initialPhotoUri={initialImageUri} />
+        <ImageManager receiveImageURI={setImageUri} />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
+        <TouchableOpacity style={styles.button} onPress={() => {
+          handleSave();
+          if (imageUri) {
+            uploadImage(imageUri);
+          }
+        }}>
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={cancelHandler}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       </View>
@@ -118,14 +109,13 @@ const EditProfile = ({navigation}) => {
   );
 };
 
-
-export default EditProfile
+export default EditProfile;
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     marginBottom: "10%",
-    alignItems:'center'
-},
+    alignItems: 'center'
+  },
   input: {
     height: 50,
     width: '80%',
@@ -160,4 +150,4 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
   }
-})
+});

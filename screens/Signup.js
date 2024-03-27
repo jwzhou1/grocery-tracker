@@ -27,9 +27,7 @@ export default function Signup({ navigation }) {
       );
       const userId = await writeToUsersDB({
         email: email,
-        shopping_list: [],
-        contribution: [],
-        watch_list:[],
+        uid: userCredential.user.uid,
       });
       console.log(userId);
     } catch (error) {
