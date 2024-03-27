@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { doc,getDocs,query,collection,where,getDoc,onSnapshot } from "firebase/firestore";
+import { doc,getDocs,query,collection,where,getDoc,onSnapshot,updateDoc,deleteField  } from "firebase/firestore";
 import { database } from "../firebase/firebaseSetup";
 import { auth,storage } from "../firebase/firebaseSetup";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, getDownloadURL,deleteObject } from "firebase/storage";
 
 const Profile = ({ navigation, route }) => {
   
@@ -20,18 +20,21 @@ const Profile = ({ navigation, route }) => {
         if (change.type === "modified") {
           const userData = change.doc.data();
           const imageUri = userData.imageUri;
-          const imageRef = ref(storage, imageUri);
-          getDownloadURL(imageRef)
-            .then(imageDownloadURL => {
-              setImageURL(imageDownloadURL);
-            })
-            .catch(error => {
-              console.error('Error fetching image URL:', error);
-            });
+          // Ensure imageUri is not null or empty before proceeding
+          if (imageUri) {
+            const imageRef = ref(storage, imageUri);
+            getDownloadURL(imageRef)
+              .then(imageDownloadURL => {
+                setImageURL(imageDownloadURL);
+              })
+              .catch(error => {
+                console.error('Error fetching image URL:', error);
+              });
+          }
         }
       });
     });
-
+  
     return () => unsubscribe();
   }, [user.uid, route.params?.updateProfile]);
   
@@ -53,11 +56,38 @@ const Profile = ({ navigation, route }) => {
 
   const handleDeleteAvatar = async () => {
     try {
-      setImageURL("");
+      if (imageURL) {
+        // Extract the image name from the URL
+        const imageNameWithQueryParams = imageURL.substring(imageURL.lastIndexOf('/') + 1);
+        const imageNameWithoutQueryParams = imageNameWithQueryParams.split('?')[0];
+        const decodedImageName = decodeURIComponent(imageNameWithoutQueryParams);
+        console.log('Deleting image:', decodedImageName);
+        // Create a reference to the image in Firebase Storage
+        const imageRef = ref(storage, decodedImageName);
+        // Delete the image from Firebase Storage
+        await deleteObject(imageRef);
+        // Update the user data to remove the imageUri field
+        const userID = auth.currentUser.uid; 
+      const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
+      const querySnapshot = await getDocs(userQuery);
+        let userId;
+        querySnapshot.forEach(doc => {
+            userId = doc.id;
+        });
+        const userRef = doc(database, 'users', userId);
+        await updateDoc(userRef, {
+          imageUri: deleteField()
+        });
+        // Reset the imageURL state to empty
+        setImageURL("");
+      } else {
+        console.warn('No image to delete.');
+      }
     } catch (error) {
       console.error('Error deleting photo:', error);
     }
   };
+  
 
   return (
     <View style={styles.container}>
