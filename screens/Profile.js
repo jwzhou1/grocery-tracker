@@ -9,17 +9,19 @@ const Profile = ({ navigation, route }) => {
   const userUid = auth.currentUser.uid;
   const [user, setUser] = useState(auth.currentUser);
   const [updatedUsername, setUpdatedUsername] = useState(null);
+  
 
-  // set updated user name every time the user updates the profile
-  useEffect(() => {
+   // set updated user name every time the user updates the profile
+   useEffect(() => {
     if (route.params?.updateProfile) {
       console.log("profile is updated");
       setUpdatedUsername(user.displayName);
-
+  
       // Set the update flag to false after handling the update
       navigation.setParams({ updateProfile: false });
     }
   }, [route.params?.updateProfile]);
+
 
   const handleEditProfilePress = () => {
     navigation.navigate("Edit Profile");
@@ -33,10 +35,36 @@ const Profile = ({ navigation, route }) => {
     navigation.navigate("My Contributions");
   };
 
+  const handleDeleteAvatar = async () => {
+    // try {
+    //   // 删除用户头像的逻辑
+    //   await auth.currentUser.updateProfile({ photoURL: null }); // 更新用户的 photoURL 为 null
+    //   setUser({ ...user, photoURL: null }); // 更新本地用户对象的 photoURL 字段为 null
+    //   // 在此处添加任何其他需要执行的逻辑，比如从存储中删除头像文件等
+    // } catch (error) {
+    //   console.error('Error deleting photo:', error);
+    // }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
-        <Text style={styles.text}>Hello</Text>
+     
+        <Text style={styles.text}>Hello, {user.displayName}</Text>
+
+
+        {auth.currentUser.photoURL ? (
+          <View style={styles.avatarContainer}>
+            <Image source={{ uri: auth.currentUser.photoURL }} style={styles.avatarImage} />
+            <TouchableOpacity onPress={handleDeleteAvatar} style={styles.deleteIcon}>
+              <AntDesign name="delete" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Image source={require('../images/default-avatar.jpg')} style={styles.avatarImage} />
+        )}
+
+
         <View style={styles.emailContainer}>
           <MaterialIcons name="email" size={24} />
           <Text style={[styles.emailText]}>
@@ -117,6 +145,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 4,
   },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
   displayNameText: {
     marginTop: "8%",
     fontSize: 22,
@@ -156,4 +190,19 @@ const styles = StyleSheet.create({
     padding: 3,
     fontWeight: "bold",
   },
+  avatarImage: {
+    width: 100, 
+    height: 100,
+    resizeMode: 'cover', 
+    borderRadius: 8, 
+  },
+  deleteIcon: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 5,
+    borderRadius: 20,
+  },
+  
 });

@@ -26,13 +26,12 @@ export default function Signup({ navigation }) {
         password
       );
       const userId = await writeToUsersDB({
-        id: userCredential.user.uid,
-        username: "",
         email: email,
-        shoppingList: [],
+        shopping_list: [],
         contribution: [],
+        watch_list:[],
       });
-      console.log("User ID:", userId);
+      console.log(userId);
     } catch (error) {
       if (error.code === "auth/invalid-email") {
         alert("Invalid email");

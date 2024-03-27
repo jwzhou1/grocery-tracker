@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { auth } from "./firebase/firebaseSetup";
 import { onAuthStateChanged } from "firebase/auth";
+import { Button } from "react-native";
 
 import Signup from "./screens/Signup";
 import Login from "./screens/Login";
@@ -69,11 +70,29 @@ function TabNavigator() {
       <FontAwesome5 name="list" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
     ),
   }
-  const profileOptions = {
+
+  const profileOptions = ({ navigation }) => ({
     tabBarIcon: ({ focused }) => (
       <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
     ),
-  }
+    headerRight: () => (
+      <Button
+        onPress={() => auth.signOut()}
+        title="Log Out"
+        color="white"
+      />
+    ),
+    headerStyle: {
+      backgroundColor: Colors.header,
+    },
+    headerTintColor: Colors.headerText,
+    headerTitleStyle: {
+      fontWeight: 'bold',
+      fontSize: 20,
+    }
+  });
+
+  
 
   return (
     <Tab.Navigator screenOptions={options}>
