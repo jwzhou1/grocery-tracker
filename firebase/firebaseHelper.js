@@ -34,7 +34,7 @@ export async function writeToUsersDB(userData) {
     try {
       const userID = auth.currentUser.uid; 
       console.log(auth.currentUser.uid);
-      const updatedUserData = { ...userData, photoURL: photoURL }; 
+      const updatedUserData = { ...userData, imageUri: photoURL }; 
       console.log(updatedUserData);
       const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
       const querySnapshot = await getDocs(userQuery);
@@ -44,8 +44,8 @@ export async function writeToUsersDB(userData) {
       });
       const userRef = doc(database, 'users', userId);
       await setDoc(userRef, updatedUserData); 
-      console.log('Suceessfully updated user photoURL in Firestore!');
+      console.log('Suceessfully updated user imageUri in Firestore!');
     } catch (error) {
-      console.error('photoURL upload Error:', error);
+      console.error('imageUri upload Error:', error);
     }
 };

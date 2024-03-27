@@ -11,7 +11,7 @@ const EditProfile = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [newUsername, setNewUsername] = useState('');
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
 
   
@@ -20,7 +20,7 @@ const EditProfile = ({ navigation }) => {
       try {
         setEmail(user.email);
         setUsername(user.displayName);
-        setAvatarUrl(user.photoURL);
+        setAvatarUrl(user.imageUri);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -31,14 +31,18 @@ const EditProfile = ({ navigation }) => {
 
   const handleSave = async () => {
     try {
-      await updateProfile(user, {
-        displayName: newUsername,
-        photoURL: avatarUrl, // Set the avatar URL if it exists
-      });
-
+      if (imageUri) {
+        const imageRef = await uploadImage(imageUri);
+        if (imageRef) {
+          // update user's profile photo
+          await updateProfile(user, {
+            imageUri: imageRef,
+          });
+        }
+      }
       alert('Profile updated successfully!');
       navigation.goBack();
-      navigation.navigate('Profile', { updateProfile: true });
+      navigation.navigate('Profile', { updateProfile: true }); 
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -68,7 +72,7 @@ const EditProfile = ({ navigation }) => {
                 email: user.email,
                 uid: user.uid,
               }
-              console.log(uploadTask.snapshot.metadata.fullPath);
+              console.log(uploadTask.snapshot.metadata.fullPath)
               updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); // Update user data in Firestore
             }
           });
@@ -79,6 +83,9 @@ const EditProfile = ({ navigation }) => {
     }
   }
   
+  function receiveImageURI(takenImageUri) {
+    setImageUri(takenImageUri);
+  }
 
   return (
     <View>
@@ -92,7 +99,7 @@ const EditProfile = ({ navigation }) => {
           onChangeText={(text) => setNewUsername(text)}
         />
         <Text style={styles.label}>Upload New Avatar: </Text>
-        <ImageManager receiveImageURI={setImageUri} />
+        <ImageManager receiveImageURI={receiveImageURI} />
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { doc,getDocs,query,collection,where,getDoc,onSnapshot } from "firebase/firestore";
+import { database } from "../firebase/firebaseSetup";
 import { auth,storage } from "../firebase/firebaseSetup";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -8,34 +10,44 @@ import { ref, getDownloadURL } from "firebase/storage";
 
 const Profile = ({ navigation, route }) => {
   
-  const userUid = auth.currentUser.uid;
-  const [user, setUser] = useState(auth.currentUser);
+  const user = auth.currentUser;
   const [updatedUsername, setUpdatedUsername] = useState(null);
   const [imageURL, setImageURL] = useState("");
 
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     try {
-  //       setImageURL(user.photoURL);
-  //     } catch (error) {
-  //       console.error('Error fetching user data:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    async function getImageURL() {
+      if (auth.currentUser) {
+        const userUid = auth.currentUser.uid;
+        try {
+          const userQuery = query(collection(database, 'users'), where('uid', '==', userUid));
+          const querySnapshot = await getDocs(userQuery);
 
-  //   fetchUserData();
-  // }, []);
-
-
-   // set updated user name every time the user updates the profile
-   useEffect(() => {
-    if (route.params?.updateProfile) {
-      console.log("profile is updated");
-      setUpdatedUsername(user.displayName);
-  
-      // Set the update flag to false after handling the update
-      navigation.setParams({ updateProfile: false });
+          let userId;
+          querySnapshot.forEach(doc => {
+            userId = doc.id;
+          });
+          const userRef = doc(database, 'users', userId);
+          const userDocSnapshot = await getDoc(userRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            const imageUri = userData.imageUri;
+            const imageRef = ref(storage, imageUri);
+            const imageDownloadURL = await getDownloadURL(imageRef);
+            setImageURL(imageDownloadURL);
+          } else {
+            console.log("user document does not exist.");
+          }
+        } catch (error) {
+          console.error('Error fetching image URL:', error);
+        }
+      }
     }
-  }, [route.params?.updateProfile]);
+
+    getImageURL();
+  }, []);
+  
+
+
 
 
   const handleEditProfilePress = () => {
@@ -51,14 +63,11 @@ const Profile = ({ navigation, route }) => {
   };
 
   const handleDeleteAvatar = async () => {
-    // try {
-    //   // 删除用户头像的逻辑
-    //   await auth.currentUser.updateProfile({ photoURL: null }); // 更新用户的 photoURL 为 null
-    //   setUser({ ...user, photoURL: null }); // 更新本地用户对象的 photoURL 字段为 null
-    //   // 在此处添加任何其他需要执行的逻辑，比如从存储中删除头像文件等
-    // } catch (error) {
-    //   console.error('Error deleting photo:', error);
-    // }
+    try {
+      setImageURL("");
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+    }
   };
 
   return (
@@ -68,18 +77,22 @@ const Profile = ({ navigation, route }) => {
         <Text style={styles.text}>Hello, {user.displayName}</Text>
 
 
-        {user.photoURL ? (
-          <Image
-            style={styles.image}
-            source={{ uri: user.photoURL}}
-          />
-        ) : (
-          <Image
-            style={styles.image}
-            source={require('../images/default-avatar.jpg')}
-          />
-        )}
-
+        {imageURL && (
+  <View>
+    <Image
+      style={styles.avatarImage}
+      source={{
+        uri: imageURL,
+      }}
+    />
+    <TouchableOpacity
+      style={styles.deleteIcon}
+      onPress={handleDeleteAvatar}
+    >
+      <MaterialIcons name="delete" size={24} color="red" />
+    </TouchableOpacity>
+  </View>
+)}
 
         <View style={styles.emailContainer}>
           <MaterialIcons name="email" size={24} />
