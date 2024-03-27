@@ -15,36 +15,25 @@ const Profile = ({ navigation, route }) => {
   const [imageURL, setImageURL] = useState("");
 
   useEffect(() => {
-    async function getImageURL() {
-      if (auth.currentUser) {
-        const userUid = auth.currentUser.uid;
-        try {
-          const userQuery = query(collection(database, 'users'), where('uid', '==', userUid));
-          const querySnapshot = await getDocs(userQuery);
-
-          let userId;
-          querySnapshot.forEach(doc => {
-            userId = doc.id;
-          });
-          const userRef = doc(database, 'users', userId);
-          const userDocSnapshot = await getDoc(userRef);
-          if (userDocSnapshot.exists()) {
-            const userData = userDocSnapshot.data();
-            const imageUri = userData.imageUri;
-            const imageRef = ref(storage, imageUri);
-            const imageDownloadURL = await getDownloadURL(imageRef);
-            setImageURL(imageDownloadURL);
-          } else {
-            console.log("user document does not exist.");
-          }
-        } catch (error) {
-          console.error('Error fetching image URL:', error);
+    const unsubscribe = onSnapshot(query(collection(database, 'users'), where('uid', '==', user.uid)), snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === "modified") {
+          const userData = change.doc.data();
+          const imageUri = userData.imageUri;
+          const imageRef = ref(storage, imageUri);
+          getDownloadURL(imageRef)
+            .then(imageDownloadURL => {
+              setImageURL(imageDownloadURL);
+            })
+            .catch(error => {
+              console.error('Error fetching image URL:', error);
+            });
         }
-      }
-    }
+      });
+    });
 
-    getImageURL();
-  }, []);
+    return () => unsubscribe();
+  }, [user.uid, route.params?.updateProfile]);
   
 
 
