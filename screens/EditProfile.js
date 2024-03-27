@@ -52,23 +52,24 @@ const EditProfile = ({ navigation }) => {
       const imageRef = ref(storage, `images/${imageName}`);
       const uploadTask = uploadBytesResumable(imageRef, imageBlob);
   
-      uploadTask.on('state_changed',
+      uploadTask.on(
+        'state_changed',
         null,
         (error) => {
           console.error('Error uploading image:', error);
         },
         () => {
-          // Upload completed successfully, get the download URL
+          // Upload completed successfully, get the metadata
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setAvatarUrl(downloadURL); // Set the avatar URL
+            // Set the avatar URL to the full path of the uploaded image
+            setAvatarUrl(uploadTask.snapshot.metadata.fullPath);
             if (user) {
               let newuser = {
                 email: user.email,
-                uid:user.uid,
+                uid: user.uid,
               }
-              console.log("newuser")
-              console.log(newuser)
-              updateToUsersDB(newuser, downloadURL); 
+              console.log(uploadTask.snapshot.metadata.fullPath);
+              updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); // Update user data in Firestore
             }
           });
         }
@@ -77,6 +78,7 @@ const EditProfile = ({ navigation }) => {
       console.log(err);
     }
   }
+  
 
   return (
     <View>

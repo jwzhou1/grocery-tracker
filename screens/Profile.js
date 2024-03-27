@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { auth } from "../firebase/firebaseSetup";
+import { auth,storage } from "../firebase/firebaseSetup";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { ref, getDownloadURL } from "firebase/storage";
 
 const Profile = ({ navigation, route }) => {
+  
   const userUid = auth.currentUser.uid;
   const [user, setUser] = useState(auth.currentUser);
   const [updatedUsername, setUpdatedUsername] = useState(null);
-  
+  const [imageURL, setImageURL] = useState("");
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     try {
+  //       setImageURL(user.photoURL);
+  //     } catch (error) {
+  //       console.error('Error fetching user data:', error);
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, []);
+
 
    // set updated user name every time the user updates the profile
    useEffect(() => {
@@ -53,15 +68,16 @@ const Profile = ({ navigation, route }) => {
         <Text style={styles.text}>Hello, {user.displayName}</Text>
 
 
-        {auth.currentUser.photoURL ? (
-          <View style={styles.avatarContainer}>
-            <Image source={{ uri: auth.currentUser.photoURL }} style={styles.avatarImage} />
-            <TouchableOpacity onPress={handleDeleteAvatar} style={styles.deleteIcon}>
-              <AntDesign name="delete" size={24} color="red" />
-            </TouchableOpacity>
-          </View>
+        {user.photoURL ? (
+          <Image
+            style={styles.image}
+            source={{ uri: user.photoURL}}
+          />
         ) : (
-          <Image source={require('../images/default-avatar.jpg')} style={styles.avatarImage} />
+          <Image
+            style={styles.image}
+            source={require('../images/default-avatar.jpg')}
+          />
         )}
 
 
