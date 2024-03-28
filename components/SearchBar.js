@@ -4,11 +4,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../styles/Colors";
 
-export default function SearchBar() {
+export default function SearchBar({ handleSearch }) {
   const navigation = useNavigation();
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchText, setSearchText] = useState("");
 
-  const handleSearch = () => {
+  const handleSearchTap = () => {
     navigation.navigate("Search");
   };
 
@@ -17,12 +17,15 @@ export default function SearchBar() {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Search..."
+        autoFocus={true}
+        placeholder="Search products"
         placeholderTextColor="#b3b3b3"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        onPressIn={handleSearch}
-        //editable={false} // Disable editing
+        value={searchText}
+        onChangeText={setSearchText}
+        onFocus={handleSearchTap}
+        onSubmitEditing={() => handleSearch(searchText)} // avoid direct function call
+        enablesReturnKeyAutomatically={true} // ios
+        clearButtonMode={'while-editing'} // ios
       />
       <Ionicons name="search" size={24} color={Colors.header} />
     </View>
@@ -35,20 +38,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    padding: 10,
     borderWidth: 1.5,
     borderColor: "#309797",
     borderRadius: 4,
     backgroundColor: "#FFFBF5",
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 15,
-    paddingVertical: 10,
+    marginVertical: 10,
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: "black",
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
   },
 });

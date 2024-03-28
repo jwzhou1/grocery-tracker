@@ -64,8 +64,6 @@ export default function SearchHeader() {
 
 const styles = StyleSheet.create({
   container: {
-    //flex: 1,
-    //justifyContent: 'space-around',
     alignItems: 'center',
   },
   addressContainer: {
@@ -80,12 +78,13 @@ const styles = StyleSheet.create({
   },
   searchAndMapContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    margin: 5
+    marginVertical: 5
   },
   searchBar: {
+    marginLeft: 10,
     flex: 1,
   },
   mapIcon: {

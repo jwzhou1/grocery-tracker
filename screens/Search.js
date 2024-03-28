@@ -1,45 +1,39 @@
 import React, { useState } from "react";
 import { View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { searchProductsByName } from "../firebase/firebaseHelper";
+import SearchBar from "../components/SearchBar";
+import { searchFromDB } from "../firebase/firebaseHelper";
 
 export default function Search() {
-  const navigation = useNavigation();
-  const [searchText, setSearchText] = useState("");
-
-  const handleSearch = async () => {
-    try {
-      if (searchText.trim() !== "") {
-        // Check if searchText is not empty
-        const searchResults = await searchProductsByName(searchText);
-        if (searchResults.length > 0) {
-          console.log("Search results:", searchResults);
-          navigation.navigate("SearchResult", { searchText }); // Pass searchText as parameter
-        } else {
-          console.log("No products found for:", searchText);
-        }
-      } else {
-        console.log("Search text is empty");
-      }
-    } catch (error) {
-      console.error("Error searching products:", error);
-    }
+  const handleSearch = async (searchText) => {
+    console.log(searchText)
+    const querySnapshot = await searchFromDB(searchText)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data())
+      //console.log(doc.id, " => ", doc.data());
+    });
+  //   try {
+  //     if (searchText.trim() !== "") {
+  //       // Check if searchText is not empty
+  //       const searchResults = await searchProductsByName(searchText);
+  //       if (searchResults.length > 0) {
+  //         console.log("Search results:", searchResults);
+  //         navigation.navigate("SearchResult", { searchText }); // Pass searchText as parameter
+  //       } else {
+  //         console.log("No products found for:", searchText);
+  //       }
+  //     } else {
+  //       console.log("Search text is empty");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error searching products:", error);
+  //   }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
-        <TextInput
-          style={styles.input}
-          placeholder="Search by product name..."
-          placeholderTextColor="#b3b3b3"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        <TouchableOpacity onPress={handleSearch}>
-          <Ionicons name="search" size={24} color="#309797" />
-        </TouchableOpacity>
+        <SearchBar handleSearch={handleSearch}/>
       </View>
     </View>
   );
@@ -49,16 +43,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
+    alignItems: "center",
     paddingTop: 10,
   },
   searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#309797",
-    backgroundColor: "#FFFBF5",
-    marginBottom: 10,
+    width: '90%',
   },
   input: {
     flex: 1,
