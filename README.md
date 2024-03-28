@@ -58,12 +58,11 @@ This is a top-level collection. Each document in the Prices collection represent
 
 The Auth Stack comprises two primary screens: the Sign Up Screen and the Log In Screen. Upon launching the app for the first time, users encounter the Sign Up Screen, presenting options for signing up or logging in. Both screens feature intuitive navigation buttons facilitating seamless transition between them.
 
-<div style="align-items: center;">
-    <img src="images/screen_images/invalid-email.jpg" alt="Invalid Email" height="200" width="auto">
-    <img src="images/screen_images/weak-password.jpg" alt="Weak Password" height="200" width="auto">
-    <img src="images/screen_images/mismatch-password.jpg" alt="Mismatch Password" height="200" width="auto">
+<div style="display: flex; justify-content: space-around;">
+    <img src="images/screen_images/invalid-email.PNG" alt="Invalid Email" height="150" style="margin-right: 10px;">
+    <img src="images/screen_images/weak-password.PNG" alt="Weak Password" height="150" style="margin-right: 10px;">
+    <img src="images/screen_images/mismatch-password.PNG" alt="Mismatch Password" height="150;">
 </div>
-
 
 The Log In Screen and Sign Up Screen are integrated with Firebase's Admin Authentication API Errors to handle common authentication issues. These screens are designed to display alerts for main errors such as invalid email format, weak password, password mismatch, and other relevant authentication errors as per Firebase's API guidelines.
 
