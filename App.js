@@ -1,6 +1,5 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -13,7 +12,6 @@ import Search from "./screens/Search";
 import Home from "./screens/Home";
 import ShoppingList from "./screens/ShoppingList";
 import Profile from "./screens/Profile";
-import SearchResult from "./screens/SearchResult";
 import Feedback from "./screens/Feedback";
 import EditProfile from "./screens/EditProfile";
 import WatchList from "./screens/WatchList";
@@ -119,13 +117,6 @@ const AppStack = (
     <Stack.Screen
       name="Search"
       component={Search}
-      options={{
-        headerShown: true,
-      }}
-    />
-    <Stack.Screen
-      name="SearchResult"
-      component={SearchResult}
       options={{
         headerShown: true,
       }}

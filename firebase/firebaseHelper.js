@@ -11,7 +11,15 @@ export async function searchFromDB(keyword) {
   // perform a query of full-text match (use Typesense for more usable search functionality)
   const q = query(productsRef, where("name", "==", keyword));
   const querySnapshot = await getDocs(q);
-  return querySnapshot;
+  const productData = []
+  querySnapshot.forEach((doc) => {
+    productData.push({
+      id: doc.id,
+      data: doc.data()
+    });
+  })
+  //console.log(productData)
+  return productData;
 }
 
 export async function writeToDB(data) {

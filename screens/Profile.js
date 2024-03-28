@@ -40,7 +40,7 @@ const Profile = ({ navigation, route }) => {
 
   useEffect(() => {
     async function getImageURL() {
-      console.log("auth.currentUser", auth.currentUser);
+      //console.log("auth.currentUser", auth.currentUser);
       if (auth.currentUser) {
         const userUid = auth.currentUser.uid; 
         try {

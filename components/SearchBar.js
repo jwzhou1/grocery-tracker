@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../styles/Colors";
 
-export default function SearchBar({ handleSearch }) {
+export default function SearchBar({ handleSearch, setSubmitted }) {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
 
@@ -22,6 +22,7 @@ export default function SearchBar({ handleSearch }) {
         placeholderTextColor="#b3b3b3"
         value={searchText}
         onChangeText={setSearchText}
+        onChange={() => setSubmitted(false)}
         onFocus={handleSearchTap}
         onSubmitEditing={() => handleSearch(searchText)} // avoid direct function call
         enablesReturnKeyAutomatically={true} // ios
