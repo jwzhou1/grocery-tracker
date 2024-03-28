@@ -37,10 +37,44 @@ const Profile = ({ navigation, route }) => {
   
     return () => unsubscribe();
   }, [user.uid, route.params?.updateProfile]);
+
+  useEffect(() => {
+    async function getImageURL() {
+      console.log("auth.currentUser", auth.currentUser);
+      if (auth.currentUser) {
+        const userUid = auth.currentUser.uid; 
+        try {
+          const userQuery = query(collection(database, 'users'), where('uid', '==', userUid));
+          const querySnapshot = await getDocs(userQuery);
+          
+          let userId;
+          querySnapshot.forEach(doc => {
+            userId = doc.id; 
+          });
+          const userRef = doc(database, 'users', userId);
+          const userDocSnapshot = await getDoc(userRef);
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            const imageUri = userData.imageUri;
+            if (imageUri) {
+              const imageRef = ref(storage,  imageUri);
+              const imageDownloadURL = await getDownloadURL(imageRef);
+              console.log("imageDownloadURL", imageDownloadURL);
+              setImageURL(imageDownloadURL);
+            } else {
+              console.log("imageUri is empty.");
+            }
+          } else {
+            console.log("user document does not exist.");
+          }
+        } catch (error) {
+          console.error('Error fetching image URL:', error);
+        }
+      }
+    }
+    getImageURL();
+  }, []);
   
-
-
-
 
   const handleEditProfilePress = () => {
     navigation.navigate("Edit Profile");
@@ -96,7 +130,7 @@ const Profile = ({ navigation, route }) => {
         <Text style={styles.text}>Hello, {user.displayName}</Text>
 
 
-        {imageURL && (
+        {imageURL ? (
   <View>
     <Image
       style={styles.avatarImage}
@@ -110,6 +144,13 @@ const Profile = ({ navigation, route }) => {
     >
       <MaterialIcons name="delete" size={24} color="red" />
     </TouchableOpacity>
+  </View>
+) : (
+  <View>
+    <Image
+      style={styles.avatarImage}
+      source={require('../images/default-avatar.jpg')}
+    />
   </View>
 )}
 
