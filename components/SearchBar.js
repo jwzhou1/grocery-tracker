@@ -2,29 +2,31 @@ import React, { useState } from "react";
 import { View, StyleSheet, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import PressableButton from "./PressableButton";
+import Colors from "../styles/Colors";
 
-export default function SearchBarForHome({ onSearch }) {
-  const [searchTerm, setSearchTerm] = useState("");
+export default function SearchBar() {
   const navigation = useNavigation();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearch = () => {
-    onSearch(searchTerm);
     navigation.navigate("Search");
   };
 
   return (
-    <PressableButton customStyle={styles.container} pressedFunction={handleSearch}>
+    // <PressableButton customStyle={styles.container} pressedFunction={handleSearch}>
+    <View style={styles.container}>
       <TextInput
         style={styles.input}
         placeholder="Search..."
         placeholderTextColor="#b3b3b3"
         value={searchTerm}
         onChangeText={setSearchTerm}
-        editable={false} // Disable editing
+        onPressIn={handleSearch}
+        //editable={false} // Disable editing
       />
-      <Ionicons name="search" size={24} color="#309797" />
-    </PressableButton>
+      <Ionicons name="search" size={24} color={Colors.header} />
+    </View>
+    // </PressableButton>
   );
 }
 

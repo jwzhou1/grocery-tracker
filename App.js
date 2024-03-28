@@ -1,11 +1,11 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { Text } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { auth } from "./firebase/firebaseSetup";
 import { onAuthStateChanged } from "firebase/auth";
-import { Button } from "react-native";
 
 import Signup from "./screens/Signup";
 import Login from "./screens/Login";
@@ -20,6 +20,8 @@ import WatchList from "./screens/WatchList";
 import Map from "./screens/Map";
 import MyContributions from "./screens/MyContributions";
 import ProductDetail from "./screens/ProductDetail";
+import SearchHeader from "./components/SearchHeader";
+import PressableButton from "./components/PressableButton";
 import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 
@@ -61,6 +63,9 @@ function TabNavigator() {
     tabBarStyle: { backgroundColor: Colors.header, borderTopWidth: 0}, // remove default gap    
   }
   const homeOptions = {
+    header: () => (
+      <SearchHeader />
+    ),
     tabBarIcon: ({ focused }) => (
       <FontAwesome5 name="home" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
     ),
@@ -76,11 +81,12 @@ function TabNavigator() {
       <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
     ),
     headerRight: () => (
-      <Button
-        onPress={() => auth.signOut()}
-        title="Log Out"
-        color="white"
-      />
+      <PressableButton
+        customStyle={{margin: 5}}
+        pressedFunction={() => auth.signOut()}
+      >
+        <FontAwesome5 name="sign-out-alt" size={24} color={Colors.iconDefault}/>
+      </PressableButton>
     ),
     headerStyle: {
       backgroundColor: Colors.header,
@@ -91,8 +97,6 @@ function TabNavigator() {
       fontSize: 20,
     }
   });
-
-  
 
   return (
     <Tab.Navigator screenOptions={options}>

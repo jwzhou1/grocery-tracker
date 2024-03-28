@@ -69,7 +69,7 @@ async function createProductToDB(data) {
   }
 }
 
-async function updatePricesArray(productId, date, price, storeName, restrictions) {
+async function updatePricesArray(productId, price, storeName, restrictions, date) {
   const productRef = db.collection('products').doc(productId);
 
   // Check if the document exists before updating it

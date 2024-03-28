@@ -7,7 +7,7 @@ import { Dimensions } from 'react-native';
 
 const windowHeight = Dimensions.get('window').height;
 
-const CategoryForHome = ({ selectedMonth }) => {
+export default function CategoryCard() {
   // Define your categories here
   const categories = [
     { name: 'Category 1' },
@@ -46,15 +46,13 @@ const CategoryForHome = ({ selectedMonth }) => {
   );
 };
 
-export default CategoryForHome;
-
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     width: '90%',
-    height: windowHeight * 0.23,
+    //height: windowHeight * 0.23,
     backgroundColor: Colors.summaryBackground,
-    borderRadius: 18,
+    borderRadius: 10,
     padding: 15,
     justifyContent: 'center',
     shadowColor: 'gray',
@@ -82,19 +80,5 @@ const styles = StyleSheet.create({
   categoryText: {
     color: 'white',
     fontWeight: 'bold',
-  },
-  budgetRemainingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
-    marginTop: 10,
-  },
-  budgetRemainingText: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: '600',
-  },
-  negativeRemaining: {
-    color: Colors.darkRed,
   },
 });
