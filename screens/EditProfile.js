@@ -31,6 +31,12 @@ const EditProfile = ({ navigation }) => {
 
   const handleSave = async () => {
     try {
+      if (newUsername !== '') {
+        await updateProfile(user, {
+          displayName: newUsername,
+        });
+      }
+
       if (imageUri) {
         const imageRef = await uploadImage(imageUri);
         if (imageRef) {
@@ -42,7 +48,10 @@ const EditProfile = ({ navigation }) => {
       }
       alert('Profile updated successfully!');
       navigation.goBack();
-      navigation.navigate('Profile', { updateProfile: true }); 
+      navigation.navigate('Profile', { 
+        updateProfile: true,
+          newUsername: newUsername || user.displayName,
+      }); 
     } catch (error) {
       console.error('Error updating profile:', error);
     }

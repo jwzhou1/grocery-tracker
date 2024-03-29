@@ -15,6 +15,13 @@ const Profile = ({ navigation, route }) => {
   const [imageURL, setImageURL] = useState("");
 
   useEffect(() => {
+    const { newUsername } = route.params || {};
+    if (newUsername) {
+      setUpdatedUsername(newUsername);
+    }
+  }, [route.params]);
+  
+  useEffect(() => {
     const unsubscribe = onSnapshot(query(collection(database, 'users'), where('uid', '==', user.uid)), snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type === "modified") {
@@ -127,7 +134,7 @@ const Profile = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
      
-        <Text style={styles.text}>Hello, {user.displayName}</Text>
+        <Text style={styles.text}>Hello, {updatedUsername || user.displayName}</Text>
 
 
         {imageURL ? (
