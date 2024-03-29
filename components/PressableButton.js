@@ -17,7 +17,7 @@ export default function PressableButton({ customStyle, pressedFunction, disabled
 
 const styles = StyleSheet.create({
   pressed: {
-    backgroundColor: "#fff",
+    //backgroundColor: "#fff",
     opacity: 0.5
   },
   disabled: {

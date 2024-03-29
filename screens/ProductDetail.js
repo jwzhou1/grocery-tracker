@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Text, Image } from 'react-native';
+import PressableButton from '../components/PressableButton';
 
-const ProductDetail = ({ route }) => {
+const ProductDetail = ({ route, navigation }) => {
   // Extracting product information from the route
-  const { name, price, store, weight } = route.params;
-  const navigation = useNavigation();
+  //console.log(route.params)
+  const { product, prices } = route.params;
+  const price = prices.at(0).data
 
   // Function to navigate to Feedback screen
   const goToFeedback = () => {
@@ -22,16 +23,16 @@ const ProductDetail = ({ route }) => {
 
       {/* Product Information */}
       <View style={styles.infoContainer}>
-        {/* Product Name and Weight */}
+        {/* Product Name and Unit */}
         <View style={styles.nameAndWeight}>
-          <Text style={styles.productName}>{name}</Text>
-          <Text style={styles.weight}>{weight}g</Text>
+          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.unitPrice}>${price.unit_price}/{product.unit}</Text>
         </View>
 
         {/* Price and Supermarket */}
         <View style={styles.priceAndSupermarket}>
-          <Text style={styles.price}>Price: ${price} at {store}</Text>
-          <Text style={styles.unitPrice}>Unit Price: ${parseFloat(price) / parseFloat(weight)} per g</Text>
+          <Text style={styles.price}>${price.price} at {price.store_name}</Text>
+          
         </View>
 
         {/* Line Chart */}
@@ -39,14 +40,14 @@ const ProductDetail = ({ route }) => {
         </View>
         
         {/* Add to List Button */}
-        <TouchableOpacity style={styles.addButton}>
+        <PressableButton customStyle={styles.addButton}>
           <Text style={styles.buttonText}>Add to List</Text>
-        </TouchableOpacity>
+        </PressableButton>
 
         {/* Feedback Link */}
-        <TouchableOpacity onPress={goToFeedback} style={styles.feedbackLink}>
+        <PressableButton pressedFunction={goToFeedback} customStyle={styles.feedbackLink}>
           <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
-        </TouchableOpacity>
+        </PressableButton>
       </View>
     </View>
   );
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
   image: {
     width: 150,
     height: 150,
+    alignSelf: 'center',
     marginBottom: 20,
   },
   infoContainer: {
@@ -68,6 +70,7 @@ const styles = StyleSheet.create({
   },
   nameAndWeight: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
   },

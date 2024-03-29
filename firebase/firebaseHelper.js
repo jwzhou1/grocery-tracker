@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { database, auth } from './firebaseSetup';
 import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebaseSetup';
@@ -18,8 +18,24 @@ export async function searchFromDB(keyword) {
       data: doc.data()
     });
   })
-  //console.log(productData)
   return productData;
+}
+
+// get all prices given a product id
+export async function getPricesFromDB(productId) {
+  const pricesRef = collection(database, "prices");
+  // order prices from newest to oldest
+  const q = query(pricesRef, where("product_id", "==", productId), orderBy("date", "desc"));
+  //const q = query(pricesRef, where("product_id", "==", productId));
+  const querySnapshot = await getDocs(q);
+  const priceData = []
+  querySnapshot.forEach((doc) => {
+    priceData.push({
+      id: doc.id,
+      data: doc.data()
+    });
+  })
+  return priceData;
 }
 
 export async function writeToDB(data) {

@@ -13,7 +13,6 @@ export default function SearchBar({ handleSearch, setSubmitted }) {
   };
 
   return (
-    // <PressableButton customStyle={styles.container} pressedFunction={handleSearch}>
     <View style={styles.container}>
       <TextInput
         style={styles.input}
@@ -30,7 +29,6 @@ export default function SearchBar({ handleSearch, setSubmitted }) {
       />
       <Ionicons name="search" size={24} color={Colors.header} />
     </View>
-    // </PressableButton>
   );
 }
 

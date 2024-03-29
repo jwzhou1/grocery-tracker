@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Text, Image, TextInput, Alert } from 'react-native';
+import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function Feedback() {
+export default function Feedback({ navigation }) {
   const [imageUri, setImageUri] = useState(null);
 
   // Function to handle image selection from camera
@@ -48,7 +49,7 @@ export default function Feedback() {
   return (
     <View style={styles.container}>
       {/* Product Image */}
-      <TouchableOpacity onPress={takePhoto} style={styles.imageContainer}>
+      <PressableButton pressedFunction={takePhoto} customStyle={styles.imageContainer}>
         <View style={styles.imageBox}>
           {imageUri ? (
             <Image style={styles.image} source={{ uri: imageUri }} />
@@ -56,7 +57,7 @@ export default function Feedback() {
             <Text style={styles.placeholderText}>Take a Photo</Text>
           )}
         </View>
-      </TouchableOpacity>
+      </PressableButton>
 
       {/* Product Information */}
       <View style={styles.infoContainer}>
@@ -80,12 +81,12 @@ export default function Feedback() {
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#ccc' }]}>
+          <PressableButton customStyle={[styles.button, { backgroundColor: '#ccc' }]} pressedFunction={() => navigation.goBack()}>
             <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#309797' }]}>
+          </PressableButton>
+          <PressableButton customStyle={[styles.button, { backgroundColor: '#309797' }]}>
             <Text style={[styles.buttonText, { color: 'white' }]}>Submit</Text>
-          </TouchableOpacity>
+          </PressableButton>
         </View>
       </View>
     </View>

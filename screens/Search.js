@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import SearchBar from "../components/SearchBar";
 import SearchResult from "../components/SearchResult";
-import LoadingScreen from "../screens/LoadingScreen"
+import LoadingScreen from "./LoadingScreen"
 import { searchFromDB } from "../firebase/firebaseHelper";
 
 export default function Search() {
@@ -20,7 +20,6 @@ export default function Search() {
       setShowResult(true)
     }
   }, [queryResult])
-  
 
   const handleSearch = async (searchText) => {
     setSearchText(searchText)
@@ -55,10 +54,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    alignItems: "center",
     paddingTop: 10,
   },
   searchBar: {
     width: '90%',
+    alignSelf: 'center'
   },
 });

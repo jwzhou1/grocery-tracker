@@ -1,15 +1,15 @@
 // run "node upload.js" to upload data to firestore
-const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
-const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 const serviceAccount = require('./grocery-tracker-40a3b-firebase-adminsdk-p4aya-95ccbf45c4.json');
 const admin = require('firebase-admin');
+const XLSX = require('xlsx');
 
 initializeApp({
   credential: cert(serviceAccount)
 });
 const db = getFirestore();
 
-const XLSX = require('xlsx');
 const workbook = XLSX.readFile('sample_data.xlsx');
 const sheetName = workbook.SheetNames[1]; // change if need
 const worksheet = workbook.Sheets[sheetName];
@@ -27,13 +27,13 @@ async function mock(data) {
   }
 }
 
-// 1.create a price document and get the id
-// 2.check if the product is already in db
-// if not create a new product document, and add that id to prices array
-// else find the document, and add that id to prices array
+// 1.check if the product is already in db
+// if not create a new product document
+// 2.get product id and store it
+// 3.create a new price document
 async function createProductToDB(data) {
   for (const row of data.slice(1)) { // Skipping header row
-    const [name, altName, brand, price, quantity, unit, unitPrice, restrictions, category, source, date, image_url] = row;
+    const [name, altName, brand, price, quantity, unit, unitPrice, restrictions, category, source, date, imageUrl] = row;
 
     // Check if name is non-empty (assuming name is a required field)
     if (!name) {
@@ -43,32 +43,40 @@ async function createProductToDB(data) {
 
     // Check if the product already exists
     const querySnapshot = await db.collection('products').where('name', '==', name).get();
-
+    let productId;
     if (querySnapshot.empty) {
       // If the product doesn't exist, create a new product document
       const productData = {
         name,
-        altName: altName || '', // Use altName if available, otherwise use an empty string
+        alt_name: altName || '',
         category: category,
-        brand: brand || '', // Use brand if available, otherwise use an empty string
-        quantity: quantity || '', // Use quantity if available, otherwise use an empty string
-        unit: unit || '', // Use unit if available, otherwise use an empty string
-        image_url: image_url || '', // Add image URL if available
-        prices: [], // Initialize prices array
+        brand: brand || '',
+        quantity: quantity || '',
+        unit: unit || '',
+        image_url: imageUrl || '',
       };
-      const productRef = await db.collection('products').add(productData);
-
-      // Add the new product's ID to prices array
-      await updatePricesArray(productRef.id, price, source, restrictions, date);
+      const productRef = db.collection('products').doc();
+      await productRef.set(productData)
+      productId = productRef.id
+      
     } else {
-      //If the product already exists, update its prices array
-      querySnapshot.forEach(async (doc) => {
-        await updatePricesArray(doc.id, price, source, restrictions, date);
+      querySnapshot.forEach(doc => {
+        productId = doc.id;
       });
     }
+    const priceData = {
+      product_id: productId,
+      date: new Date(Date.UTC(0, 0, date - 1)), // convert excel serial number to normal date
+      price: parseFloat(price),
+      unit_price: unitPrice || '',
+      store_name: source || '',
+      restrictions: restrictions || '',
+    };
+    await db.collection('prices').add(priceData);
   }
 }
 
+// LEGACY WAY TO STRUCTURE DATA
 async function updatePricesArray(productId, price, storeName, restrictions, date) {
   const productRef = db.collection('products').doc(productId);
 

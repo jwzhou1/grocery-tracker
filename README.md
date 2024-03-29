@@ -31,26 +31,41 @@ This is a top-level collection. Each document in the Users collection represents
 
 ####  2. Products Collection (Contribution: Liyao Zhang):
 This is a top-level collection. Each document in the Products collection represents a single product entry. It has these fields:
- 
--   "altName": ,
--   "brand": "",
--   "category": "",
--   "image_url": ,
--   "name": ,
--   "prices": "",
--   "user": "",
--   "quantity": "",
--   "unit": "",
 
+-   "name"
+-   "alt_name"
+-   "category"
+-   "brand"
+-   "quantity"
+-   "unit"
+-   "image_url"
+
+#### CRUD operations for Products Collection:
+1. **Create:**
+   The Products are created beforehand using a separate Node.js script (utils/upload.js)
+
+2. **Read:**
+   Users can search products by their names. Then a query will be executed and return matched products.
 
 ####  3. Prices Collection (Contribution: Liyao Zhang):
 This is a top-level collection. Each document in the Prices collection represents a single price entry. It has these fields:
 
--   "date": ,
--   "price": "",
--   "product_id": "",
--   "restrictions": "",
--   "store_name": "",
+-   "date"
+-   "price"
+-   "unit_price"
+-   "store_name"
+-   "restrictions"
+-   "product_id"
+
+#### CRUD operations for Prices Collection:
+1. **Create:**
+   The Prices are created beforehand using a separate Node.js script (utils/upload.js)
+
+2. **Read:**
+   For each searched product, another query will be executed based on the product_id. And all price history will be returned.
+
+3. **Update:**
+   Users can contribute to the price collection by adding a new price they found in store. However, this operation is not implemented yet.
 
 ### Screens
 #### Auth Stack Screens (Contribution: Jiawei Zhou):
@@ -75,11 +90,22 @@ The Log In Screen and Sign Up Screen are integrated with Firebase's Admin Authen
 On the home screen, the top of the screen displays the user's current location, requiring the user to grant permission for our app to access their current location. Following this, users can find a search bar that they can click to navigate to the search screen. Additionally, users will be able to view all grocery categories (still under implementation) and the hot deal banner (also still under implementation). At the bottom, there is a bottom tab for Home, Shopping List, and Profile.
 
 **Search Screen (Contribution: Liyao Zhang):**
-**(still under implementation)**  
 
-<img src="images/screen_images/search-screen1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/search-screen2.jpg" alt="Alt text" width="200">
+<img src="images/screen_images/search-screen1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/searchresult.png" alt="Alt text" width="200">
 
-On the search screen...
+User can search products by their names(exact full name). However, due to limitations of Firebase, there is no support for full-text search yet. If user wants to have a better search experience, we may need to incorporate third-party search services like Typesense to achieve that. There are currently around 100 products ready for search. Please refer to the second workbook of utils/sample_data.xlsx for a comprehensive list of products. 
+
+**Product Detail Screen (Contribution: Liyao Zhang):**
+
+<img src="images/screen_images/productdetail.png" alt="Alt text" width="200">
+
+After tapping on the Product preview card, it will navigate to a product detail screen where more details will be displayed like unit prices, stores, and the option to add product to the shopping list. However, the CRUD operations on user's lists(shopping list, watch list, my contributions) have not been implemented in this iteration due to time constraints. So the Add to List button is not working at the moment.
+
+**Feedback Screen (Contribution: Liyao Zhang, Jiawei Zhou):**
+
+<img src="images/screen_images/feedback.png" alt="Alt text" width="200">
+
+If users don't agree on the price, they will be navigated to Feedback screen to contribute a new record of price on that product. They need to specify store name, new price and the date they found the price. Similarly, the submit button is currently not working, as it will be implemented in the next iteration.
 
 **Profile Screen (Contribution: Jiawei Zhou):**  
 

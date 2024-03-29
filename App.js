@@ -122,10 +122,10 @@ const AppStack = (
       }}
     />
     <Stack.Screen
-      name="ProductDetail"
+      name="Product Detail"
       component={ProductDetail}
       options={{
-        headerShown: true
+        headerShown: true,
       }}
     />
     <Stack.Screen
@@ -133,6 +133,7 @@ const AppStack = (
       component={Feedback}
       options={{
         headerShown: true,
+        headerBackTitleVisible: false
       }}
     />
     <Stack.Screen
