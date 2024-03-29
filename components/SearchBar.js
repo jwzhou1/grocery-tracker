@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../styles/Colors";
 
-export default function SearchBar({ handleSearch, setSubmitted }) {
+export default function SearchBar({ handleSearch, setSubmitted, autoFocus }) {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
 
@@ -16,7 +16,7 @@ export default function SearchBar({ handleSearch, setSubmitted }) {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        autoFocus={true}
+        autoFocus={autoFocus || false}
         placeholder="Search products"
         placeholderTextColor="#b3b3b3"
         value={searchText}

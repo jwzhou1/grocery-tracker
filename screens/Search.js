@@ -22,8 +22,8 @@ export default function Search() {
   }, [queryResult])
 
   const handleSearch = async (searchText) => {
+    //console.log(searchText)
     setSearchText(searchText)
-    console.log(searchText)
     setSubmitted(true)
     setLoading(true)
 
@@ -41,7 +41,7 @@ export default function Search() {
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
-        <SearchBar handleSearch={handleSearch} setSubmitted={setSubmitted}/>
+        <SearchBar handleSearch={handleSearch} setSubmitted={setSubmitted} autoFocus={true}/>
         {submitted && !loading && !showResult && <Text>No results</Text>}
       </View>
       {submitted && loading && <LoadingScreen />}
