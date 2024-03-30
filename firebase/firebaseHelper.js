@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy,getDoc,updateDoc,arrayUnion  } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, getDocs,arrayRemove, query, where, orderBy,getDoc,updateDoc,arrayUnion  } from 'firebase/firestore';
 import { database, auth } from './firebaseSetup';
 import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebaseSetup';
@@ -171,3 +171,38 @@ export async function searchProductDetail(productId) {
     throw error;
   }
 }
+
+export async function deleteFromShoppingList(userId, productId) {
+  try {
+    const userQuery = query(collection(database, 'users'), where('uid', '==', userId));
+    const querySnapshot = await getDocs(userQuery);
+
+    if (querySnapshot.empty) {
+      console.error(`User document with ID ${userId} does not exist.`);
+      return;
+    }
+
+    // 获取用户文档的 ID
+    const userDocId = querySnapshot.docs[0].id;
+
+    // 检查用户数据中是否存在购物清单字段
+    const userData = querySnapshot.docs[0].data();
+    if (!userData.shopping_list || !Array.isArray(userData.shopping_list)) {
+      console.error(`Shopping list not found in user data.`);
+      return;
+    }
+
+    // 从购物清单中删除指定的产品
+    const updatedShoppingList = userData.shopping_list.filter(item => item !== productId);
+
+    // 更新购物清单字段
+    const userDocRef = doc(database, 'users', userDocId);
+    await updateDoc(userDocRef, { shopping_list: updatedShoppingList.length > 0 ? updatedShoppingList : null });
+
+    console.log('Product removed from shopping list successfully.');
+  } catch (error) {
+    console.error('Error deleting product from shopping list:', error);
+    throw error;
+  }
+}
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { addToShoppingList } from '../firebase/firebaseHelper';
 import { getAuth } from 'firebase/auth'; 
 
@@ -15,6 +15,7 @@ const ProductDetail = ({ route, navigation }) => {
     console.log('product id:', productId); 
     addToShoppingList(userId, productId); 
     console.log('Added to shopping list:', product.name);
+    Alert.alert('Success', 'Product successfully added to shopping list');
   };
 
   const goToFeedback = () => {

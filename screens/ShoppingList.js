@@ -1,39 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { getShoppingList,searchProductDetail, getPricesFromDB } from '../firebase/firebaseHelper'; 
+import { getShoppingList, searchProductDetail, getPricesFromDB, deleteFromShoppingList } from '../firebase/firebaseHelper';
+import LoadingScreen from './LoadingScreen';
+import { useFocusEffect } from '@react-navigation/native'; 
+import { Ionicons } from '@expo/vector-icons'; 
 
-export default function ShoppingList() {
+export default function ShoppingList({ route, navigation }) {
   const auth = getAuth();
   const [shoppingList, setShoppingList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchShoppingList() {
-      try {
-        const userId = auth.currentUser.uid;
-        const list = await getShoppingList(userId);
-        console.log("Shopping List:", list);
-        const detailedList = await Promise.all(list.map(async (productId) => {
-          const productDetail = await searchProductDetail(productId);
-          console.log("productDetail",productDetail);
-          const productName = productDetail ? productDetail.name : 'Unknown';
-          console.log("productName", productName);
-          const priceData = await getPricesFromDB(productId);
-          const productPrice = priceData.length > 0 ? priceData[0].data.price : 'Unknown'; 
-          return { productId, name: productName, price: productPrice }; 
-        }));
-        setShoppingList(detailedList);
-      } catch (error) {
-        console.error('Error fetching shopping list:', error);
+  useFocusEffect(
+    React.useCallback(() => {
+      async function fetchShoppingList() {
+        try {
+          const userId = auth.currentUser.uid;
+          const list = await getShoppingList(userId);
+          const detailedList = await Promise.all(list.map(async (productId) => {
+            const productDetail = await searchProductDetail(productId);
+            const productName = productDetail ? productDetail.name : 'Unknown';
+            const priceData = await getPricesFromDB(productId);
+            const productPrice = priceData.length > 0 ? priceData[0].data.price : 'Unknown';
+            return { productId, name: productName, price: productPrice };
+          }));
+          setShoppingList(detailedList);
+          setLoading(false); 
+        } catch (error) {
+          console.error('Error fetching shopping list:', error);
+        }
       }
+      fetchShoppingList();
+    }, [])
+  );
+
+  const handleDeleteItem = async (productId) => {
+    try {
+      const userId = auth.currentUser.uid;
+      await deleteFromShoppingList(userId, productId);
+      setShoppingList(shoppingList.filter(item => item.productId !== productId));
+      console.log('Item deleted');
+    } catch (error) {
+      console.error('Error deleting item:', error);
     }
-
-    fetchShoppingList();
-  }, []);
-
-  const handleDeleteItem = () => {
-    console.log('Item deleted');
   };
+
+  if (loading) {
+    return <LoadingScreen />; 
+  }
 
   return (
     <View style={styles.container}>
@@ -56,8 +70,8 @@ export default function ShoppingList() {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity onPress={handleDeleteItem}>
-            <Text style={{ color: 'red' }}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDeleteItem(item.productId)}>
+          <Ionicons name="trash-bin" size={24} color="red" />
           </TouchableOpacity>
         </View>
       ))}
