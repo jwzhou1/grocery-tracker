@@ -9,11 +9,11 @@ export default function CategoryCard() {
   // Define your categories here
   const categories = [
     { name: 'Produce', image: require('../images/category_images/produce.png') },
-    { name: 'Drinks' },
-    { name: 'Food' },
-    { name: 'Groceries' },
-    { name: 'Meat' },
-    { name: 'Seafood' },
+    { name: 'Drinks', image: require('../images/category_images/drink.png') },
+    { name: 'Food', image: require('../images/category_images/food.png') },
+    { name: 'Groceries', image: require('../images/category_images/grocery.webp') },
+    { name: 'Meat', image: require('../images/category_images/meat.png') },
+    { name: 'Seafood', image: require('../images/category_images/seafood.png') },
   ];
 
   // Function to handle category press
