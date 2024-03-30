@@ -18,7 +18,7 @@ export default function Home({ navigation }) {
         <View style={styles.bannerContainer}>
           <ImageBackground source={require('../images/hot_deal/save-on-foods.jpg')} style={styles.bannerImage} />
         </View>
-        {/* Three vertical posters */}
+        {/* Vertical posters */}
         <View style={styles.postersContainer}>
           <ImageBackground source={require('../images/hot_deal/walmart.jpg')} style={styles.posterImage} />
         </View>

@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
-import PressableButton from '../components/PressableButton';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { addToShoppingList } from '../firebase/firebaseHelper';
+import { getAuth } from 'firebase/auth'; 
 
 const ProductDetail = ({ route, navigation }) => {
-  // Extracting product information from the route
-  //console.log(route.params)
+  const auth = getAuth(); 
   const { product, prices } = route.params;
-  const price = prices.at(0).data
+  const price = prices.at(0).data;
+  const productId = prices.at(0).data.product_id; 
 
-  // Function to navigate to Feedback screen
+  const addToShoppingListHandler = () => {
+    const userId = auth.currentUser.uid;
+    console.log('userId:', userId);
+    console.log('product id:', productId); 
+    addToShoppingList(userId, productId); 
+    console.log('Added to shopping list:', product.name);
+  };
+
   const goToFeedback = () => {
     navigation.navigate('Feedback');
   };
@@ -32,7 +40,6 @@ const ProductDetail = ({ route, navigation }) => {
         {/* Price and Supermarket */}
         <View style={styles.priceAndSupermarket}>
           <Text style={styles.price}>${price.price} at {price.store_name}</Text>
-          
         </View>
 
         {/* Line Chart */}
@@ -40,14 +47,14 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
         
         {/* Add to List Button */}
-        <PressableButton customStyle={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={addToShoppingListHandler}>
           <Text style={styles.buttonText}>Add to List</Text>
-        </PressableButton>
+        </TouchableOpacity>
 
         {/* Feedback Link */}
-        <PressableButton pressedFunction={goToFeedback} customStyle={styles.feedbackLink}>
+        <TouchableOpacity style={styles.feedbackLink} onPress={goToFeedback}>
           <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
-        </PressableButton>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -111,7 +118,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   lineChartContainer: {
-    marginTop: 20, // Add appropriate spacing
+    marginTop: 20,
   },
 });
 

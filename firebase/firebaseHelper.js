@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy,getDoc,updateDoc,arrayUnion  } from 'firebase/firestore';
 import { database, auth } from './firebaseSetup';
 import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebaseSetup';
@@ -38,24 +38,9 @@ export async function getPricesFromDB(productId) {
   return priceData;
 }
 
-export async function searchCategoriesFromDB(category) {
-  try {
-    const productsRef = collection(database, "products");
-    const q = query(productsRef, where("category", "==", category));
-    const querySnapshot = await getDocs(q);
-    const productData = [];
-    querySnapshot.forEach((doc) => {
-      productData.push({
-        id: doc.id,
-        data: doc.data()
-      });
-    });
-    return productData;
-  } catch (error) {
-    console.error("Error fetching search results:", error);
-    throw error;
-  }
-}
+
+
+
 
 export async function writeToDB(data) {
 
@@ -99,5 +84,72 @@ export const updateToUsersDB = async (userData, photoURL) => {
     console.log('Suceessfully updated user imageUri in Firestore!');
   } catch (error) {
     console.error('imageUri upload Error:', error);
+  }
+};
+
+export async function searchCategoriesFromDB(category) {
+  try {
+    const productsRef = collection(database, "products");
+    const q = query(productsRef, where("category", "==", category));
+    const querySnapshot = await getDocs(q);
+    const productData = [];
+    querySnapshot.forEach((doc) => {
+      productData.push({
+        id: doc.id,
+        data: doc.data()
+      });
+    });
+    return productData;
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    throw error;
+  }
+}
+
+
+export const addToShoppingList = async (userId, productId) => {
+  try {
+    const userQuery = query(collection(database, 'users'), where('uid', '==', userId));
+    const querySnapshot = await getDocs(userQuery);
+
+    let userIdToUpdate;
+    querySnapshot.forEach(doc => {
+        userIdToUpdate = doc.id;
+    });
+
+    if (!userIdToUpdate) {
+      console.error(`User document with ID ${userId} does not exist.`);
+      return;
+    }
+
+    const userRef = doc(database, 'users', userIdToUpdate);
+
+    // Get the found user document data
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+
+    // Check if the shopping_list field exists and is an array
+    if (!userData.shopping_list || !Array.isArray(userData.shopping_list)) {
+      // Initialize the shopping_list field as an empty array
+      await updateDoc(userRef, { shopping_list: [] });
+    }
+    console.log('Product ID:', productId);
+    // Add the productId to the shopping_list array
+    await updateDoc(userRef, { shopping_list: arrayUnion(productId) });
+
+    console.log('Product added to shopping list successfully.');
+  } catch (error) {
+    console.error('Error adding product to shopping list:', error);
+  }
+};
+
+
+export const getProductById = async (productId) => {
+  try {
+    const productDoc = await firestore().collection('products').doc(productId).get();
+    return productDoc.data() || null;
+  } catch (error) {
+    console.error('Error getting product by ID:', error);
+    return null;
   }
 };
