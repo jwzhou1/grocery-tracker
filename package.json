@@ -41,6 +41,7 @@
     "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-paper": "^5.11.1",
     "react-native-picker-select": "^9.0.0",
+    "react-native-vector-icons": "^10.0.3",
     "victory": "^36.7.0",
     "victory-native": "^36.7.0",
     "xlsx": "^0.18.5"

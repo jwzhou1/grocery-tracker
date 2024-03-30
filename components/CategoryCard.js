@@ -1,35 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { collection, query, where, onSnapshot, sum } from 'firebase/firestore';
 import { database, auth } from "../firebase/firebaseSetup";
 import Colors from '../styles/Colors';
 import { Dimensions } from 'react-native';
 
 const windowHeight = Dimensions.get('window').height;
+const windowWidth = Dimensions.get('window').width;
 
 export default function CategoryCard() {
   // Define your categories here
   const categories = [
-    { name: 'Category 1' },
-    { name: 'Category 2' },
-    { name: 'Category 3' },
-    { name: 'Category 4' },
-    { name: 'Category 5' },
-    { name: 'Category 6' },
-    { name: 'Category 7' },
-    { name: 'Category 8' },
-    // Add more categories as needed
+    { name: 'Produce', image: require('../images/category_images/produce.png') },
+    { name: 'Drinks' },
+    { name: 'Food' },
+    { name: 'Groceries' },
+    { name: 'Meat' },
+    { name: 'Seafood' },
   ];
 
-  const firstRowCategories = categories.slice(0, 4);
-  const secondRowCategories = categories.slice(4);
+  // Divide categories into 2 rows
+  const firstRowCategories = categories.slice(0, 3);
+  const secondRowCategories = categories.slice(3);
 
   return (
     <View style={styles.container}>
       <View style={styles.rowContainer}>
         {firstRowCategories.map((category, index) => (
           <View key={index} style={styles.categoryContainer}>
-            <View style={styles.circle}></View>
+            {category.image ? (
+              <Image source={category.image} style={styles.image} />
+            ) : (
+              <View style={styles.circle} />
+            )}
             <Text style={styles.categoryText}>{category.name}</Text>
           </View>
         ))}
@@ -37,7 +40,11 @@ export default function CategoryCard() {
       <View style={styles.rowContainer}>
         {secondRowCategories.map((category, index) => (
           <View key={index} style={styles.categoryContainer}>
-            <View style={styles.circle}></View>
+            {category.image ? (
+              <Image source={category.image} style={styles.image} />
+            ) : (
+              <View style={styles.circle} />
+            )}
             <Text style={styles.categoryText}>{category.name}</Text>
           </View>
         ))}
@@ -50,16 +57,15 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     width: '90%',
-    //height: windowHeight * 0.23,
     backgroundColor: Colors.summaryBackground,
     borderRadius: 10,
     padding: 15,
     justifyContent: 'center',
     shadowColor: 'gray',
-    shadowOffset: { width: 5, height: 5 }, // Shadow offset
-    shadowOpacity: 0.8, // Shadow opacity
-    shadowRadius: 8, // Shadow radius
-    elevation: 10, // Android shadow elevation
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 10,
   },
   rowContainer: {
     flexDirection: 'row',
@@ -69,6 +75,12 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     alignItems: 'center',
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginBottom: 5,
   },
   circle: {
     width: 50,
