@@ -6,7 +6,7 @@ import PressableButton from '../components/PressableButton';
 import Colors from '../styles/Colors';
 
 export default function Home({ navigation }) {
-  const currentCategory = "Fruit";
+  const currentCategory = "Produce";
   const selectedCategory = currentCategory;
 
   return (

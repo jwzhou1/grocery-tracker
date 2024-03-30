@@ -7,6 +7,7 @@ import { auth } from "./firebase/firebaseSetup";
 import { onAuthStateChanged } from "firebase/auth";
 
 import Signup from "./screens/Signup";
+import Category from "./screens/Category";
 import Login from "./screens/Login";
 import Search from "./screens/Search";
 import Home from "./screens/Home";
@@ -110,6 +111,13 @@ const AppStack = (
   <>
     <Stack.Screen name="Tabs" component={TabNavigator}/>
     <Stack.Screen name="Edit Profile" component={EditProfile}
+      options={{
+        headerShown: true,
+      }}
+    />
+      <Stack.Screen
+      name="Category"
+      component={Category}
       options={{
         headerShown: true,
       }}

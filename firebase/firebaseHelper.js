@@ -38,6 +38,25 @@ export async function getPricesFromDB(productId) {
   return priceData;
 }
 
+export async function searchCategoriesFromDB(category) {
+  try {
+    const productsRef = collection(database, "products");
+    const q = query(productsRef, where("category", "==", category));
+    const querySnapshot = await getDocs(q);
+    const productData = [];
+    querySnapshot.forEach((doc) => {
+      productData.push({
+        id: doc.id,
+        data: doc.data()
+      });
+    });
+    return productData;
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    throw error;
+  }
+}
+
 export async function writeToDB(data) {
 
 }

@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { collection, query, where, onSnapshot, sum } from 'firebase/firestore';
-import { database, auth } from "../firebase/firebaseSetup";
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/Colors';
-import { Dimensions } from 'react-native';
-
-const windowHeight = Dimensions.get('window').height;
-const windowWidth = Dimensions.get('window').width;
 
 export default function CategoryCard() {
+  const navigation = useNavigation();
+
   // Define your categories here
   const categories = [
     { name: 'Produce', image: require('../images/category_images/produce.png') },
@@ -19,6 +16,11 @@ export default function CategoryCard() {
     { name: 'Seafood' },
   ];
 
+  // Function to handle category press
+  const handleCategoryPress = (categoryName) => {
+    navigation.navigate('Category', { category: categoryName });
+  };
+
   // Divide categories into 2 rows
   const firstRowCategories = categories.slice(0, 3);
   const secondRowCategories = categories.slice(3);
@@ -27,26 +29,26 @@ export default function CategoryCard() {
     <View style={styles.container}>
       <View style={styles.rowContainer}>
         {firstRowCategories.map((category, index) => (
-          <View key={index} style={styles.categoryContainer}>
+          <TouchableOpacity key={index} style={styles.categoryContainer} onPress={() => handleCategoryPress(category.name)}>
             {category.image ? (
               <Image source={category.image} style={styles.image} />
             ) : (
               <View style={styles.circle} />
             )}
             <Text style={styles.categoryText}>{category.name}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
       <View style={styles.rowContainer}>
         {secondRowCategories.map((category, index) => (
-          <View key={index} style={styles.categoryContainer}>
+          <TouchableOpacity key={index} style={styles.categoryContainer} onPress={() => handleCategoryPress(category.name)}>
             {category.image ? (
               <Image source={category.image} style={styles.image} />
             ) : (
               <View style={styles.circle} />
             )}
             <Text style={styles.categoryText}>{category.name}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
