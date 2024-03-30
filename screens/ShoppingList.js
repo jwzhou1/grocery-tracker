@@ -1,47 +1,69 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { getAuth } from 'firebase/auth';
+import { getShoppingList,searchProductDetail, getPricesFromDB } from '../firebase/firebaseHelper'; 
 
 export default function ShoppingList() {
-  // Function to handle item deletion
+  const auth = getAuth();
+  const [shoppingList, setShoppingList] = useState([]);
+
+  useEffect(() => {
+    async function fetchShoppingList() {
+      try {
+        const userId = auth.currentUser.uid;
+        const list = await getShoppingList(userId);
+        console.log("Shopping List:", list);
+        const detailedList = await Promise.all(list.map(async (productId) => {
+          const productDetail = await searchProductDetail(productId);
+          console.log("productDetail",productDetail);
+          const productName = productDetail ? productDetail.name : 'Unknown';
+          console.log("productName", productName);
+          const priceData = await getPricesFromDB(productId);
+          const productPrice = priceData.length > 0 ? priceData[0].data.price : 'Unknown'; 
+          return { productId, name: productName, price: productPrice }; 
+        }));
+        setShoppingList(detailedList);
+      } catch (error) {
+        console.error('Error fetching shopping list:', error);
+      }
+    }
+
+    fetchShoppingList();
+  }, []);
+
   const handleDeleteItem = () => {
-    // Implement your logic to delete the item here
     console.log('Item deleted');
   };
 
   return (
     <View style={styles.container}>
-      {/* Shopping List Items */}
-      {/* Map through shopping list items and display them */}
-
-      {/* Example Item */}
-      <View style={styles.itemContainer}>
-        {/* Product Image */}
-        <Image
-          style={styles.image}
-          source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder image URL
-        />
-
-        {/* Product Information */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.productName}>Item 1</Text>
-          <Text style={styles.price}>Price: $1.00</Text>
-          {/* Add/Remove Buttons */}
-          <View style={styles.quantityControl}>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.buttonText}>+</Text>
-            </TouchableOpacity>
-            <Text style={styles.quantity}>1</Text>
-            <TouchableOpacity style={styles.controlButton}>
-              <Text style={styles.buttonText}>-</Text>
-            </TouchableOpacity>
+      {shoppingList.map((item, index) => (
+        <View key={index} style={styles.itemContainer}>
+          <Image
+            style={styles.image}
+            source={{ uri: item.imageUrl }}
+          />
+          <View style={styles.infoContainer}>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.price}>Price: ${item.price}</Text>
+            <View style={styles.quantityControl}>
+              <TouchableOpacity style={styles.controlButton}>
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+              <Text style={styles.quantity}>{item.quantity}</Text>
+              <TouchableOpacity style={styles.controlButton}>
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+          <TouchableOpacity onPress={handleDeleteItem}>
+            <Text style={{ color: 'red' }}>Delete</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Delete Button */}
-      </View>
+      ))}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

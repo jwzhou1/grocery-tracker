@@ -111,23 +111,18 @@ export const addToShoppingList = async (userId, productId) => {
   try {
     const userQuery = query(collection(database, 'users'), where('uid', '==', userId));
     const querySnapshot = await getDocs(userQuery);
-
     let userIdToUpdate;
     querySnapshot.forEach(doc => {
         userIdToUpdate = doc.id;
     });
-
     if (!userIdToUpdate) {
       console.error(`User document with ID ${userId} does not exist.`);
       return;
     }
-
     const userRef = doc(database, 'users', userIdToUpdate);
-
     // Get the found user document data
     const userDoc = await getDoc(userRef);
     const userData = userDoc.data();
-
     // Check if the shopping_list field exists and is an array
     if (!userData.shopping_list || !Array.isArray(userData.shopping_list)) {
       // Initialize the shopping_list field as an empty array
@@ -136,7 +131,6 @@ export const addToShoppingList = async (userId, productId) => {
     console.log('Product ID:', productId);
     // Add the productId to the shopping_list array
     await updateDoc(userRef, { shopping_list: arrayUnion(productId) });
-
     console.log('Product added to shopping list successfully.');
   } catch (error) {
     console.error('Error adding product to shopping list:', error);
@@ -144,12 +138,36 @@ export const addToShoppingList = async (userId, productId) => {
 };
 
 
-export const getProductById = async (productId) => {
+export async function getShoppingList(userId) {
   try {
-    const productDoc = await firestore().collection('products').doc(productId).get();
-    return productDoc.data() || null;
+    const userQuery = query(collection(database, 'users'), where('uid', '==', userId));
+    const querySnapshot = await getDocs(userQuery);
+    let shoppingList = []; 
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data(); 
+      if (userData.shopping_list && Array.isArray(userData.shopping_list)) {
+        shoppingList = userData.shopping_list; 
+      }
+    });
+    return shoppingList;
   } catch (error) {
-    console.error('Error getting product by ID:', error);
-    return null;
+    console.error('Error getting shopping list:', error);
+    throw error;
   }
 };
+
+
+export async function searchProductDetail(productId) {
+  try {
+    const productDoc = await doc(database, 'products', productId); 
+    const productSnapshot = await getDoc(productDoc); 
+    if (productSnapshot.exists()) {
+      return productSnapshot.data(); 
+    } else {
+      return null; 
+    }
+  } catch (error) {
+    console.error('Error searching product detail:', error);
+    throw error;
+  }
+}
