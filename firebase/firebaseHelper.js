@@ -1,4 +1,4 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs,arrayRemove, query, where, orderBy,getDoc,updateDoc,arrayUnion  } from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, getDocs,arrayRemove, query, where, orderBy,getDoc,updateDoc,arrayUnion,Timestamp} from 'firebase/firestore';
 import { database, auth } from './firebaseSetup';
 import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebaseSetup';
@@ -54,9 +54,13 @@ export async function updateDB(id, data) {
 
 }
 
-export async function writeToUsersDB(userData) {
+export const writeToUsersDB = async (userData) => {
   try {
-    const docRef = await addDoc(collection(database, 'users'), userData);
+    const { email, ...otherData } = userData;
+    const username = email.substring(0, email.indexOf('@')); 
+    const timestamp = Timestamp.now(); 
+    const userDataWithTimestamp = { email, username, ...otherData, createdAt: timestamp };
+    const docRef = await addDoc(collection(database, 'users'), userDataWithTimestamp);
     console.log('Document written with ID: ', docRef.id);
     console.log(docRef.id);
     return docRef.id;
@@ -65,7 +69,6 @@ export async function writeToUsersDB(userData) {
     throw error;
   }
 }
-
 
 export const updateToUsersDB = async (userData, photoURL) => {
   try {

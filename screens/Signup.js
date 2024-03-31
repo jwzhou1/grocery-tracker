@@ -26,8 +26,8 @@ export default function Signup({ navigation }) {
         password
       );
       const userId = await writeToUsersDB({
-        email: email,
-        uid: userCredential.user.uid,
+          email: email,
+          uid: userCredential.user.uid,
       });
       console.log(userId);
     } catch (error) {
