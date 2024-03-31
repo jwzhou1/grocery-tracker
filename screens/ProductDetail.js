@@ -19,7 +19,7 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   const goToFeedback = () => {
-    navigation.navigate('Feedback');
+    navigation.navigate('Feedback', { product,price });
   };
 
   return (

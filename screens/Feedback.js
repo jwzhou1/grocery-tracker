@@ -3,7 +3,8 @@ import { View, StyleSheet, Text, Image, TextInput, Alert } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function Feedback({ navigation }) {
+export default function Feedback({ route, navigation }) {
+  const { product, price } = route.params;
   const [imageUri, setImageUri] = useState(null);
 
   // Function to handle image selection from camera
@@ -62,10 +63,10 @@ export default function Feedback({ navigation }) {
       {/* Product Information */}
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Product Name:</Text>
-        <Text style={styles.value}>Item1</Text>
+        <Text style={styles.value}>{product.name}</Text>
 
         <Text style={styles.label}>Weight:</Text>
-        <Text style={styles.value}>100g</Text>
+        <Text style={styles.value}>{product.unit}</Text>
 
         <Text style={styles.label}>Store:</Text>
         {/* Dropdown for Store */}

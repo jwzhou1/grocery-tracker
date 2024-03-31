@@ -6,7 +6,7 @@ import LoadingScreen from './LoadingScreen';
 import { useFocusEffect } from '@react-navigation/native'; 
 import { MaterialIcons } from '@expo/vector-icons';
 
-export default function ShoppingList({ route, navigation }) {
+export default function ShoppingList() {
   const auth = getAuth();
   const [shoppingList, setShoppingList] = useState([]);
   const [loading, setLoading] = useState(true);
