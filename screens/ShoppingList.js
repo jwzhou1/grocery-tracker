@@ -4,12 +4,12 @@ import { getAuth } from 'firebase/auth';
 import { getShoppingList, searchProductDetail, getPricesFromDB, deleteFromShoppingList } from '../firebase/firebaseHelper';
 import LoadingScreen from './LoadingScreen';
 import { useFocusEffect } from '@react-navigation/native'; 
-import { Ionicons } from '@expo/vector-icons'; 
 
 export default function ShoppingList({ route, navigation }) {
   const auth = getAuth();
   const [shoppingList, setShoppingList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quantities, setQuantities] = useState({});
 
   useFocusEffect(
     React.useCallback(() => {
@@ -49,6 +49,20 @@ export default function ShoppingList({ route, navigation }) {
     return <LoadingScreen />; 
   }
 
+  const handleIncreaseQuantity = (productId) => {
+    setQuantities(prevQuantities => ({
+      ...prevQuantities,
+      [productId]: (prevQuantities[productId] || 1) + 1,
+    }));
+  };
+
+  const handleDecreaseQuantity = (productId) => {
+    setQuantities(prevQuantities => ({
+      ...prevQuantities,
+      [productId]: Math.max((prevQuantities[productId] || 1) - 1, 1),
+    }));
+  };
+
   return (
     <View style={styles.container}>
       {shoppingList.map((item, index) => (
@@ -61,17 +75,17 @@ export default function ShoppingList({ route, navigation }) {
             <Text style={styles.productName}>{item.name}</Text>
             <Text style={styles.price}>Price: ${item.price}</Text>
             <View style={styles.quantityControl}>
-              <TouchableOpacity style={styles.controlButton}>
+            <TouchableOpacity style={styles.controlButton} onPress={() => handleIncreaseQuantity(item.productId)}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
-              <Text style={styles.quantity}>{item.quantity}</Text>
-              <TouchableOpacity style={styles.controlButton}>
+              <Text style={styles.quantity}>{quantities[item.productId] || 1}</Text>
+              <TouchableOpacity style={styles.controlButton} onPress={() => handleDecreaseQuantity(item.productId)}>
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
             </View>
           </View>
           <TouchableOpacity onPress={() => handleDeleteItem(item.productId)}>
-          <Ionicons name="trash-bin" size={24} color="red" />
+            <Text style={{ color: 'red' }}>Delete</Text>
           </TouchableOpacity>
         </View>
       ))}

@@ -181,21 +181,13 @@ export async function deleteFromShoppingList(userId, productId) {
       console.error(`User document with ID ${userId} does not exist.`);
       return;
     }
-
-    // 获取用户文档的 ID
     const userDocId = querySnapshot.docs[0].id;
-
-    // 检查用户数据中是否存在购物清单字段
     const userData = querySnapshot.docs[0].data();
     if (!userData.shopping_list || !Array.isArray(userData.shopping_list)) {
       console.error(`Shopping list not found in user data.`);
       return;
     }
-
-    // 从购物清单中删除指定的产品
     const updatedShoppingList = userData.shopping_list.filter(item => item !== productId);
-
-    // 更新购物清单字段
     const userDocRef = doc(database, 'users', userDocId);
     await updateDoc(userDocRef, { shopping_list: updatedShoppingList.length > 0 ? updatedShoppingList : null });
 
