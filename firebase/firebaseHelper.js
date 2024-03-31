@@ -57,10 +57,9 @@ export async function updateDB(id, data) {
 export const writeToUsersDB = async (userData) => {
   try {
     const { email, ...otherData } = userData;
-    const username = email.substring(0, email.indexOf('@')); 
-    const timestamp = Timestamp.now(); 
-    const userDataWithTimestamp = { email, username, ...otherData, createdAt: timestamp };
-    const docRef = await addDoc(collection(database, 'users'), userDataWithTimestamp);
+    const username = email.split('@')[0];
+    const userDataWithoutCreatedAt = { email, username, ...otherData };
+    const docRef = await addDoc(collection(database, 'users'), userDataWithoutCreatedAt);
     console.log('Document written with ID: ', docRef.id);
     console.log(docRef.id);
     return docRef.id;
@@ -87,6 +86,22 @@ export const updateToUsersDB = async (userData, photoURL) => {
     console.log('Suceessfully updated user imageUri in Firestore!');
   } catch (error) {
     console.error('imageUri upload Error:', error);
+  }
+};
+
+export const getUsername = async () => {
+  try {
+    const userID = auth.currentUser.uid;
+    const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
+    const querySnapshot = await getDocs(userQuery);
+    let username = null;
+    querySnapshot.forEach(doc => {
+      username = doc.data().username; 
+    });
+    return username;
+  } catch (error) {
+    console.error('Error fetching username:', error);
+    throw error;
   }
 };
 

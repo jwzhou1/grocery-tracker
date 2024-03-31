@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { getShoppingList, searchProductDetail, getPricesFromDB, deleteFromShoppingList } from '../firebase/firebaseHelper';
 import LoadingScreen from './LoadingScreen';
 import { useFocusEffect } from '@react-navigation/native'; 
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ShoppingList({ route, navigation }) {
   const auth = getAuth();
@@ -85,7 +86,7 @@ export default function ShoppingList({ route, navigation }) {
             </View>
           </View>
           <TouchableOpacity onPress={() => handleDeleteItem(item.productId)}>
-            <Text style={{ color: 'red' }}>Delete</Text>
+        <MaterialIcons name="delete" size={24} color="red" />
           </TouchableOpacity>
         </View>
       ))}

@@ -7,20 +7,22 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL,deleteObject } from "firebase/storage";
+import { getUsername } from "../firebase/firebaseHelper";
 
 const Profile = ({ navigation, route }) => {
   
   const user = auth.currentUser;
-  const [updatedUsername, setUpdatedUsername] = useState(null);
   const [imageURL, setImageURL] = useState("");
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    const { newUsername } = route.params || {};
-    if (newUsername) {
-      setUpdatedUsername(newUsername);
-    }
-  }, [route.params]);
-  
+    getUsername().then(username => {
+      setUsername(username);
+    }).catch(error => {
+      console.error('Error fetching username:', error);
+    });
+  }, []);
+
   useEffect(() => {
     const unsubscribe = onSnapshot(query(collection(database, 'users'), where('uid', '==', user.uid)), snapshot => {
       snapshot.docChanges().forEach(change => {
@@ -134,9 +136,7 @@ const Profile = ({ navigation, route }) => {
     <View style={styles.container}>
       <View style={styles.userInfoContainer}>
      
-        <Text style={styles.text}>Hello, {updatedUsername || user.displayName}</Text>
-
-
+      <Text style={styles.text}>Hello, {username}</Text> 
         {imageURL ? (
   <View>
     <Image

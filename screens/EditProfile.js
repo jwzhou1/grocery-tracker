@@ -5,12 +5,12 @@ import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateToUsersDB } from '../firebase/firebaseHelper';
+import { getUsername } from '../firebase/firebaseHelper';
 
 const EditProfile = ({ navigation }) => {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
-  const [newUsername, setNewUsername] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
 
@@ -19,8 +19,9 @@ const EditProfile = ({ navigation }) => {
     const fetchUserData = async () => {
       try {
         setEmail(user.email);
-        setUsername(user.displayName);
         setAvatarUrl(user.imageUri);
+        const username = await getUsername(); 
+        setUsername(username); 
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -31,12 +32,6 @@ const EditProfile = ({ navigation }) => {
 
   const handleSave = async () => {
     try {
-      if (newUsername !== '') {
-        await updateProfile(user, {
-          displayName: newUsername,
-        });
-      }
-
       if (imageUri) {
         const imageRef = await uploadImage(imageUri);
         if (imageRef) {
@@ -50,7 +45,6 @@ const EditProfile = ({ navigation }) => {
       navigation.goBack();
       navigation.navigate('Profile', { 
         updateProfile: true,
-          newUsername: newUsername || user.displayName,
       }); 
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -80,9 +74,10 @@ const EditProfile = ({ navigation }) => {
               let newuser = {
                 email: user.email,
                 uid: user.uid,
+                username:username,
               }
               console.log(uploadTask.snapshot.metadata.fullPath)
-              updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); // Update user data in Firestore
+              updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); 
             }
           });
         }
@@ -100,13 +95,7 @@ const EditProfile = ({ navigation }) => {
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
-        <Text style={styles.label}>Username: {auth.currentUser.displayName}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter New Username"
-          value={newUsername}
-          onChangeText={(text) => setNewUsername(text)}
-        />
+        <Text style={styles.label}>Username: {username}</Text> 
         <Text style={styles.label}>Upload New Avatar: </Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
