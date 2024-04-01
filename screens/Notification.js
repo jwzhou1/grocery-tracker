@@ -5,7 +5,7 @@ import { scheduleDailyNotification, cancelNotification } from '../components/Not
 import { useEffect } from 'react';
 import { database, auth } from '../firebase/firebaseSetup';
 import { collection,  getDocs, query, where,doc, onSnapshot } from "firebase/firestore";
-import { updateInUsersDB } from '../firebase/firebaseHelper';
+import { updateToUsersDB } from '../firebase/firebaseHelper';
 import { isTimestamp } from 'firebase/firestore';
 import Colors from '../styles/Colors';
 
@@ -23,16 +23,14 @@ const NotificationSetting = () => {
       query(collection(database, 'users'), where('uid', '==', userUid)),
       (querySnapshot) => {
         if (!querySnapshot.empty) {
-          // Get the first document
           const userDoc = querySnapshot.docs[0];
           const entryId = userDoc.id;
           setEntryId(entryId);
           const userData = userDoc.data();
-          // Now you can access the fields, e.g., userData.isNotification
           setIsNotification(userData.isNotification || false);
           setNotificationTime(userData.notificationTime || new Date());
         } else {
-          // console.log('User document not found.');
+          console.log('User document not found.');
         }
       },
       (err) => {
@@ -43,7 +41,7 @@ const NotificationSetting = () => {
       }
     );
   
-    return () => unsubscribe(); // Cleanup the listener when the component is unmounted
+    return () => unsubscribe(); 
   }, [notificationTime]);
   
   const showDatePicker = () => {
@@ -63,15 +61,13 @@ const NotificationSetting = () => {
     };
     console.log('entryId:', entryId);
     console.log('updatedEntry:', updatedEntry);
-    updateInUsersDB(entryId, updatedEntry);
+    updateToUsersDB(entryId, updatedEntry);
     setIsNotification(true)
     setNotificationTime(time)
 
     const formattedHour = parseInt(time.getHours());
     const formattedMinute = parseInt(time.getMinutes());
     const formattedTime = `${formattedHour}:${formattedMinute}`;
-  
-    // Pass the formatted time to NotificationManager 
     scheduleDailyNotification(formattedHour,formattedMinute)
   };   
   const cancelNotificationHandler = () => {
@@ -81,7 +77,7 @@ const NotificationSetting = () => {
       isNotification: false,
     };
 
-    updateInUsersDB(entryId, updatedEntry);
+    updateToUsersDB(entryId, updatedEntry);
   };
   function formatTime(time) {
     const date = new Date(time.seconds * 1000 + time.nanoseconds / 1000000);

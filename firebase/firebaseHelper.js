@@ -69,34 +69,13 @@ export const writeToUsersDB = async (userData) => {
   }
 }
 
-export const updateToUsersDB = async (userData, photoURL) => {
-  try {
-    const userID = auth.currentUser.uid; 
-    console.log(auth.currentUser.uid);
-    const updatedUserData = { ...userData, imageUri: photoURL }; 
-    console.log(updatedUserData);
-    const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
-    const querySnapshot = await getDocs(userQuery);
-    let userId;
-    querySnapshot.forEach(doc => {
-        userId = doc.id;
-    });
-    const userRef = doc(database, 'users', userId);
-    await setDoc(userRef, updatedUserData); 
-    console.log('Suceessfully updated user imageUri in Firestore!');
-  } catch (error) {
-    console.error('imageUri upload Error:', error);
-  }
-};
-
-export async function updateInUsersDB(entryId, updateEntry) {
+export async function updateToUsersDB(entryId, updateEntry) {
   try {
     const entryRef = doc(database, 'users', entryId);
-    console.log('entryRef:', entryRef);
     await setDoc(entryRef, updateEntry, { merge: true });
-    console.log('Updated');
+    console.log('Updated To Users DB Successfully');
   } catch (err) {
-    console.log('error in updateInUsersDB: ', err);
+    console.log('error in updateToUsersDB: ', err);
   }
 }
 

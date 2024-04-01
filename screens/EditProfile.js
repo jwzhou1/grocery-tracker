@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { auth, storage } from '../firebase/firebaseSetup';
+import { auth, storage,database } from '../firebase/firebaseSetup';
 import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateToUsersDB } from '../firebase/firebaseHelper';
 import { getUsername } from '../firebase/firebaseHelper';
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const EditProfile = ({ navigation }) => {
   const user = auth.currentUser;
@@ -13,6 +14,31 @@ const EditProfile = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [entryId, setEntryId] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(database, 'users'), where('uid', '==', user.uid)),
+      (querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const entryId = userDoc.id;
+          setEntryId(entryId);
+        } else {
+          console.log('User document not found.');
+        }
+      },
+      (err) => {
+        console.log(err);
+        if (err.code === 'permission-denied') {
+          console.log('User does not have permission to access this collection');
+        }
+      }
+    );
+  
+    return () => unsubscribe(); 
+  }, []);
+
 
   
   useEffect(() => {
@@ -71,13 +97,10 @@ const EditProfile = ({ navigation }) => {
             // Set the avatar URL to the full path of the uploaded image
             setAvatarUrl(uploadTask.snapshot.metadata.fullPath);
             if (user) {
-              let newuser = {
-                email: user.email,
-                uid: user.uid,
-                username:username,
-              }
-              console.log(uploadTask.snapshot.metadata.fullPath)
-              updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); 
+              const updateEntry = {
+                imageUri: uploadTask.snapshot.metadata.fullPath, // Add the image URL to the user data
+              };
+              updateToUsersDB(entryId, updateEntry); // Update the user document
             }
           });
         }
