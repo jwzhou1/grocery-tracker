@@ -216,3 +216,33 @@ export async function deleteFromShoppingList(userId, productId) {
   }
 }
 
+export const updatePriceInDatabase = async (updatedPrice) => {
+  try {
+    const q = query(collection(database, 'prices'), 
+    where('product_id', '==', updatedPrice.product_id)
+    && where('store_name', '==', updatedPrice.store_name));
+    const querySnapshot = await getDocs(q);
+    let priceId; 
+    querySnapshot.forEach(doc => {
+      priceId = doc.id; 
+    });
+
+    console.log('NewpriceId:', priceId);
+    if (!priceId) {
+      console.error('No matching price documents found in the subset');
+      throw new Error('No matching price documents found in the subset');
+    }
+    await updateDoc(doc(collection(database, 'prices'), priceId), updatedPrice);
+    console.log('Price updated successfully');
+    return true; 
+
+  } catch (error) {
+    console.error('Error updating price:', error);
+    throw error;
+  }
+};
+
+
+
+
+
