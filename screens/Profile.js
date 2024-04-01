@@ -8,6 +8,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL,deleteObject } from "firebase/storage";
 import { getUsername } from "../firebase/firebaseHelper";
+import { Ionicons } from '@expo/vector-icons';
 
 const Profile = ({ navigation, route }) => {
   
@@ -97,6 +98,10 @@ const Profile = ({ navigation, route }) => {
     navigation.navigate("My Contributions");
   };
 
+  const handleNotificationPress = () => {
+    navigation.navigate("Notification");
+  };
+
   const handleDeleteAvatar = async () => {
     try {
       if (imageURL) {
@@ -177,6 +182,21 @@ const Profile = ({ navigation, route }) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <AntDesign name="edit" size={24} color="#163020" />
             <Text style={styles.text}> Edit Profile</Text>
+          </View>
+          <MaterialIcons
+            name="keyboard-arrow-right"
+            size={26}
+            color="black"
+          />
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          onPress={() => handleNotificationPress()}
+          style={styles.linkButton}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Ionicons name="notifications-outline" size={24} />
+            <Text style={styles.text}>Schedule an Notification</Text>
           </View>
           <MaterialIcons
             name="keyboard-arrow-right"

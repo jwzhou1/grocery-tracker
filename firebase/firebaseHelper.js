@@ -89,6 +89,17 @@ export const updateToUsersDB = async (userData, photoURL) => {
   }
 };
 
+export async function updateInUsersDB(entryId, updateEntry) {
+  try {
+    const entryRef = doc(database, 'users', entryId);
+    console.log('entryRef:', entryRef);
+    await setDoc(entryRef, updateEntry, { merge: true });
+    console.log('Updated');
+  } catch (err) {
+    console.log('error in updateInUsersDB: ', err);
+  }
+}
+
 export const getUsername = async () => {
   try {
     const userID = auth.currentUser.uid;

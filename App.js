@@ -18,6 +18,7 @@ import EditProfile from "./screens/EditProfile";
 import WatchList from "./screens/WatchList";
 import Map from "./screens/Map";
 import MyContributions from "./screens/MyContributions";
+import Notification from "./screens/Notification";
 import ProductDetail from "./screens/ProductDetail";
 import SearchHeader from "./components/SearchHeader";
 import PressableButton from "./components/PressableButton";
@@ -161,6 +162,13 @@ const AppStack = (
     <Stack.Screen
       name="My Contributions"
       component={MyContributions}
+      options={{
+        headerShown: true,
+      }}
+    />
+        <Stack.Screen
+      name="Notification"
+      component={Notification}
       options={{
         headerShown: true,
       }}
