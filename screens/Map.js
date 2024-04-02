@@ -2,17 +2,8 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import { FontAwesome } from '@expo/vector-icons'; // Importing FontAwesome for the cart icon
 import { GOOGLE_MAPS_API_KEY } from "@env";
-
-const storesToSearch = [
-  { name: "Walmart", color: "red" },
-  { name: "Save-On-Foods", color: "pink" },
-  { name: "T&T Supermarket", color: "green" },
-  { name: "Real Canadian Superstore", color: "purple" },
-  { name: "Costco Wholesale", color: "orange" },
-  { name: "Safeway", color: "yellow" },
-  { name: "Hannam", color: "cyan" }
-];
 
 export default function Map() {
   const [location, setLocation] = useState(null);
@@ -35,36 +26,23 @@ export default function Map() {
 
   useEffect(() => {
     if (location) {
-      searchNearbyStores(location.latitude, location.longitude);
+      searchNearbySupermarkets(location.latitude, location.longitude);
     }
   }, [location]);
 
-  const searchNearbyStores = async (lat, lng) => {
+  const searchNearbySupermarkets = async (lat, lng) => {
     try {
-      const promises = storesToSearch.map(async (store) => {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=grocery_or_supermarket&keyword=${encodeURIComponent(store.name)}&key=${GOOGLE_MAPS_API_KEY}`
-        );
-        const data = await response.json();
-        if (data.results.length > 0) {
-          return {
-            name: store.name,
-            color: store.color,
-            locations: data.results.map((result) => ({
-              latitude: result.geometry.location.lat,
-              longitude: result.geometry.location.lng,
-              name: result.name,
-              vicinity: result.vicinity,
-            })),
-          };
-        }
-        return null;
-      });
-      const results = await Promise.all(promises);
-      const filteredResults = results.filter(result => {
-        return storesToSearch.some(store => result && result.name.includes(store.name));
-      });
-      setStores(filteredResults.filter((result) => result !== null));
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=supermarket&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+      const results = data.results.map(result => ({
+        name: result.name,
+        vicinity: result.vicinity,
+        latitude: result.geometry.location.lat,
+        longitude: result.geometry.location.lng
+      }));
+      setStores(results);
     } catch (error) {
       console.error("Error fetching nearby stores:", error);
     }
@@ -84,34 +62,21 @@ export default function Map() {
   };
 
   const renderStoreMarkers = () => {
-    return stores.map((storeGroup, index) =>
-      storeGroup.locations.map((store, idx) => (
-        <Marker
-          key={`${index}-${idx}`}
-          coordinate={{
-            latitude: store.latitude,
-            longitude: store.longitude,
-          }}
-          title={storeGroup.name}
-          pinColor={storeGroup.color}
-          onPress={() => handleNavigation(store)}
-        />
-      ))
-    );
+    return stores.map((store, index) => (
+      <Marker
+        key={index}
+        coordinate={{
+          latitude: store.latitude,
+          longitude: store.longitude,
+        }}
+        title={store.name}
+        onPress={() => handleNavigation(store)}
+      >
+         <FontAwesome name="map-marker" size={24} color="red" />
+      </Marker>
+    ));
   };
-
-  const renderLegend = () => {
-    return (
-      <View style={styles.legendContainer}>
-        {storesToSearch.map((store, index) => (
-          <View key={index} style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: store.color }]} />
-            <Text>{store.name}</Text>
-          </View>
-        ))}
-      </View>
-    );
-  };
+  
 
   return (
     <View style={styles.container}>
@@ -146,24 +111,28 @@ export default function Map() {
           </TouchableOpacity>
         </View>
       )}
-      {renderLegend()}
+      <View style={styles.legendContainer}>
+      <FontAwesome name="map-marker" size={24} color="red" />
+        <Text style={styles.legendText}>Supermarket</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
   map: {
-    ...StyleSheet.absoluteFillObject,
+    width: "100%",
+    height: "100%",
   },
   storeDetailsContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 5,
     position: "absolute",
     bottom: 20,
     left: 20,
@@ -188,20 +157,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 20,
     right: 20,
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 10,
-    elevation: 5,
-  },
-  legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
   },
-  legendColor: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
-    borderRadius: 10,
+  legendText: {
+    fontSize: 16,
+    marginLeft: 5,
   },
 });
