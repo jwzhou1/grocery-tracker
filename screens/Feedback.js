@@ -3,13 +3,28 @@ import { View, StyleSheet, Text, Image, TextInput, Alert,TouchableOpacity  } fro
 import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 import { updatePriceInDatabase } from '../firebase/firebaseHelper';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 export default function Feedback({ route, navigation }) {
   const { product, price } = route.params;
   const [imageUri, setImageUri] = useState(null);
   const [newPrice, setNewPrice] = useState('');
-  const oldPrice = price.price;
-  console.log('price:', price);
+  // const [selectedStore, setSelectedStore] = useState('');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const confirmDate = (date) => {
+    hideDatePicker();
+    setSelectedDate(date);
+  };
 
   // Function to handle image selection from camera
   const takePhoto = async () => {
@@ -56,14 +71,19 @@ export default function Feedback({ route, navigation }) {
       Alert.alert('Error', 'Please enter a new price');
       return;
     }
+    if (!selectedDate) {
+      Alert.alert('Error', 'Please select a date');
+      return;
+    }
   
     const updatedPrice = {
       ...price,
       price: parseFloat(newPrice),
+      date: selectedDate, 
     };
     console.log('updatedPrice:', updatedPrice);
-    console.log('storename',updatedPrice.store_name);
     console.log("productid",updatedPrice.product_id);
+    console.log("date",updatedPrice.date);
     
     updatePriceInDatabase(updatedPrice)
       .then(() => {
@@ -98,8 +118,7 @@ export default function Feedback({ route, navigation }) {
         <Text style={styles.value}>{product.unit}</Text>
 
         <Text style={styles.label}>Store:</Text>
-        {/* Dropdown for Store */}
-        <TextInput style={styles.input} placeholder="Select Store" />
+        <Text style={styles.value}>{price.store_name}</Text>
 
         <Text style={styles.label}>New Price:</Text>
         {/* Input for New Price */}
@@ -112,8 +131,17 @@ export default function Feedback({ route, navigation }) {
         />
 
         <Text style={styles.label}>Date:</Text>
-        {/* Calendar Dropdown for Date */}
-        <TextInput style={styles.input} placeholder="Select Date" />
+        {/* Date picker */}
+        <TouchableOpacity onPress={showDatePicker} style={styles.input}>
+          <Text>{selectedDate.toDateString()}</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={confirmDate}
+          onCancel={hideDatePicker}
+        />
+
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>

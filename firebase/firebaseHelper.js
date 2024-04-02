@@ -216,7 +216,6 @@ export const updatePriceInDatabase = async (updatedPrice) => {
     querySnapshot.forEach(doc => {
       priceId = doc.id; 
     });
-
     console.log('NewpriceId:', priceId);
     if (!priceId) {
       console.error('No matching price documents found in the subset');
