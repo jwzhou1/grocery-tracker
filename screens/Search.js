@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, TextInput } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, StyleSheet, Text } from "react-native";
 import SearchBar from "../components/SearchBar";
 import SearchResult from "../components/SearchResult";
 import LoadingScreen from "./LoadingScreen"
@@ -22,7 +21,6 @@ export default function Search() {
   }, [queryResult])
 
   const handleSearch = async (searchText) => {
-    //console.log(searchText)
     setSearchText(searchText)
     setSubmitted(true)
     setLoading(true)
