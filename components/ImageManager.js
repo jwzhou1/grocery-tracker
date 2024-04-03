@@ -1,4 +1,5 @@
-import { View, StyleSheet, Button, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, Image } from "react-native";
+import PressableButton from "./PressableButton";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 
@@ -64,8 +65,12 @@ export default function ImageManager({ receiveImageURI }) {
 
   return (
     <View style={styles.container}>
-      <Button title="Take an Image" onPress={takeImageHandler} />
-      <Button title="Upload from Library" onPress={pickImageHandler} />
+      <PressableButton pressedFunction={takeImageHandler} customStyle={styles.button}>
+        <Text style={styles.buttonText}>Take an Image</Text>
+      </PressableButton>
+      <PressableButton pressedFunction={pickImageHandler} customStyle={styles.button}>
+        <Text style={styles.buttonText}>Upload from Library</Text>
+        </PressableButton>
       {imageUri && (
         <Image
           style={styles.image}
@@ -81,6 +86,17 @@ export default function ImageManager({ receiveImageURI }) {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 5,
+  },
+  button: {
+    backgroundColor: "#00796b",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
   image: {
     width: 100,

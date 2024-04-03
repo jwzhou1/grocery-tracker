@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { auth, storage,database } from '../firebase/firebaseSetup';
 import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
+import PressableButton from '../components/PressableButton';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updateToUsersDB } from '../firebase/firebaseHelper';
-import { getUsername } from '../firebase/firebaseHelper';
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const EditProfile = ({ navigation }) => {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [entryId, setEntryId] = useState('');
@@ -39,20 +38,15 @@ const EditProfile = ({ navigation }) => {
     return () => unsubscribe(); 
   }, []);
 
-
-  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setEmail(user.email);
         setAvatarUrl(user.imageUri);
-        const username = await getUsername(); 
-        setUsername(username); 
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
-
     fetchUserData();
   }, []);
 
@@ -67,7 +61,7 @@ const EditProfile = ({ navigation }) => {
           });
         }
       }
-      alert('Profile updated successfully!');
+      Alert.alert('Profile updated successfully!');
       navigation.goBack();
       navigation.navigate('Profile', { 
         updateProfile: true,
@@ -118,22 +112,21 @@ const EditProfile = ({ navigation }) => {
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
-        <Text style={styles.label}>Username: {username}</Text> 
         <Text style={styles.label}>Upload New Avatar: </Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => {
+        <PressableButton customStyle={styles.button} pressedFunction={() => {
           handleSave();
           if (imageUri) {
             uploadImage(imageUri);
           }
         }}>
           <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+        </PressableButton>
+        <PressableButton customStyle={styles.button} pressedFunction={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+        </PressableButton>
       </View>
     </View>
   );

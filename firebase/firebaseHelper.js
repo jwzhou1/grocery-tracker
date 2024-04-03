@@ -1,7 +1,5 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs,arrayRemove, query, where, orderBy,getDoc,updateDoc,arrayUnion,Timestamp} from 'firebase/firestore';
+import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy, getDoc, updateDoc, arrayUnion} from 'firebase/firestore';
 import { database, auth } from './firebaseSetup';
-import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebaseSetup';
 
 // support searching products by name
 export async function searchFromDB(keyword) {
@@ -38,22 +36,6 @@ export async function getPricesFromDB(productId) {
   return priceData;
 }
 
-
-
-
-
-export async function writeToDB(data) {
-
-}
-
-export async function deleteFromDB(id) {
-
-}
-
-export async function updateDB(id, data) {
-
-}
-
 export const writeToUsersDB = async (userData) => {
   try {
     const { email, ...otherData } = userData;
@@ -78,22 +60,6 @@ export async function updateToUsersDB(entryId, updateEntry) {
     console.log('error in updateToUsersDB: ', err);
   }
 }
-
-export const getUsername = async () => {
-  try {
-    const userID = auth.currentUser.uid;
-    const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
-    const querySnapshot = await getDocs(userQuery);
-    let username = null;
-    querySnapshot.forEach(doc => {
-      username = doc.data().username; 
-    });
-    return username;
-  } catch (error) {
-    console.error('Error fetching username:', error);
-    throw error;
-  }
-};
 
 export async function searchCategoriesFromDB(category) {
   try {
