@@ -4,7 +4,13 @@
 
 ###    Authors: Liyao Zhang, Jiawei Zhou
 
-##    Iteration1: Overall Stucture, Navigation, and Basis of CRUD Operations to Firestore
+###    Iteration 2 adds following functionalities: 
+1. Authentication 
+2. Location use 
+3. Notification 
+4. External API use
+
+##    Iteration 2: Overall Stucture, Navigation, and Basis of CRUD Operations to Firestore
 ###    Data Modal and Collections:
 ####   1. Users Collection (Contribution: Jiawei Zhou):
 This is a top-level collection. Each document in the Users collection represents a user of our application. It has these fields:
@@ -12,6 +18,7 @@ This is a top-level collection. Each document in the Users collection represents
 -   "uid": "user_unique_id",
 -   "email": "user@example.com",
 -   "imageUri": "User Profile Image",
+-   "username": 'Username, which is set by being extracted before the "@" symbol in an email address'
 
 #### CRUD operations for Users Collection:
 
@@ -130,3 +137,17 @@ After saving the changes, users can view the updated profile picture on the Prof
 <img src="images/screen_images/profile-screen4.jpg" alt="Alt text" width="200">
 
 After clicking on the trash bin icon located at the bottom right corner of the profile picture, users can delete their current profile picture. Subsequently, the profile picture will revert to the default profile image. Additionally, the trash bin icon will disappear since the user no longer has an uploaded profile image associated with their account.
+
+**Map Screen**
+
+Location Use (Contribution: Jiawei Zhou):
+
+<img src="images/screen_images/map1.png" alt="Alt text" width="200"> <img src="images/screen_images/map2.jpg" alt="Alt text" width="200">
+
+To access the map screen, you need to go to the main page and click on the map icon in the top right corner. This action will direct you to the map screen. On this screen, you will notice two colors of markers: the blue marker indicates the user's current location, while the red marker represents nearby supermarkets. On this screen, the app will automatically display the nearby supermarket locations with red markers if you authorize the app to access your location. We utilize the Google API to search for these supermarkets.
+
+<img src="images/screen_images/map3.jpg" alt="Alt text" width="200"> <img src="images/screen_images/map4.jpg" alt="Alt text" width="200">
+
+When you click the red marker, it will display information about the supermarket's name and location at the bottom. Additionally, the supermarket name will appear above the red marker. You can also notice a button labeled "Navigate" in the bottom supermarket information window. If you click this button, it will direct you to the Google Maps app on your phone and assist you in navigating to the selected supermarket location.
+
+<img src="images/screen_images/map5.jpg" alt="Alt text" width="200">
