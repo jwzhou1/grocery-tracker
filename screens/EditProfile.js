@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { auth, storage,database } from '../firebase/firebaseSetup';
-import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
 import PressableButton from '../components/PressableButton';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { updateProfile } from "firebase/auth";
+import { auth, storage, database } from '../firebase/firebaseSetup';
 import { updateToUsersDB } from '../firebase/firebaseHelper';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const EditProfile = ({ navigation }) => {

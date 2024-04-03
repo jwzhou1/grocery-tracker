@@ -13,36 +13,36 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 export default function ShoppingList() {
   const [shoppingList, setShoppingList] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [quantities, setQuantities] = useState({});
 
-  useFocusEffect(
-    React.useCallback(() => {
-      async function fetchShoppingList() {
-        try {
-          const userId = auth.currentUser.uid;
-          const list = await getShoppingList(userId);
-          const detailedList = await Promise.all(
-            list.map(async (productId) => {
-              const productDetail = await searchProductDetail(productId);
-              const productName = productDetail
-                ? productDetail.name
-                : "Unknown";
-              const priceData = await getPricesFromDB(productId);
-              const productPrice =
-                priceData.length > 0 ? priceData[0].data.price : "Unknown";
-              return { productId, name: productName, price: productPrice };
-            })
-          );
-          setShoppingList(detailedList);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error fetching shopping list:", error);
-        }
-      }
-      fetchShoppingList();
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     async function fetchShoppingList() {
+  //       try {
+  //         const userId = auth.currentUser.uid;
+  //         const list = await getShoppingList(userId);
+  //         const detailedList = await Promise.all(
+  //           list.map(async (productId) => {
+  //             const productDetail = await searchProductDetail(productId);
+  //             const productName = productDetail
+  //               ? productDetail.name
+  //               : "Unknown";
+  //             const priceData = await getPricesFromDB(productId);
+  //             const productPrice =
+  //               priceData.length > 0 ? priceData[0].data.price : "Unknown";
+  //             return { productId, name: productName, price: productPrice };
+  //           })
+  //         );
+  //         setShoppingList(detailedList);
+  //         setLoading(false);
+  //       } catch (error) {
+  //         console.error("Error fetching shopping list:", error);
+  //       }
+  //     }
+  //     fetchShoppingList();
+  //   }, [])
+  // );
 
   const handleDeleteItem = async (productId) => {
     try {

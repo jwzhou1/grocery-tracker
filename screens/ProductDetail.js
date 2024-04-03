@@ -1,25 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { addToShoppingList } from '../firebase/firebaseHelper';
-import { getAuth } from 'firebase/auth'; 
+import { auth } from '../firebase/firebaseSetup';
 
 const ProductDetail = ({ route, navigation }) => {
-  const auth = getAuth(); 
-  const { product, prices } = route.params;
-  const price = prices.at(0).data;
-  const productId = prices.at(0).data.product_id; 
+  const { productId, product, prices } = route.params;
+  const price = prices.at(0).data; // display most recent price, change later
 
-  const addToShoppingListHandler = () => {
+  async function addHandler() {
     const userId = auth.currentUser.uid;
-    console.log('userId:', userId);
-    console.log('product id:', productId); 
-    addToShoppingList(userId, productId); 
-    console.log('Added to shopping list:', product.name);
-    Alert.alert('Success', 'Product successfully added to shopping list');
-  };
-
-  const goToFeedback = () => {
-    navigation.navigate('Feedback', { product,price });
+    await addToShoppingList(userId, productId);
+    Alert.alert('Success', `${product.name} is added to shopping list`);
   };
 
   return (
@@ -48,12 +39,12 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
         
         {/* Add to List Button */}
-        <TouchableOpacity style={styles.addButton} onPress={addToShoppingListHandler}>
+        <TouchableOpacity style={styles.addButton} onPress={addHandler}>
           <Text style={styles.buttonText}>Add to List</Text>
         </TouchableOpacity>
 
         {/* Feedback Link */}
-        <TouchableOpacity style={styles.feedbackLink} onPress={goToFeedback}>
+        <TouchableOpacity style={styles.feedbackLink} onPress={() => navigation.navigate('Feedback', { product, price })}>
           <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
         </TouchableOpacity>
       </View>

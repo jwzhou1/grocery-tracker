@@ -11,7 +11,7 @@ export default function ProductCard({ productId, product }) {
 
   const navigation = useNavigation()
   const navigateToProductDetail = () => {
-    navigation.navigate('Product Detail', { product, prices});
+    navigation.navigate('Product Detail', { productId, product, prices });
   };
 
   useEffect(() => {
