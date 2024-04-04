@@ -1,37 +1,17 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
-import { getPricesFromDB } from '../firebase/firebaseHelper';
 
-export default function ProductCard({ productId, product }) {
-  const [prices, setPrices] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+export default function ProductCard({ productId, product, prices }) {
   const navigation = useNavigation()
   const navigateToProductDetail = () => {
     navigation.navigate('Product Detail', { productId, product, prices });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const priceData = await getPricesFromDB(productId);
-        setPrices(priceData);
-      } catch (error) {
-        console.error('Error fetching price data:', error);
-      } finally {
-        setLoading(false)
-      }
-    };
-    fetchData();
-  }, [productId]);
-
   return (
     <PressableButton pressedFunction={navigateToProductDetail}>
-      {!loading && prices.at(0) &&
+      {prices.at(0) &&
       <View style={styles.productCard}>
         <Image source={{ uri: "https://via.placeholder.com/150" }} style={styles.image} />
         <View style={styles.detailsContainer}>

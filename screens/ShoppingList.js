@@ -1,108 +1,118 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
-import {
-  getShoppingList,
-  searchProductDetail,
-  getPricesFromDB,
-  deleteFromShoppingList,
-} from "../firebase/firebaseHelper";
-import { auth } from "../firebase/firebaseSetup";
+import { View, StyleSheet, Text, Image, FlatList } from "react-native";
+import { getPricesFromDB } from "../firebase/firebaseHelper";
+import { doc, updateDoc, deleteDoc, collection, onSnapshot, increment } from "firebase/firestore";
+import { auth, database } from "../firebase/firebaseSetup";
+import PressableButton from "../components/PressableButton";
 import LoadingScreen from "./LoadingScreen";
-import { useFocusEffect } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+// Next steps:
+// 1.save the store information when added to list, then group items by store
+// 2.improve UI (layout, detail, snackbar)
+// 3.navigate to productDetail
 export default function ShoppingList() {
+  const userId = auth.currentUser.uid
   const [shoppingList, setShoppingList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // set to true initially to adapt to firestore listener
   const [quantities, setQuantities] = useState({});
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     async function fetchShoppingList() {
-  //       try {
-  //         const userId = auth.currentUser.uid;
-  //         const list = await getShoppingList(userId);
-  //         const detailedList = await Promise.all(
-  //           list.map(async (productId) => {
-  //             const productDetail = await searchProductDetail(productId);
-  //             const productName = productDetail
-  //               ? productDetail.name
-  //               : "Unknown";
-  //             const priceData = await getPricesFromDB(productId);
-  //             const productPrice =
-  //               priceData.length > 0 ? priceData[0].data.price : "Unknown";
-  //             return { productId, name: productName, price: productPrice };
-  //           })
-  //         );
-  //         setShoppingList(detailedList);
-  //         setLoading(false);
-  //       } catch (error) {
-  //         console.error("Error fetching shopping list:", error);
-  //       }
-  //     }
-  //     fetchShoppingList();
-  //   }, [])
-  // );
+  useEffect(() => {
+    // set up a listener to get realtime data from firestore
+    const unsubscribe = onSnapshot(collection(database, `users/${userId}/shopping_list`),
+      async (snapshot) => {
+        if (snapshot.empty) {
+          setLoading(false)
+          return (
+            <Text>Add something to your shopping list</Text>
+          );
+        }
 
-  const handleDeleteItem = async (productId) => {
+        let promises = [];
+        snapshot.forEach((doc) => {
+          const productData = doc.data();
+          const productId = doc.id;
+          // fetch prices for the current product and collect the promise
+          promises.push(getPricesFromDB(productId).then(prices => 
+            ({ ...productData, id: productId, price: prices.at(0).data.price })));
+          setQuantities(prevQuantities => ({ ...prevQuantities, [productId]: productData.quantity }));
+        });
+        // wait for all promises to resolve
+        const productWithPrices = await Promise.all(promises);
+        setShoppingList(productWithPrices);
+        setLoading(false)
+      },
+      (error) => {
+        console.log(error.message);
+        setLoading(false)
+      }
+    );
+    return () => {
+      console.log("unsubscribe");
+      unsubscribe();
+    };
+  }, []);
+
+  const quantityHandler = async (productId, delta) => {
+    // first update local states
+    setQuantities(prevQuantities => ({
+      ...prevQuantities, [productId]: prevQuantities[productId] + delta
+    }));
     try {
-      const userId = auth.currentUser.uid;
-      await deleteFromShoppingList(userId, productId);
-      setShoppingList(
-        shoppingList.filter((item) => item.productId !== productId)
-      );
-      console.log("Item deleted");
+      // get a reference to the item and update in firestore
+      const listRef = collection(database, `users/${userId}/shopping_list`);
+      const itemRef = doc(listRef, productId)
+      await updateDoc(itemRef, { quantity: increment(delta) });
     } catch (error) {
-      console.error("Error deleting item:", error);
+      console.log(error)
     }
-  };
+  }
 
-  const handleIncreaseQuantity = (productId) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [productId]: (prevQuantities[productId] || 1) + 1,
-    }));
-  };
-
-  const handleDecreaseQuantity = (productId) => {
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [productId]: Math.max((prevQuantities[productId] || 1) - 1, 1),
-    }));
-  };
+  const deleteHandler = async (productId) => {
+    try {
+      await deleteDoc(doc(database, `users/${userId}/shopping_list/${productId}`))
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <View style={styles.container}>
       {loading && <LoadingScreen />}
-      {shoppingList.map((item, index) => (
-        <View key={index} style={styles.itemContainer}>
-          <Image style={styles.image} source={{ uri: item.imageUrl }} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.productName}>{item.name}</Text>
-            <Text style={styles.price}>Price: ${item.price}</Text>
-            <View style={styles.quantityControl}>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() => handleIncreaseQuantity(item.productId)}
-              >
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantity}>
-                {quantities[item.productId] || 1}
-              </Text>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() => handleDecreaseQuantity(item.productId)}
-              >
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
+      <FlatList
+        // contentContainerStyle={}
+        data={shoppingList}
+        renderItem={({ item }) => {
+          return (
+            <View style={styles.itemContainer}>
+              <Image style={styles.image} source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} />
+              <View style={styles.infoContainer}>
+                <Text style={styles.productName}>{item.name}</Text>
+                <Text style={styles.price}>Price: ${item.price}</Text>
+                <View style={styles.quantityControl}>
+                  <PressableButton
+                    customStyle={styles.controlButton}
+                    pressedFunction={() => quantityHandler(item.id, 1)}
+                  >
+                    <Text style={styles.buttonText}>+</Text>
+                  </PressableButton>
+                  <Text style={styles.quantity}>{quantities[item.id]}</Text>
+                  <PressableButton
+                    customStyle={styles.controlButton}
+                    pressedFunction={() => quantityHandler(item.id, -1)}
+                    disabled={quantities[item.id] === 1}
+                  >
+                    <Text style={styles.buttonText}>-</Text>
+                  </PressableButton>
+                </View>
+              </View>
+              <PressableButton pressedFunction={() => deleteHandler(item.id)}>
+                <MaterialIcons name="delete" size={24} color="red" />
+              </PressableButton>
             </View>
-          </View>
-          <TouchableOpacity onPress={() => handleDeleteItem(item.productId)}>
-            <MaterialIcons name="delete" size={24} color="red" />
-          </TouchableOpacity>
-        </View>
-      ))}
+          );
+        }}
+      />
     </View>
   );
 }

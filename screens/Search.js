@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import SearchBar from "../components/SearchBar";
 import SearchResult from "../components/SearchResult";
 import LoadingScreen from "./LoadingScreen"
-import { searchFromDB } from "../firebase/firebaseHelper";
+import { searchFromDB, getPricesFromDB } from "../firebase/firebaseHelper";
 
 export default function Search() {
   const [searchText, setSearchText] = useState("");
@@ -26,8 +26,14 @@ export default function Search() {
     setLoading(true)
 
     try {
+      // first fetch a list of products
       const productData = await searchFromDB(searchText)
-      setQueryResult(productData)
+      // then fetch prices for each of them
+      const productWithPrices = await Promise.all(productData.map(async (product) => {
+        const prices = await getPricesFromDB(product.id);
+        return { ...product, prices };
+      }))
+      setQueryResult(productWithPrices)
     } catch (error) {
       console.error("Error fetching search results:", error);
       setQueryResult([]); // reset query result

@@ -10,6 +10,7 @@ import {
   orderBy,
   getDoc,
   updateDoc,
+  increment,
   arrayUnion,
 } from "firebase/firestore";
 import { database, auth } from "./firebaseSetup";
@@ -43,12 +44,7 @@ export async function getPricesFromDB(productId) {
     const pricesRef = collection(database, `products/${productId}/prices`);
 
     // query prices and order from newest to oldest
-    const q = query(
-      pricesRef,
-      where("product_id", "==", productId),
-      orderBy("date", "desc")
-    );
-
+    const q = query(pricesRef, orderBy("date", "desc"));
     const querySnapshot = await getDocs(q);
     const priceData = [];
     querySnapshot.forEach((doc) => {
@@ -100,9 +96,9 @@ export async function searchCategoriesFromDB(category) {
   }
 }
 
-export async function addToShoppingList(userId, productId) {
+export async function addToShoppingList(userId, productId, name, image_url) {
   try {
-    // Get a reference to the shoppinglist/productId
+    // Get a reference to the shoppinglist
     const listRef = collection(database, `users/${userId}/shopping_list`);
     const itemRef = doc(listRef, productId)
     const itemDoc = await getDoc(itemRef);
@@ -110,82 +106,16 @@ export async function addToShoppingList(userId, productId) {
     // Check if the item exists in the shopping list
     if (itemDoc.exists()) {
       // update its quantity
-      await setDoc(itemRef, { quantity: increment(1) }, { merge: true });
+      await updateDoc(itemRef, { name: name, image_url: image_url, quantity: increment(1) });
     } else {
       // create a new doc and set quantity to 1
-      await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), { quantity: 1 });
+      await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), 
+        { name: name, image_url: image_url, quantity: 1 });
     }
   } catch (error) {
     console.log(error)
   }
 };
-
-export async function getShoppingList(userId) {
-  try {
-    const userQuery = query(
-      collection(database, "users"),
-      where("uid", "==", userId)
-    );
-    const querySnapshot = await getDocs(userQuery);
-    let shoppingList = [];
-    querySnapshot.forEach((doc) => {
-      const userData = doc.data();
-      if (userData.shopping_list && Array.isArray(userData.shopping_list)) {
-        shoppingList = userData.shopping_list;
-      }
-    });
-    return shoppingList;
-  } catch (error) {
-    console.error("Error getting shopping list:", error);
-  }
-}
-
-// export async function searchProductDetail(productId) {
-//   try {
-//     const productDoc = await doc(database, "products", productId);
-//     const productSnapshot = await getDoc(productDoc);
-//     if (productSnapshot.exists()) {
-//       return productSnapshot.data();
-//     } else {
-//       return null;
-//     }
-//   } catch (error) {
-//     console.error("Error searching product detail:", error);
-//   }
-// }
-
-export async function deleteFromShoppingList(userId, productId) {
-  try {
-    const userQuery = query(
-      collection(database, "users"),
-      where("uid", "==", userId)
-    );
-    const querySnapshot = await getDocs(userQuery);
-
-    if (querySnapshot.empty) {
-      console.error(`User document with ID ${userId} does not exist.`);
-      return;
-    }
-    const userDocId = querySnapshot.docs[0].id;
-    const userData = querySnapshot.docs[0].data();
-    if (!userData.shopping_list || !Array.isArray(userData.shopping_list)) {
-      console.error(`Shopping list not found in user data.`);
-      return;
-    }
-    const updatedShoppingList = userData.shopping_list.filter(
-      (item) => item !== productId
-    );
-    const userDocRef = doc(database, "users", userDocId);
-    await updateDoc(userDocRef, {
-      shopping_list:
-        updatedShoppingList.length > 0 ? updatedShoppingList : null,
-    });
-
-    console.log("Product removed from shopping list successfully.");
-  } catch (error) {
-    console.error("Error deleting product from shopping list:", error);
-  }
-}
 
 export const updatePriceInDatabase = async (updatedPrice) => {
   try {

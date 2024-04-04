@@ -67,7 +67,6 @@ async function createProductToDB(data) {
 
     // Create the price document
     const priceData = {
-      product_id: productId,
       date: new Date(Date.UTC(0, 0, date - 1)), // convert excel serial number to normal date
       price: parseFloat(price),
       unit_price: unitPrice || '',

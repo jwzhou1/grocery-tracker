@@ -5,12 +5,12 @@ import { auth } from '../firebase/firebaseSetup';
 
 const ProductDetail = ({ route, navigation }) => {
   const { productId, product, prices } = route.params;
-  const price = prices.at(0).data; // display most recent price, change later
+  const price = prices.at(0).data; // display most up-to-date price, change later
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
-    await addToShoppingList(userId, productId);
     Alert.alert('Success', `${product.name} is added to shopping list`);
+    await addToShoppingList(userId, productId, product.name, product.image_url);
   };
 
   return (
