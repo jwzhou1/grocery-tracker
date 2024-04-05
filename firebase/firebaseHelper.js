@@ -11,7 +11,6 @@ import {
   getDoc,
   updateDoc,
   increment,
-  arrayUnion,
 } from "firebase/firestore";
 import { database, auth } from "./firebaseSetup";
 

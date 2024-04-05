@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image, TextInput, Alert,TouchableOpacity  } from 'react-native';
+import { View, StyleSheet, Text, Image, TextInput, Alert } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 import { updatePriceInDatabase } from '../firebase/firebaseHelper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+// Next steps:
+// 1.reuse ImageManager functions
+// 2.CRUD operations on users/:id/contribution
+// 3.improve UI (layout, detail, snackbar)
 export default function Feedback({ route, navigation }) {
-  const { product, price } = route.params;
+  const { product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
   const [newPrice, setNewPrice] = useState('');
   // const [selectedStore, setSelectedStore] = useState('');
@@ -99,7 +103,7 @@ export default function Feedback({ route, navigation }) {
   return (
     <View style={styles.container}>
       {/* Product Image */}
-      <TouchableOpacity onPress={takePhoto} style={styles.imageContainer}>
+      <PressableButton pressedFunction={takePhoto} customStyle={styles.imageContainer}>
         <View style={styles.imageBox}>
           {imageUri ? (
             <Image style={styles.image} source={{ uri: imageUri }} />
@@ -107,18 +111,13 @@ export default function Feedback({ route, navigation }) {
             <Text style={styles.placeholderText}>Take a Photo</Text>
           )}
         </View>
-      </TouchableOpacity>
+      </PressableButton>
 
       {/* Product Information */}
       <View style={styles.infoContainer}>
-        <Text style={styles.label}>Product Name:</Text>
-        <Text style={styles.value}>{product.name}</Text>
-
-        <Text style={styles.label}>Weight:</Text>
-        <Text style={styles.value}>{product.unit}</Text>
-
-        <Text style={styles.label}>Store:</Text>
-        <Text style={styles.value}>{price.store_name}</Text>
+        <Text style={styles.label}>Product Name: {product.name}</Text>
+        <Text style={styles.label}>Unit: {product.unit}</Text>
+        <Text style={styles.label}>Store: {selectedPrice.store_name}</Text>
 
         <Text style={styles.label}>New Price:</Text>
         {/* Input for New Price */}
@@ -132,9 +131,9 @@ export default function Feedback({ route, navigation }) {
 
         <Text style={styles.label}>Date:</Text>
         {/* Date picker */}
-        <TouchableOpacity onPress={showDatePicker} style={styles.input}>
+        <PressableButton pressedFunction={showDatePicker} customStyle={styles.input}>
           <Text>{selectedDate.toDateString()}</Text>
-        </TouchableOpacity>
+        </PressableButton>
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="date"
@@ -145,12 +144,12 @@ export default function Feedback({ route, navigation }) {
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#ccc' }]} onPress={() => navigation.goBack()}>
+          <PressableButton customStyle={[styles.button, { backgroundColor: '#ccc' }]} pressedFunction={() => navigation.goBack()}>
             <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#309797' }]} onPress={submitNewPrice}>
+          </PressableButton>
+          <PressableButton customStyle={[styles.button, { backgroundColor: '#309797' }]} pressedFunction={submitNewPrice}>
             <Text style={[styles.buttonText, { color: 'white' }]}>Submit</Text>
-          </TouchableOpacity>
+          </PressableButton>
         </View>
       </View>
     </View>
@@ -192,10 +191,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 5,
-  },
-  value: {
-    fontSize: 16,
-    marginBottom: 15,
   },
   input: {
     borderWidth: 1,

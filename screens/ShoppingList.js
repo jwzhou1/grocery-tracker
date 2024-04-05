@@ -8,9 +8,10 @@ import LoadingScreen from "./LoadingScreen";
 import { MaterialIcons } from "@expo/vector-icons";
 
 // Next steps:
-// 1.save the store information when added to list, then group items by store
-// 2.improve UI (layout, detail, snackbar)
-// 3.navigate to productDetail
+// 1.save the store information when added to list
+// 2.query price based on store, then group items by store
+// 3.improve UI (layout, detail, snackbar)
+// 4.navigate to productDetail
 export default function ShoppingList() {
   const userId = auth.currentUser.uid
   const [shoppingList, setShoppingList] = useState([]);
@@ -23,9 +24,6 @@ export default function ShoppingList() {
       async (snapshot) => {
         if (snapshot.empty) {
           setLoading(false)
-          return (
-            <Text>Add something to your shopping list</Text>
-          );
         }
 
         let promises = [];
@@ -79,6 +77,9 @@ export default function ShoppingList() {
   return (
     <View style={styles.container}>
       {loading && <LoadingScreen />}
+      {shoppingList.length === 0 && !loading &&
+        <Text>Add something to your shopping list</Text>
+      }
       <FlatList
         // contentContainerStyle={}
         data={shoppingList}
