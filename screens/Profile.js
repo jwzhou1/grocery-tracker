@@ -8,11 +8,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL,deleteObject } from "firebase/storage";
 import { Ionicons } from '@expo/vector-icons';
+import { fetchWeatherData, getUserLocation } from '../components/weatherAPI'
 
 const Profile = ({ navigation }) => {
   
   const user = auth.currentUser;
   const [imageURL, setImageURL] = useState("");
+  const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(query(collection(database, 'users'), where('uid', '==', user.uid)), snapshot => {
@@ -38,6 +40,20 @@ const Profile = ({ navigation }) => {
       console.log("unsubscribe");
       unsubscribe();
     }
+  }, []);
+
+  useEffect(() => {
+    const getWeatherData = async () => {
+      const userLocation = await getUserLocation();
+      if (userLocation) {
+        const data = await fetchWeatherData(userLocation.latitude, userLocation.longitude);
+        if (data) {
+          setWeatherData(data);
+        }
+      }
+    };
+
+    getWeatherData();
   }, []);
 
   useEffect(() => {
@@ -131,6 +147,23 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+
+{weatherData && (
+        <View style={styles.weatherContainer}>
+          <Text style={styles.weatherText}>
+            Tomorrow's Weather: {weatherData.timezoneAbbreviation}
+          </Text>
+          <Text style={styles.weatherText}>
+            High: {Math.max(...weatherData.hourly.temperature_2m)}°C
+          </Text>
+          <Text style={styles.weatherText}>
+            Low: {Math.min(...weatherData.hourly.temperature_2m)}°C
+          </Text>
+          <Text style={styles.weatherText}>
+          Precipitation Probability: {Math.round(weatherData.hourly.precipitation_probability.reduce((a, b) => a + b) / weatherData.hourly.precipitation_probability.length)}%
+          </Text>
+        </View>
+      )}
       <View style={styles.userInfoContainer}>
      
       
@@ -311,6 +344,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     padding: 5,
     borderRadius: 20,
+  },
+  weatherContainer: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  weatherText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "bold",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   
 });
