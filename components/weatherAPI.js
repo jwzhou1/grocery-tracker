@@ -1,4 +1,3 @@
-import { fetchWeatherApi } from 'openmeteo';
 import * as Location from 'expo-location';
 
 export const getUserLocation = async () => {

@@ -5,13 +5,13 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { addToShoppingList } from '../firebase/firebaseHelper';
 import { auth } from '../firebase/firebaseSetup';
+import Colors from '../styles/Colors';
 
 // Next steps:
 // 1.save the store information when added to list (same as ShoppingList)
-// 2.optimize price displaying logic (show latest price for each store)
-// 2.add price range bar
-// 3.navigate to ShoppingList
-// 4.add historical trend chart
+// 2.add historical trend chart
+// 3.optimize price displaying logic (show latest price for each store)
+// 4.navigate to ShoppingList
 // 5.improve UI (layout, detail, snackbar)
 // 6.set up notification when price drops
 const ProductDetail = ({ route, navigation }) => {
@@ -33,13 +33,14 @@ const ProductDetail = ({ route, navigation }) => {
         style={styles.image}
         source={{ uri: product.image_url || 'https://via.placeholder.com/150' }}
       />
-      <View style={styles.infoContainer}>
-        {/* Product name and unit price */}
+      <View>
+        <Text style={styles.unitPrice}>{product.brand}</Text>
+        {/* Product brand, name and unit price */}
         <View style={styles.rowContainer}>
-          <Text style={styles.productName}>{product.name}</Text>
+          <Text style={styles.productName}>{product.name}{'\n'}({product.alt_name})</Text>
           <Text style={styles.unitPrice}>${selectedPrice.unit_price}/{product.unit}</Text>
         </View>
-
+        
         {/* Prices */}
         <View style={styles.rowContainer}>
           <Text style={styles.price}>${selectedPrice.price} at {selectedPrice.store_name}</Text>
@@ -53,7 +54,6 @@ const ProductDetail = ({ route, navigation }) => {
 
         {/* Price Range Bar */}
         <View style={styles.priceRangeContainer}>
-          <Text style={{color: 'green'}}>${minPrice}</Text>
           <View style={styles.priceRangeFiller}>
             <LinearGradient
               colors={['green', 'orange', 'red']}
@@ -61,8 +61,11 @@ const ProductDetail = ({ route, navigation }) => {
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
             />
-            <View style={[styles.currentPriceIndicator, { left: `${((selectedPrice.price - minPrice) / (maxPrice - minPrice)) * 99}%` }]} />
+            <View style={[styles.currentPriceIndicator, { left: `${((selectedPrice.price - minPrice) / (maxPrice - minPrice)) * 99.5}%` }]} />
           </View>
+        </View>
+        <View style={styles.priceLabelsContainer}>
+          <Text style={{color: 'green'}}>${minPrice}</Text>
           <Text style={{color: 'red'}}>${maxPrice}</Text>
         </View>
         
@@ -93,7 +96,7 @@ const ProductDetail = ({ route, navigation }) => {
                   >
                     <View style={styles.rowContainer}>
                       <Text style={styles.moreOptionText}>${item.data.price} at {item.data.store_name}</Text>
-                      {item.data === selectedPrice && <MaterialIcons name="check-circle" size={24} color="green" />}
+                      {item.data === selectedPrice && <MaterialIcons style={{marginRight: 5}} name="check-circle" size={24} color="green" />}
                     </View>
                   </PressableButton>
                 )}
@@ -119,10 +122,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     alignSelf: 'center',
-    //marginBottom: 20,
-  },
-  infoContainer: {
-    //flex: 1,
   },
   rowContainer: {
     flexDirection: 'row',
@@ -133,6 +132,10 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 20,
     fontWeight: 'bold',
+    // wrap text to the next line
+    flex: 1, 
+    flexWrap: 'wrap',
+    maxWidth: '70%',
   },
   price: {
     fontSize: 16,
@@ -145,30 +148,28 @@ const styles = StyleSheet.create({
     color: '#666666'
   },
   addButton: {
-    backgroundColor: '#309797',
+    backgroundColor: Colors.header,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
   },
   feedbackLink: {
-    textDecorationLine: 'underline',
-    alignSelf: 'flex-start',
-    marginBottom: 20,
+    alignSelf: 'center'
   },
   feedbackText: {
-    color: '#309797',
+    color: Colors.header,
     fontSize: 16,
   },
   moreOptionsLink: {
     marginBottom: 10,
   },
   moreOptionsLinkText: {
-    color: '#309797',
+    color: Colors.header,
     fontSize: 16,
     textDecorationLine: 'underline',
   },
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   closeModalButton: {
-    backgroundColor: '#309797',
+    backgroundColor: Colors.header,
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -215,20 +216,16 @@ const styles = StyleSheet.create({
   priceRangeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: 'black',
+    marginVertical: 5,
   },
   priceRangeFiller: {
-    height: 10,
+    height: 7,
     flex: 1,
-    marginLeft: 10,
-    marginRight: 10,
-    position: 'relative',
-    overflow: 'hidden',
     flexDirection: 'row',
+  },
+  priceLabelsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   gradientFiller: {
     flex: 1,
@@ -237,9 +234,9 @@ const styles = StyleSheet.create({
   },
   currentPriceIndicator: {
     position: 'absolute',
-    top: -10,
+    top: -4.5,
     width: 3,
-    height: 30,
+    height: 15,
     backgroundColor: 'black',
   }
 });
