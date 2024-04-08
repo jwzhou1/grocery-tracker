@@ -9,17 +9,34 @@ import Colors from '../styles/Colors';
 
 // Next steps:
 // 1.save the store information when added to list (same as ShoppingList)
-// 2.add historical trend chart
-// 3.optimize price displaying logic (show latest price for each store)
-// 4.navigate to ShoppingList
-// 5.improve UI (layout, detail, snackbar)
-// 6.set up notification when price drops
+// 2.navigate to ShoppingList
+// 3.add historical trend chart
+// 4.improve UI (layout, detail, snackbar)
+// 5.set up notification when price drops
 const ProductDetail = ({ route, navigation }) => {
-  const { productId, product, prices } = route.params;
+  const { productId, product, prices, priceToShow } = route.params;
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(prices[0].data); // display most up-to-date price, change to recent cheapest
+  const [selectedPrice, setSelectedPrice] = useState(priceToShow);
+  const [latestPrices, setLatestPrices] = useState({});
   const minPrice = Math.min(...prices.map(price => price.data.price));
   const maxPrice = Math.max(...prices.map(price => price.data.price));
+  
+  useEffect(() => {
+    // display the latest price for each store in modal
+    function getLatestPrices() {
+      const priceArray = []
+      const storePrices = {}
+      prices.forEach((price) => {
+        const { store_name } = price.data;
+        if (!(store_name in storePrices)) {
+          storePrices[store_name] = 1;
+          priceArray.push(price)
+        }
+      });
+      setLatestPrices(priceArray)
+    }
+    getLatestPrices()
+  }, [])
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
@@ -37,7 +54,9 @@ const ProductDetail = ({ route, navigation }) => {
         <Text style={styles.unitPrice}>{product.brand}</Text>
         {/* Product brand, name and unit price */}
         <View style={styles.rowContainer}>
-          <Text style={styles.productName}>{product.name}{'\n'}({product.alt_name})</Text>
+          {product.alt_name ? 
+          <Text style={styles.productName}>{product.name}{'\n'}({product.alt_name})</Text> :
+          <Text style={styles.productName}>{product.name}</Text>}
           <Text style={styles.unitPrice}>${selectedPrice.unit_price}/{product.unit}</Text>
         </View>
         
@@ -85,7 +104,7 @@ const ProductDetail = ({ route, navigation }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>More Buying Options</Text>
               <FlatList
-                data={prices}
+                data={latestPrices}
                 renderItem={({ item }) => (
                   <PressableButton
                     customStyle={[styles.moreOptionItem, item.data === selectedPrice && styles.selectedItem]}

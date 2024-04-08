@@ -1,13 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
 
 export default function ProductCard({ productId, product, prices }) {
   const navigation = useNavigation()
-  const [priceToShow, setPriceToShow] = useState(prices.at(0).data) // display most up-to-date price, change to recent cheapest
+  const [priceToShow, setPriceToShow] = useState({})
+
+  useEffect(() => {
+    const getLatestCheapestPrice = () => {
+      const anchorDate = prices[0].data.date.toDate();
+      const anchor = anchorDate.getUTCDay();
+      const range = anchor < 4 ? anchor + 3 : anchor - 4 // calculate the date range to look for
+      anchorDate.setDate(anchorDate.getDate() - range);
+      // iterate through prices array to search for price within the range dating back from anchor
+      const recentPrices = prices.filter(price => price.data.date.toDate() >= anchorDate)
+      // then find out the minimum price in that range
+      let minPrice = Infinity;
+      let minPriceIndex = -1;
+
+      recentPrices.forEach((price, index) => {
+        if (price.data.price < minPrice) {
+          minPrice = price.data.price;
+          minPriceIndex = index;
+        }
+      });
+      setPriceToShow(prices.at(minPriceIndex).data)
+    }
+    getLatestCheapestPrice()
+  })
+
   const navigateToProductDetail = () => {
-    navigation.navigate('Product Detail', { productId, product, prices });
+    navigation.navigate('Product Detail', { productId, product, prices, priceToShow });
   };
 
   return (
