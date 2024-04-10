@@ -10,7 +10,7 @@
 3. Notification 
 4. External API use
 
-##    Iteration 2: Overall Stucture, Navigation, and Basis of CRUD Operations to Firestore
+##    Iteration 2: Authentication, Location use, Notification and External API use
 ###    Data Modal and Collections:
 ####   1. Users Collection (Contribution: Jiawei Zhou):
 This is a top-level collection. Each document in the Users collection represents a user of our application. It has these fields:
@@ -18,7 +18,6 @@ This is a top-level collection. Each document in the Users collection represents
 -   "uid": "user_unique_id",
 -   "email": "user@example.com",
 -   "imageUri": "User Profile Image",
--   "username": 'Username, which is set by being extracted before the "@" symbol in an email address'
 
 #### CRUD operations for Users Collection:
 
@@ -46,6 +45,7 @@ This is a top-level collection. Each document in the Products collection represe
 -   "quantity"
 -   "unit"
 -   "image_url"
+-   "prices"
 
 #### CRUD operations for Products Collection:
 1. **Create:**
@@ -54,8 +54,8 @@ This is a top-level collection. Each document in the Products collection represe
 2. **Read:**
    Users can search products by their names. Then a query will be executed and return matched products.
 
-####  3. Prices Collection (Contribution: Liyao Zhang):
-This is a top-level collection. Each document in the Prices collection represents a single price entry. It has these fields:
+####  3. Prices Sub-Collection (Contribution: Liyao Zhang):
+This is a sub collection in Products Collection. Each document in the Prices sub-collection represents a single price entry. It has these fields:
 
 -   "date"
 -   "price"
@@ -75,6 +75,7 @@ This is a top-level collection. Each document in the Prices collection represent
    Users can contribute to the price collection by adding a new price they found in store. However, this operation is not implemented yet.
 
 ### Screens
+### Authentication
 #### Auth Stack Screens (Contribution: Jiawei Zhou):
  <img src="images/screen_images/signup-screen.jpg" alt="Signup" width="200"> <img src="images/screen_images/login-screen.jpg" alt="Login" width="200">
 
@@ -88,13 +89,14 @@ The Auth Stack comprises two primary screens: the Sign Up Screen and the Log In 
 
 The Log In Screen and Sign Up Screen are integrated with Firebase's Admin Authentication API Errors to handle common authentication issues. These screens are designed to display alerts for main errors such as invalid email format, weak password, password mismatch, and other relevant authentication errors as per Firebase's API guidelines.
 
-#### App Stack Screens
+#### App Stack Screens 
+
+### Location use 
 **Home Screen (Contribution: Jiawei Zhou):**  
-**(still under implementation)**  
 
 <img src="images/screen_images/home-screen.jpg" alt="Alt text" width="200">
 
-On the home screen, the top of the screen displays the user's current location, requiring the user to grant permission for our app to access their current location. Following this, users can find a search bar that they can click to navigate to the search screen. Additionally, users will be able to view all grocery categories (still under implementation) and the hot deal banner (also still under implementation). At the bottom, there is a bottom tab for Home, Shopping List, and Profile.
+On the home screen, the top displays the user's current location, requiring permission for our app to access it. Below this, users can find a search bar to navigate to the search screen. Additionally, users can view all grocery categories, each accompanied by a unique category image. Below the category cards is the hot deal banner, which requires manual updates by our team. At the bottom, there are tabs for Home, Shopping List, and Profile.
 
 **Search Screen (Contribution: Liyao Zhang):**
 
@@ -104,27 +106,38 @@ User can search products by their names(exact full name). However, due to limita
 
 **Product Detail Screen (Contribution: Liyao Zhang):**
 
-<img src="images/screen_images/productdetail.png" alt="Alt text" width="200">
+<img src="images/screen_images/productdetail1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/productdetail2.jpg" alt="Alt text" width="200"> 
 
-After tapping on the Product preview card, it will navigate to a product detail screen where more details will be displayed like unit prices, stores, and the option to add product to the shopping list. However, the CRUD operations on user's lists(shopping list, watch list, my contributions) have not been implemented in this iteration due to time constraints. So the Add to List button is not working at the moment.
+After tapping on the product preview card, you will navigate to a product detail screen where more information will be displayed, such as unit prices, stores, price range, and the option to add the product to your shopping list. On the product detail screen, you can click 'More Buying Options' to view different purchasing choices. However, the CRUD operations on user's lists(watch list, my contributions) have not been implemented in this iteration due to time constraints.
+
+<img src="images/screen_images/productdetail3.jpg" alt="Alt text" width="200"> <img src="images/screen_images/productdetail4.jpg" alt="Alt text" width="200"> 
+
+You can also click the 'Add to List' button, which will add the product to the shopping list. If it is added successfully, a popup will appear.
 
 **Feedback Screen (Contribution: Liyao Zhang, Jiawei Zhou):**
+**(still under implementation)**
 
 <img src="images/screen_images/feedback.png" alt="Alt text" width="200">
 
-If users don't agree on the price, they will be navigated to Feedback screen to contribute a new record of price on that product. They need to specify store name, new price and the date they found the price. Similarly, the submit button is currently not working, as it will be implemented in the next iteration.
+If users don't agree on the price, they will be directed to the Feedback screen to contribute a new price record for that product. Users can only submit a new price they found at the same store. They need to specify the new price and the date they found it. Please note that the submit button is currently not operational, as it will be implemented in the next iteration.
+
+**Shopping List Screen (Contribution: Liyao Zhang):**
+
+<img src="images/screen_images/shoppinglist1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/shoppinglist2.jpg" alt="Alt text" width="200"> 
+
+Now let's go to the shopping list screen to check whether the product has been added. We can see that the product has indeed been added to the shopping list. On the shopping list screen, you can increase the quantity by pressing the '+' button or decrease it by pressing the '-' button. You can also remove this product from your shopping list by tapping the 'trash' icon.
 
 **Profile Screen (Contribution: Jiawei Zhou):**  
 
 <img src="images/screen_images/profile-screen1.jpg" alt="Alt text" width="200">
 
-The Profile Screen presents the user's profile information. Upon initial registration and login, if no profile image is uploaded, a default profile image is utilized. Below the profile image, there is a place to display the user's email address. Moreover, users have the option to click on "Edit Profile" on the Profile Screen to modify their profile, which includes updating their profile image. Additionally, users can access "My Watch List" (still under implementation) and "My Contributions" (also still under implementation) by tapping on the respective options. In the top right corner of the profile screen, there's an icon to logout and return to the signup screen.
+The Profile Screen presents the user's profile information. Upon initial registration and login, if no profile image is uploaded, a default profile image is utilized. Below the profile image, there is a place to display the user's email address. Moreover, users have the option to click on "Edit Profile" on the Profile Screen to modify their profile, which includes updating their profile image. Additionally, users can access "My Watch List" (still under implementation) and "My Contributions" (also still under implementation) by tapping on the respective options. Users can also access 'Schedule a Notification' to schedule a notification for shopping. In the top right corner of the profile screen, there's an icon to logout and return to the signup screen.
 
 **Edit Profile Screen (Contribution: Jiawei Zhou):**  
 
 <img src="images/screen_images/edit-profile1.jpg" alt="Alt text" width="200">
 
-The Edit Profile Screen presents the current user's email information at the top. Below, there is a section where users can upload their username (still under implementation). Additionally, users have the option to upload their profile image by either taking a photo using their device's camera or uploading from their device's local photo library.
+The Edit Profile Screen presents the current user's email information at the top. Below, users have the option to upload their profile image by either taking a photo using their device's camera or uploading from their device's local photo library.
 
 <img src="images/screen_images/edit-profile2.jpg" alt="Alt text" width="200"> <img src="images/screen_images/edit-profile3.jpg" alt="Alt text" width="200">
 
@@ -138,9 +151,9 @@ After saving the changes, users can view the updated profile picture on the Prof
 
 After clicking on the trash bin icon located at the bottom right corner of the profile picture, users can delete their current profile picture. Subsequently, the profile picture will revert to the default profile image. Additionally, the trash bin icon will disappear since the user no longer has an uploaded profile image associated with their account.
 
-**Map Screen**
+**Map Screen (Contribution: Jiawei Zhou):**
 
-Location Use (Contribution: Jiawei Zhou):
+### Location Use and External API Use
 
 <img src="images/screen_images/map1.png" alt="Alt text" width="200"> <img src="images/screen_images/map2.jpg" alt="Alt text" width="200">
 
@@ -151,3 +164,11 @@ To access the map screen, you need to go to the main page and click on the map i
 When you click the red marker, it will display information about the supermarket's name and location at the bottom. Additionally, the supermarket name will appear above the red marker. You can also notice a button labeled "Navigate" in the bottom supermarket information window. If you click this button, it will direct you to the Google Maps app on your phone and assist you in navigating to the selected supermarket location.
 
 <img src="images/screen_images/map5.jpg" alt="Alt text" width="200">
+
+Here we use the Google Location API as the external API:
+
+```
+ const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=supermarket&key=${GOOGLE_MAPS_API_KEY}`
+      );
+```
