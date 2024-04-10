@@ -7,7 +7,6 @@ import { auth } from "./firebase/firebaseSetup";
 import { onAuthStateChanged } from "firebase/auth";
 
 import Signup from "./screens/Signup";
-import Category from "./screens/Category";
 import Login from "./screens/Login";
 import Search from "./screens/Search";
 import Home from "./screens/Home";
@@ -56,7 +55,7 @@ function TabNavigator() {
       fontSize: 20,
     },
     tabBarActiveTintColor: Colors.iconFocused,
-    tabBarInactiveTintColor: Colors.iconDefault,
+    tabBarInactiveTintColor: Colors.headerText,
     tabBarLabelStyle: {
       fontSize: 11,
     },
@@ -67,25 +66,25 @@ function TabNavigator() {
       <SearchHeader />
     ),
     tabBarIcon: ({ focused }) => (
-      <FontAwesome5 name="home" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+      <FontAwesome5 name="home" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
   }
   const listOptions = {
     tabBarIcon: ({ focused }) => (
-      <FontAwesome5 name="list" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+      <FontAwesome5 name="list" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
   }
 
   const profileOptions = ({ navigation }) => ({
     tabBarIcon: ({ focused }) => (
-      <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.iconDefault}/>
+      <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
     headerRight: () => (
       <PressableButton
         customStyle={{margin: 5}}
         pressedFunction={() => auth.signOut()}
       >
-        <FontAwesome5 name="sign-out-alt" size={24} color={Colors.iconDefault}/>
+        <FontAwesome5 name="sign-out-alt" size={24} color={Colors.headerText}/>
       </PressableButton>
     ),
     headerStyle: {
@@ -112,13 +111,6 @@ const AppStack = (
   <>
     <Stack.Screen name="Tabs" component={TabNavigator}/>
     <Stack.Screen name="Edit Profile" component={EditProfile}
-      options={{
-        headerShown: true,
-      }}
-    />
-      <Stack.Screen
-      name="Category"
-      component={Category}
       options={{
         headerShown: true,
       }}

@@ -22,7 +22,7 @@ export default function SearchBar({ handleSearch, setSubmitted, autoFocus }) {
         value={searchText}
         onChangeText={setSearchText}
         onChange={() => setSubmitted(false)}
-        onFocus={handleSearchTap}
+        onPressIn={handleSearchTap}
         onSubmitEditing={() => handleSearch(searchText)} // avoid direct function call
         enablesReturnKeyAutomatically={true} // ios
         clearButtonMode={'while-editing'} // ios
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
     borderWidth: 1.5,
-    borderColor: "#309797",
+    borderColor: Colors.header,
     borderRadius: 4,
     backgroundColor: "#FFFBF5",
     marginVertical: 10,

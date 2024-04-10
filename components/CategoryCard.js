@@ -18,7 +18,7 @@ export default function CategoryCard() {
 
   // Function to handle category press
   const handleCategoryPress = (categoryName) => {
-    navigation.navigate('Category', { category: categoryName });
+    navigation.navigate('Search', { category: categoryName});
   };
 
   // Divide categories into 2 rows

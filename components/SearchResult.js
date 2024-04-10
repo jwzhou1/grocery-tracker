@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, FlatList } from 'react-native'
 import React from 'react'
 import ProductCard from './ProductCard'
 
-export default function SearchResult({ searchText, data }) {
+export default function SearchResult({ headerText, data }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Results for "{searchText}"</Text>
+      <Text style={styles.title}>{headerText}</Text>
       <FlatList
         data={data}
         renderItem={({item}) => {
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     marginLeft: '5%',
     marginVertical: 5,
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   }
 })

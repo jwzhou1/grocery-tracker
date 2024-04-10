@@ -3,9 +3,11 @@ import { View, StyleSheet, Text } from "react-native";
 import SearchBar from "../components/SearchBar";
 import SearchResult from "../components/SearchResult";
 import LoadingScreen from "./LoadingScreen"
-import { searchFromDB, getPricesFromDB } from "../firebase/firebaseHelper";
+import { searchFromDB, getPricesFromDB, searchCategoriesFromDB } from "../firebase/firebaseHelper";
 
-export default function Search() {
+export default function Search({ route }) {
+  const { category } = route.params || {}
+  const [headerText, setHeaderText] = useState("");
   const [searchText, setSearchText] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -20,8 +22,36 @@ export default function Search() {
     }
   }, [queryResult])
 
+  // handle searching by category
+  useEffect(() => {
+    async function fetchCategory() {
+      if (category) {
+        setHeaderText(`View all results for ${category}`)
+        setSubmitted(true)
+        setLoading(true)
+        // fetch all products from category
+        try {
+          const productData = await searchCategoriesFromDB(category)
+          const productWithPrices = await Promise.all(productData.map(async (product) => {
+            const prices = await getPricesFromDB(product.id);
+            return { ...product, prices };
+          }))
+          setQueryResult(productWithPrices)
+        } catch (error) {
+          console.error("Error fetching category results:", error);
+          setQueryResult([]); // reset query result
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+    fetchCategory()
+  }, [])
+
+  // handle searching by keyword
   const handleSearch = async (searchText) => {
     setSearchText(searchText)
+    setHeaderText(`Results for "${searchText}"`)
     setSubmitted(true)
     setLoading(true)
 
@@ -49,7 +79,7 @@ export default function Search() {
         {submitted && !loading && !showResult && <Text>No results</Text>}
       </View>
       {submitted && loading && <LoadingScreen />}
-      {submitted && !loading && showResult && <SearchResult searchText={searchText} data={queryResult}/>}
+      {submitted && !loading && showResult && <SearchResult headerText={headerText} data={queryResult}/>}
     </View>
   );
 };
@@ -62,6 +92,6 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     width: '90%',
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
 });
