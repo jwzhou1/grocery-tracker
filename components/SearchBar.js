@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Colors from "../styles/Colors";
 
-export default function SearchBar({ handleSearch, setSubmitted }) {
+export default function SearchBar({ handleSearch, setSubmitted, autoFocus }) {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
 
@@ -16,13 +16,13 @@ export default function SearchBar({ handleSearch, setSubmitted }) {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        autoFocus={true}
+        autoFocus={autoFocus || false}
         placeholder="Search products"
         placeholderTextColor="#b3b3b3"
         value={searchText}
         onChangeText={setSearchText}
         onChange={() => setSubmitted(false)}
-        onFocus={handleSearchTap}
+        onPressIn={handleSearchTap}
         onSubmitEditing={() => handleSearch(searchText)} // avoid direct function call
         enablesReturnKeyAutomatically={true} // ios
         clearButtonMode={'while-editing'} // ios
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
     borderWidth: 1.5,
-    borderColor: "#309797",
+    borderColor: Colors.header,
     borderRadius: 4,
     backgroundColor: "#FFFBF5",
     marginVertical: 10,

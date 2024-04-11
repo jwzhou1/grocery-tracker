@@ -1,43 +1,57 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
-import { getPricesFromDB } from '../firebase/firebaseHelper';
 
-export default function ProductCard({ productId, product }) {
-  const [prices, setPrices] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+export default function ProductCard({ productId, product, prices }) {
   const navigation = useNavigation()
-  const navigateToProductDetail = () => {
-    navigation.navigate('Product Detail', { product, prices});
-  };
+  const [priceToShow, setPriceToShow] = useState({})
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const priceData = await getPricesFromDB(productId);
-        setPrices(priceData);
-      } catch (error) {
-        console.error('Error fetching price data:', error);
-      } finally {
-        setLoading(false)
-      }
-    };
-    fetchData();
-  }, [productId]);
+    const getLatestCheapestPrice = () => {
+      const anchorDate = prices[0].data.date.toDate();
+      const anchor = anchorDate.getUTCDay();
+      const range = anchor < 4 ? anchor + 3 : anchor - 4 // calculate the date range to look for
+      anchorDate.setDate(anchorDate.getDate() - range);
+      // iterate through prices array to search for price within the range dating back from anchor
+      const recentPrices = prices.filter(price => price.data.date.toDate() >= anchorDate)
+      // then find out the minimum price in that range
+      let minPrice = Infinity;
+      let minPriceIndex = -1;
+
+      recentPrices.forEach((price, index) => {
+        if (price.data.price < minPrice) {
+          minPrice = price.data.price;
+          minPriceIndex = index;
+        }
+      });
+      setPriceToShow(prices.at(minPriceIndex).data)
+    }
+    getLatestCheapestPrice()
+  })
+
+  const navigateToProductDetail = () => {
+    navigation.navigate('Product Detail', { productId, product, prices, priceToShow });
+  };
 
   return (
     <PressableButton pressedFunction={navigateToProductDetail}>
-      {!loading && prices.at(0) &&
+      {prices.at(0) &&
       <View style={styles.productCard}>
-        <Image source={{ uri: "https://via.placeholder.com/150" }} style={styles.image} />
+        <Image source={{ uri: product.image_url || "https://via.placeholder.com/150" }} style={styles.image} />
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.category}>{product.category}</Text>
-          <Text style={styles.price}>${prices.at(0).data.price}</Text>
+          <View style={styles.priceRow}>
+            {product.unit && product.quantity === 1 ? 
+            // if loose, show unit price only
+            <Text style={styles.price}>${priceToShow.unit_price}/{product.unit}</Text> :
+            // otherwise show both price & unit price
+            <>
+            <Text style={styles.price}>${priceToShow.price}</Text>
+            <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>
+            </>}
+          </View>
         </View>
       </View>}
     </PressableButton>
@@ -56,11 +70,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   image: {
-    width: '100%',
+    width: '50%',
     height: 150,
+    alignSelf: 'center'
   },
   detailsContainer: {
     padding: 10,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   name: {
     fontSize: 16,

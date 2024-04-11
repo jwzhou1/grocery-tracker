@@ -25,11 +25,10 @@ export default function Signup({ navigation }) {
         email,
         password
       );
-      const userId = await writeToUsersDB({
-        email: email,
-        uid: userCredential.user.uid,
+      await writeToUsersDB({
+          email: email,
+          uid: userCredential.user.uid
       });
-      console.log(userId);
     } catch (error) {
       if (error.code === "auth/invalid-email") {
         alert("Invalid email");

@@ -1,31 +1,52 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { auth, storage } from '../firebase/firebaseSetup';
-import { updateProfile } from "firebase/auth";
 import ImageManager from '../components/ImageManager';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import PressableButton from '../components/PressableButton';
+import { updateProfile } from "firebase/auth";
+import { auth, storage, database } from '../firebase/firebaseSetup';
 import { updateToUsersDB } from '../firebase/firebaseHelper';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const EditProfile = ({ navigation }) => {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [newUsername, setNewUsername] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [entryId, setEntryId] = useState('');
 
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(collection(database, 'users'), where('uid', '==', user.uid)),
+      (querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const entryId = userDoc.id;
+          setEntryId(entryId);
+        } else {
+          console.log('User document not found.');
+        }
+      },
+      (err) => {
+        console.log(err);
+        if (err.code === 'permission-denied') {
+          console.log('User does not have permission to access this collection');
+        }
+      }
+    );
   
+    return () => unsubscribe(); 
+  }, []);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setEmail(user.email);
-        setUsername(user.displayName);
         setAvatarUrl(user.imageUri);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
-
     fetchUserData();
   }, []);
 
@@ -40,9 +61,11 @@ const EditProfile = ({ navigation }) => {
           });
         }
       }
-      alert('Profile updated successfully!');
+      Alert.alert('Profile updated successfully!');
       navigation.goBack();
-      navigation.navigate('Profile', { updateProfile: true }); 
+      navigation.navigate('Profile', { 
+        updateProfile: true,
+      }); 
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -68,12 +91,10 @@ const EditProfile = ({ navigation }) => {
             // Set the avatar URL to the full path of the uploaded image
             setAvatarUrl(uploadTask.snapshot.metadata.fullPath);
             if (user) {
-              let newuser = {
-                email: user.email,
-                uid: user.uid,
-              }
-              console.log(uploadTask.snapshot.metadata.fullPath)
-              updateToUsersDB(newuser, uploadTask.snapshot.metadata.fullPath); // Update user data in Firestore
+              const updateEntry = {
+                imageUri: uploadTask.snapshot.metadata.fullPath, // Add the image URL to the user data
+              };
+              updateToUsersDB(entryId, updateEntry); // Update the user document
             }
           });
         }
@@ -91,28 +112,21 @@ const EditProfile = ({ navigation }) => {
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
-        <Text style={styles.label}>Username: {auth.currentUser.displayName}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter New Username"
-          value={newUsername}
-          onChangeText={(text) => setNewUsername(text)}
-        />
         <Text style={styles.label}>Upload New Avatar: </Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => {
+        <PressableButton customStyle={styles.button} pressedFunction={() => {
           handleSave();
           if (imageUri) {
             uploadImage(imageUri);
           }
         }}>
           <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+        </PressableButton>
+        <PressableButton customStyle={styles.button} pressedFunction={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
+        </PressableButton>
       </View>
     </View>
   );

@@ -1,84 +1,142 @@
-import { collection, addDoc, deleteDoc, doc, setDoc, getDocs, query, where, orderBy } from 'firebase/firestore';
-import { database, auth } from './firebaseSetup';
-import { ref, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { storage } from './firebaseSetup';
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  getDoc,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
+import { database, auth } from "./firebaseSetup";
 
 // support searching products by name
 export async function searchFromDB(keyword) {
-  // create a reference to products collection
-  const productsRef = collection(database, "products");
+  try {
+    // create a reference to products collection
+    const productsRef = collection(database, "products");
 
-  // perform a query of full-text match (use Typesense for more usable search functionality)
-  const q = query(productsRef, where("name", "==", keyword));
-  const querySnapshot = await getDocs(q);
-  const productData = []
-  querySnapshot.forEach((doc) => {
-    productData.push({
-      id: doc.id,
-      data: doc.data()
+    // perform a query of full-text match (use Typesense for more usable search functionality)
+    const q = query(productsRef, where("name", "==", keyword));
+    const querySnapshot = await getDocs(q);
+    const productData = [];
+    querySnapshot.forEach((doc) => {
+      productData.push({
+        id: doc.id,
+        data: doc.data(),
+      });
     });
-  })
-  return productData;
+    return productData;
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 // get all prices given a product id
 export async function getPricesFromDB(productId) {
-  const pricesRef = collection(database, "prices");
-  // order prices from newest to oldest
-  const q = query(pricesRef, where("product_id", "==", productId), orderBy("date", "desc"));
-  //const q = query(pricesRef, where("product_id", "==", productId));
-  const querySnapshot = await getDocs(q);
-  const priceData = []
-  querySnapshot.forEach((doc) => {
-    priceData.push({
-      id: doc.id,
-      data: doc.data()
-    });
-  })
-  return priceData;
-}
-
-export async function writeToDB(data) {
-
-}
-
-export async function deleteFromDB(id) {
-
-}
-
-export async function updateDB(id, data) {
-
-}
-
-export async function writeToUsersDB(userData) {
   try {
-    const docRef = await addDoc(collection(database, 'users'), userData);
-    console.log('Document written with ID: ', docRef.id);
-    console.log(docRef.id);
-    return docRef.id;
+    // create a reference to prices subcollection
+    const pricesRef = collection(database, `products/${productId}/prices`);
+
+    // query prices and order from newest to oldest
+    const q = query(pricesRef, orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
+    const priceData = [];
+    querySnapshot.forEach((doc) => {
+      priceData.push({
+        id: doc.id,
+        data: doc.data(),
+      });
+    });
+    return priceData;
   } catch (error) {
-    console.error('Error adding document: ', error);
-    throw error;
+    console.log(error)
   }
 }
 
-
-export const updateToUsersDB = async (userData, photoURL) => {
+export const writeToUsersDB = async (userData) => {
   try {
-    const userID = auth.currentUser.uid; 
-    console.log(auth.currentUser.uid);
-    const updatedUserData = { ...userData, imageUri: photoURL }; 
-    console.log(updatedUserData);
-    const userQuery = query(collection(database, 'users'), where('uid', '==', userID));
-    const querySnapshot = await getDocs(userQuery);
-    let userId;
-    querySnapshot.forEach(doc => {
-        userId = doc.id;
-    });
-    const userRef = doc(database, 'users', userId);
-    await setDoc(userRef, updatedUserData); 
-    console.log('Suceessfully updated user imageUri in Firestore!');
+    const { email, uid } = userData;
+    await setDoc(doc(database, "users", uid), { email: email, uid: uid });
   } catch (error) {
-    console.error('imageUri upload Error:', error);
+    console.error("Error adding document: ", error);
+  }
+};
+
+export async function updateToUsersDB(entryId, updateEntry) {
+  try {
+    const entryRef = doc(database, "users", entryId);
+    await setDoc(entryRef, updateEntry, { merge: true });
+    console.log("Updated To Users DB Successfully");
+  } catch (err) {
+    console.log("error in updateToUsersDB: ", err);
+  }
+}
+
+export async function searchCategoriesFromDB(category) {
+  try {
+    const productsRef = collection(database, "products");
+    const q = query(productsRef, where("category", "==", category));
+    const querySnapshot = await getDocs(q);
+    const productData = [];
+    querySnapshot.forEach((doc) => {
+      productData.push({
+        id: doc.id,
+        data: doc.data(),
+      });
+    });
+    return productData;
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+  }
+}
+
+export async function addToShoppingList(userId, productId, name, image_url) {
+  try {
+    // Get a reference to the shoppinglist
+    const listRef = collection(database, `users/${userId}/shopping_list`);
+    const itemRef = doc(listRef, productId)
+    const itemDoc = await getDoc(itemRef);
+
+    // Check if the item exists in the shopping list
+    if (itemDoc.exists()) {
+      // update its quantity
+      await updateDoc(itemRef, { name: name, image_url: image_url, quantity: increment(1) });
+    } else {
+      // create a new doc and set quantity to 1
+      await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), 
+        { name: name, image_url: image_url, quantity: 1 });
+    }
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+export const updatePriceInDatabase = async (updatedPrice) => {
+  try {
+    const q = query(
+      collection(database, "prices"),
+      where("product_id", "==", updatedPrice.product_id) &&
+        where("store_name", "==", updatedPrice.store_name)
+    );
+    const querySnapshot = await getDocs(q);
+    let priceId;
+    querySnapshot.forEach((doc) => {
+      priceId = doc.id;
+    });
+    console.log("NewpriceId:", priceId);
+    if (!priceId) {
+      console.error("No matching price documents found in the subset");
+      throw new Error("No matching price documents found in the subset");
+    }
+    await updateDoc(doc(collection(database, "prices"), priceId), updatedPrice);
+    console.log("Price updated successfully");
+    return true;
+  } catch (error) {
+    console.error("Error updating price:", error);
   }
 };
