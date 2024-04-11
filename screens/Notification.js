@@ -59,8 +59,6 @@ const NotificationSetting = () => {
       isNotification: true,
       notificationTime: time,
     };
-    console.log('entryId:', entryId);
-    console.log('updatedEntry:', updatedEntry);
     updateToUsersDB(entryId, updatedEntry);
     setIsNotification(true)
     setNotificationTime(time)

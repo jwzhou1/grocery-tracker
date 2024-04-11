@@ -23,9 +23,21 @@ import SearchHeader from "./components/SearchHeader";
 import PressableButton from "./components/PressableButton";
 import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
+import * as Notifications from "expo-notifications";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
+Notifications.setNotificationHandler({
+  handleNotification: async function (notification) {
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: true,
+    };
+  },
+});
+
 
 // Auth Screens
 const AuthStack = (
