@@ -7,10 +7,11 @@
 ###    Iteration 2 adds following functionalities: 
 1. Authentication 
 2. Location use 
-3. Notification 
-4. External API use
+3. External API use
+4. Notification 
 
-##    Iteration 2: Authentication, Location use, Notification and External API use
+
+##    Iteration 2: Authentication, Location use, External API use and Notification
 ###    Data Modal and Collections:
 ####   1. Users Collection (Contribution: Jiawei Zhou):
 This is a top-level collection. Each document in the Users collection represents a user of our application. It has these fields:
@@ -172,3 +173,13 @@ Here we use the Google Location API as the external API:
         `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=supermarket&key=${GOOGLE_MAPS_API_KEY}`
       );
 ```
+
+**Notification Screen (Contribution: Jiawei Zhou):** 
+
+<img src="images/screen_images/notification1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/notification2.jpg" alt="Alt text" width="200">
+
+Users can set shopping notifications in the notification screen. By clicking the "Set Shopping Notifications" button, a date-time picker will appear. Users can then choose the time they want to receive notifications to go shopping.
+
+<img src="images/screen_images/notification3.jpg" alt="Alt text" width="200"> <img src="images/screen_images/notification4.jpg" alt="Alt text" width="200">
+
+After selecting the desired time, it will be displayed on the notification screen. Then, at the selected time, a notification will appear on the phone.
