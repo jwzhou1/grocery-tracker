@@ -9,14 +9,14 @@ export default function SearchBar({ handleSearch, setSubmitted, autoFocus }) {
   const [searchText, setSearchText] = useState("");
 
   const handleSearchTap = () => {
-    navigation.navigate("Search");
+    navigation.navigate("Search", { focus: true });
   };
 
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        autoFocus={autoFocus || false}
+        autoFocus={autoFocus || false} // prevent bugs due to empty props
         placeholder="Search products"
         placeholderTextColor="#b3b3b3"
         value={searchText}

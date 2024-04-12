@@ -6,7 +6,7 @@ import LoadingScreen from "./LoadingScreen"
 import { searchFromDB, getPricesFromDB, searchCategoriesFromDB } from "../firebase/firebaseHelper";
 
 export default function Search({ route }) {
-  const { category } = route.params || {}
+  const { category, focus } = route.params
   const [headerText, setHeaderText] = useState("");
   const [searchText, setSearchText] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -75,7 +75,7 @@ export default function Search({ route }) {
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
-        <SearchBar handleSearch={handleSearch} setSubmitted={setSubmitted} autoFocus={true}/>
+        <SearchBar handleSearch={handleSearch} setSubmitted={setSubmitted} autoFocus={focus}/>
         {submitted && !loading && !showResult && <Text>No results</Text>}
       </View>
       {submitted && loading && <LoadingScreen />}
