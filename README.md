@@ -1,18 +1,18 @@
 #   APP Name: Grocery Price Tracker
 
-### Introducing Grocery Price Tracker: your ultimate companion for grocery shopping. Track historical prices to uncover true bargains, and receive notifications when prices drop. Plan your trips efficiently with our customizable shopping list feature. Can't find an item? Simply snap a picture and contribute its price. Effortlessly navigate through various categories and stay updated with hot deals from nearby supermarkets. With detailed product insights and an intuitive interface, making informed decisions has never been easier. Plus, your feedback ensures accurate pricing for all. Revolutionize your grocery shopping experience – download Grocery Price Tracker now!
+#### Introducing Grocery Price Tracker: your ultimate companion for grocery shopping. Track historical prices to uncover true bargains, and receive notifications when prices drop. Plan your trips efficiently with our customizable shopping list feature. Can't find an item? Simply snap a picture and contribute its price. Effortlessly navigate through various categories and stay updated with hot deals from nearby supermarkets. With detailed product insights and an intuitive interface, making informed decisions has never been easier. Plus, your feedback ensures accurate pricing for all. Revolutionize your grocery shopping experience – download Grocery Price Tracker now!
 
 ###    Authors: Liyao Zhang, Jiawei Zhou
+###    Iteration 1 adds following key functionalities: 
+1. Authentication
+2. Location use
+3. Camera use
 
-###    Iteration 2 adds following functionalities: 
-1. Authentication 
-2. Location use 
-3. External API use
-4. Notification 
+###    Iteration 2 adds following key functionalities: 
+1. External API use
+2. Notification
 
-
-##    Iteration 2: Authentication, Location use, External API use and Notification
-###    Data Modal and Collections:
+###    Data Model and Collections:
 ####   1. Users Collection (Contribution: Jiawei Zhou):
 This is a top-level collection. Each document in the Users collection represents a user of our application. It has these fields:
 
@@ -33,8 +33,6 @@ This is a top-level collection. Each document in the Users collection represents
 
 4. **Delete (Delete User's Profile Image):**
    Users can delete their profile image by initiating this action through the profile screen, clicking on a trash bin icon located at the bottom right corner of the profile image. This action triggers a request to delete the current profile image stored in the Firebase storage associated with their account. The system will remove the 'imageUri' field from the user's document in the Users Collection.
-
-
 
 ####  2. Products Collection (Contribution: Liyao Zhang):
 This is a top-level collection. Each document in the Products collection represents a single product entry. It has these fields:
@@ -76,7 +74,6 @@ This is a sub collection in Products Collection. Each document in the Prices sub
    Users can contribute to the price collection by adding a new price they found in store. However, this operation is not implemented yet.
 
 ### Screens
-### Authentication
 #### Auth Stack Screens (Contribution: Jiawei Zhou):
  <img src="images/screen_images/signup-screen.jpg" alt="Signup" width="200"> <img src="images/screen_images/login-screen.jpg" alt="Login" width="200">
 
@@ -91,9 +88,7 @@ The Auth Stack comprises two primary screens: the Sign Up Screen and the Log In 
 The Log In Screen and Sign Up Screen are integrated with Firebase's Admin Authentication API Errors to handle common authentication issues. These screens are designed to display alerts for main errors such as invalid email format, weak password, password mismatch, and other relevant authentication errors as per Firebase's API guidelines.
 
 #### App Stack Screens 
-
-### Location use 
-**Home Screen (Contribution: Jiawei Zhou):**  
+**Home Screen (Contribution: Jiawei Zhou):**
 
 <img src="images/screen_images/home-screen.jpg" alt="Alt text" width="200">
 
@@ -104,6 +99,9 @@ On the home screen, the top displays the user's current location, requiring perm
 <img src="images/screen_images/search-screen1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/searchresult.png" alt="Alt text" width="200">
 
 User can search products by their names(exact full name). However, due to limitations of Firebase, there is no support for full-text search yet. If user wants to have a better search experience, we may need to incorporate third-party search services like Typesense to achieve that. There are currently around 100 products ready for search. Please refer to the second workbook of utils/sample_data.xlsx for a comprehensive list of products. 
+
+Also, users can view all results for a specific category by tapping a category icon at home page.
+<img src="images/screen_images/search-category.png" alt="Alt text" width="200">
 
 **Product Detail Screen (Contribution: Liyao Zhang):**
 

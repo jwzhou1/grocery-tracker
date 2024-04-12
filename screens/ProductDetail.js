@@ -8,11 +8,9 @@ import { auth } from '../firebase/firebaseSetup';
 import Colors from '../styles/Colors';
 
 // Next steps:
-// 1.save the store information when added to list (same as ShoppingList)
-// 2.navigate to ShoppingList
-// 3.add historical trend chart
-// 4.improve UI (layout, detail, snackbar)
-// 5.set up notification when price drops
+// 1.add historical trend chart
+// 2.improve UI (layout, detail, snackbar)
+// 3.set up notification when price drops
 const ProductDetail = ({ route, navigation }) => {
   const { productId, product, prices, priceToShow } = route.params;
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -36,12 +34,14 @@ const ProductDetail = ({ route, navigation }) => {
       setLatestPrices(priceArray)
     }
     getLatestPrices()
-  }, [])
+    setSelectedPrice(priceToShow) // update the state when navigating from shopping list
+  }, [priceToShow])
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
     Alert.alert('Success', `${product.name} is added to shopping list`); // replace with a snackbar later
-    await addToShoppingList(userId, productId, product.name, product.image_url);
+    await addToShoppingList(userId, productId, product.name, product.image_url, 
+      product.alt_name, product.brand, product.unit, selectedPrice.store_name);
   };
 
   return (
