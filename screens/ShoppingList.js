@@ -8,11 +8,9 @@ import LoadingScreen from "./LoadingScreen";
 import { MaterialIcons } from "@expo/vector-icons";
 
 // Next steps:
-// 1.save the store information when added to list
-// 2.query price based on store, then group items by store
+// 1.group items by store
 // 3.improve UI (layout, detail, snackbar)
-// 4.navigate to productDetail
-export default function ShoppingList() {
+export default function ShoppingList({ navigation }) {
   const userId = auth.currentUser.uid
   const [shoppingList, setShoppingList] = useState([]);
   const [loading, setLoading] = useState(true); // set to true initially to adapt to firestore listener
@@ -32,7 +30,8 @@ export default function ShoppingList() {
           const productId = doc.id;
           // fetch prices for the current product and collect the promise
           promises.push(getPricesFromDB(productId).then(prices => 
-            ({ ...productData, id: productId, price: prices.at(0).data.price })));
+            ({ product: productData, id: productId, prices: prices, 
+              priceToShow: prices.filter((price) => price.data.store_name === productData.store_name).at(0).data })));
           setQuantities(prevQuantities => ({ ...prevQuantities, [productId]: productData.quantity }));
         });
         // wait for all promises to resolve
@@ -50,6 +49,11 @@ export default function ShoppingList() {
       unsubscribe();
     };
   }, []);
+
+  const navigateToProductDetail = (item) => {
+    navigation.navigate("Product Detail", 
+      { productId: item.id, product: item.product, prices: item.prices, priceToShow: item.priceToShow })
+  }
 
   const quantityHandler = async (productId, delta) => {
     // first update local states
@@ -85,32 +89,34 @@ export default function ShoppingList() {
         data={shoppingList}
         renderItem={({ item }) => {
           return (
-            <View style={styles.itemContainer}>
-              <Image style={styles.image} source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} />
-              <View style={styles.infoContainer}>
-                <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.price}>Price: ${item.price}</Text>
-                <View style={styles.quantityControl}>
-                  <PressableButton
-                    customStyle={styles.controlButton}
-                    pressedFunction={() => quantityHandler(item.id, 1)}
-                  >
-                    <Text style={styles.buttonText}>+</Text>
-                  </PressableButton>
-                  <Text style={styles.quantity}>{quantities[item.id]}</Text>
-                  <PressableButton
-                    customStyle={styles.controlButton}
-                    pressedFunction={() => quantityHandler(item.id, -1)}
-                    disabled={quantities[item.id] === 1}
-                  >
-                    <Text style={styles.buttonText}>-</Text>
-                  </PressableButton>
+            <PressableButton pressedFunction={() => navigateToProductDetail(item)}>
+              <View style={styles.itemContainer}>
+                <Image style={styles.image} source={{ uri: item.product.image_url || 'https://via.placeholder.com/150' }} />
+                <View style={styles.infoContainer}>
+                  <Text style={styles.productName}>{item.product.name}</Text>
+                  <Text style={styles.price}>Price: ${item.priceToShow.price}</Text>
+                  <View style={styles.quantityControl}>
+                    <PressableButton
+                      customStyle={styles.controlButton}
+                      pressedFunction={() => quantityHandler(item.id, 1)}
+                    >
+                      <Text style={styles.buttonText}>+</Text>
+                    </PressableButton>
+                    <Text style={styles.quantity}>{quantities[item.id]}</Text>
+                    <PressableButton
+                      customStyle={styles.controlButton}
+                      pressedFunction={() => quantityHandler(item.id, -1)}
+                      disabled={quantities[item.id] === 1}
+                    >
+                      <Text style={styles.buttonText}>-</Text>
+                    </PressableButton>
+                  </View>
                 </View>
+                <PressableButton pressedFunction={() => deleteHandler(item.id)}>
+                  <MaterialIcons name="delete" size={24} color="red" />
+                </PressableButton>
               </View>
-              <PressableButton pressedFunction={() => deleteHandler(item.id)}>
-                <MaterialIcons name="delete" size={24} color="red" />
-              </PressableButton>
-            </View>
+            </PressableButton>
           );
         }}
       />

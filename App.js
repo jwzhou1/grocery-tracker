@@ -21,7 +21,7 @@ import Notification from "./screens/Notification";
 import ProductDetail from "./screens/ProductDetail";
 import SearchHeader from "./components/SearchHeader";
 import PressableButton from "./components/PressableButton";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
 
@@ -37,7 +37,6 @@ Notifications.setNotificationHandler({
     };
   },
 });
-
 
 // Auth Screens
 const AuthStack = (
@@ -81,13 +80,13 @@ function TabNavigator() {
       <FontAwesome5 name="home" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
   }
-  const listOptions = {
+  const listOptions = () => ({
     tabBarIcon: ({ focused }) => (
       <FontAwesome5 name="list" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
-  }
+  })
 
-  const profileOptions = ({ navigation }) => ({
+  const profileOptions = () => ({
     tabBarIcon: ({ focused }) => (
       <FontAwesome5 name="user" size={24} color={focused ? Colors.iconFocused : Colors.headerText}/>
     ),
@@ -118,10 +117,17 @@ function TabNavigator() {
   );
 }
 
-// App Screens
+// App Stack Screens
 const AppStack = (
   <>
     <Stack.Screen name="Tabs" component={TabNavigator}/>
+    <Stack.Screen name="Shopping List Stack" component={ShoppingList} // for convenience to navigate from product detail
+      options={{ 
+        headerShown: true,
+        headerBackTitleVisible: false,
+        headerTitle: 'Shopping List'
+      }}
+    />
     <Stack.Screen name="Edit Profile" component={EditProfile}
       options={{
         headerShown: true,
@@ -132,14 +138,21 @@ const AppStack = (
       component={Search}
       options={{
         headerShown: true,
+        animation: 'fade'
       }}
     />
     <Stack.Screen
       name="Product Detail"
       component={ProductDetail}
-      options={{
+      options={({ route, navigation }) => ({
         headerShown: true,
-      }}
+        headerBackTitleVisible: false,
+        headerRight: () => (
+          <PressableButton pressedFunction={() => navigation.navigate("Shopping List Stack")}>
+            <Ionicons name="cart-outline" size={24} color={Colors.headerText} />
+          </PressableButton>
+        )
+      })}
     />
     <Stack.Screen
       name="Feedback"
@@ -170,7 +183,7 @@ const AppStack = (
         headerShown: true,
       }}
     />
-        <Stack.Screen
+    <Stack.Screen
       name="Notification"
       component={Notification}
       options={{
