@@ -123,17 +123,17 @@ export async function addToShoppingList(userId, productId, name, image_url, alt_
 };
 
 
-export async function addToContributionList(userId, productId, newPrice, date) {
+export async function addToContributionList(userId, productId, newPrice, date, imageUri) {
   try {
     const listRef = collection(database, `users/${userId}/contribution_list`);
     const itemRef = doc(listRef, productId);
     const itemDoc = await getDoc(itemRef);
 
     if (itemDoc.exists()) {
-      await updateDoc(itemRef, { price: newPrice, date: date });
+      await updateDoc(itemRef, { price: newPrice, date: date, imageUri: imageUri});
     } else {
       await setDoc(doc(database, `users/${userId}/contribution_list/${productId}`), 
-        { productId: productId, price: newPrice, date: date });
+        { productId: productId, price: newPrice, date: date, imageUri: imageUri});
     }
   } catch (error) {
     console.log(error);

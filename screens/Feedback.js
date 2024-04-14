@@ -1,24 +1,19 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Alert } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 import { addToContributionList } from '../firebase/firebaseHelper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { auth } from "../firebase/firebaseSetup";
+import { auth, storage, database } from '../firebase/firebaseSetup';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
-// Next steps:
-// 1.reuse ImageManager functions
-// 2.CRUD operations on users/:id/contribution
-// 3.improve UI (layout, detail, snackbar)
 export default function Feedback({ route, navigation }) {
   const { product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
+  const [uploadUri, setUploadUri] = useState(null);
   const [newPrice, setNewPrice] = useState('');
-  // const [selectedStore, setSelectedStore] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  console.log("product",product);
-  console.log("selectedPrice",selectedPrice);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -33,7 +28,6 @@ export default function Feedback({ route, navigation }) {
     setSelectedDate(date);
   };
 
-  // Function to handle image selection from camera
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
@@ -49,11 +43,32 @@ export default function Feedback({ route, navigation }) {
     });
 
     if (!result.canceled) {
-      setImageUri(result.uri);
+      uploadImage(result.assets[0].uri);
     }
   };
 
-  // Function to handle image selection from gallery
+  const uploadImage = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const imageBlob = await response.blob();
+      const imageName = uri.substring(uri.lastIndexOf('/') + 1);
+      const storageRef = ref(storage, `contributions/${imageName}`);
+      const uploadTask = uploadBytesResumable(storageRef, imageBlob);
+
+      uploadTask.on('state_changed', null, (error) => {
+        console.error('Error uploading image:', error);
+      }, () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          // Set the avatar URL to the full path of the uploaded image
+          setImageUri(downloadURL);
+          setUploadUri(uploadTask.snapshot.metadata.fullPath)
+        });
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -68,8 +83,8 @@ export default function Feedback({ route, navigation }) {
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImageUri(result.uri);
+    if (!result.canceled) {
+      uploadImage(result.assets[0].uri);
     }
   };
 
@@ -82,26 +97,33 @@ export default function Feedback({ route, navigation }) {
       Alert.alert('Error', 'Please select a date');
       return;
     }
+    if (!imageUri) {
+      Alert.alert('Error', 'Please take a photo');
+      return;
+    }
+  
   
     const updatedPrice = {
-      productId: selectedPrice.product_id, 
+      productId: selectedPrice.product_id,
       price: parseFloat(newPrice),
       date: selectedDate,
+      uploadUri: uploadUri, 
     };
-    console.log('productId:', updatedPrice.productId);
-    console.log("price",updatedPrice.price);
-    console.log("date",updatedPrice.date);
+  
+    console.log("imageUri", uploadUri);
+
     const userId = auth.currentUser.uid;
-    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date)
+    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date, updatedPrice.uploadUri)
       .then(() => {
-        Alert.alert('Success', 'New price has been submitted successfully');
+        Alert.alert('Success', 'New price and photo have been submitted successfully');
         navigation.goBack();
       })
       .catch(error => {
         console.error('Error adding to contribution list:', error);
-        Alert.alert('Error', 'Failed to submit new price');
+        Alert.alert('Error', 'Failed to submit new price and photo');
       });
   };
+
 
   return (
     <View style={styles.container}>
