@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Text, Image, TextInput, Alert } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
-import { updatePriceInDatabase } from '../firebase/firebaseHelper';
+import { addToContributionList } from '../firebase/firebaseHelper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { auth } from "../firebase/firebaseSetup";
 
 // Next steps:
 // 1.reuse ImageManager functions
@@ -16,6 +17,8 @@ export default function Feedback({ route, navigation }) {
   // const [selectedStore, setSelectedStore] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  console.log("product",product);
+  console.log("selectedPrice",selectedPrice);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -81,21 +84,21 @@ export default function Feedback({ route, navigation }) {
     }
   
     const updatedPrice = {
-      ...price,
+      productId: selectedPrice.product_id, 
       price: parseFloat(newPrice),
-      date: selectedDate, 
+      date: selectedDate,
     };
-    console.log('updatedPrice:', updatedPrice);
-    console.log("productid",updatedPrice.product_id);
+    console.log('productId:', updatedPrice.productId);
+    console.log("price",updatedPrice.price);
     console.log("date",updatedPrice.date);
-    
-    updatePriceInDatabase(updatedPrice)
+    const userId = auth.currentUser.uid;
+    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date)
       .then(() => {
         Alert.alert('Success', 'New price has been submitted successfully');
         navigation.goBack();
       })
       .catch(error => {
-        console.error('Error updating price:', error);
+        console.error('Error adding to contribution list:', error);
         Alert.alert('Error', 'Failed to submit new price');
       });
   };
@@ -116,7 +119,7 @@ export default function Feedback({ route, navigation }) {
       {/* Product Information */}
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Product Name: {product.name}</Text>
-        <Text style={styles.label}>Unit: {product.unit}</Text>
+        <Text style={styles.label}>Unit: {product.quantity} {product.unit}</Text>
         <Text style={styles.label}>Store: {selectedPrice.store_name}</Text>
 
         <Text style={styles.label}>New Price:</Text>
