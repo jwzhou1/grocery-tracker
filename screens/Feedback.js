@@ -14,7 +14,8 @@ export default function Feedback({ route, navigation }) {
   const [newPrice, setNewPrice] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
+console.log("selectedPrice", selectedPrice);
+console.log("product", product);
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -113,7 +114,7 @@ export default function Feedback({ route, navigation }) {
     console.log("imageUri", uploadUri);
 
     const userId = auth.currentUser.uid;
-    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date, updatedPrice.uploadUri)
+    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date, updatedPrice.uploadUri, product.name,selectedPrice.store_name)
       .then(() => {
         Alert.alert('Success', 'New price and photo have been submitted successfully');
         navigation.goBack();
