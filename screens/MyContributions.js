@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { ref, getDownloadURL } from "firebase/storage";
 import { auth, database, storage } from "../firebase/firebaseSetup";
@@ -52,34 +52,45 @@ export default function MyContributions() {
   console.log("contributions", contributions)
 
   return (
-    <View style={styles.container}>
-      {contributions.map((contribution, index) => (
-        <View key={index} style={styles.contributionContainer}>
-          {contribution.imageURL && (
-            <Image source={{ uri: contribution.imageURL }} style={styles.image} />
-          )}
-          <Text>Contributed Date: {contribution.date}</Text>
-          <Text>Contributed Price: {contribution.price}</Text>
-          <Text>Product Name: {contribution.productName}</Text>
-          <Text>StoreName: {contribution.store_name}</Text>
-        </View>
-      ))}
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      <View style={styles.container}>
+        {contributions.map((contribution, index) => (
+          <View key={index} style={styles.contributionContainer}>
+            {contribution.imageURL && (
+              <Image source={{ uri: contribution.imageURL }} style={styles.image} />
+            )}
+            <Text>Contributed Date: {contribution.date}</Text>
+            <Text>Contributed Price: {contribution.price}</Text>
+            <Text>Product Name: {contribution.productName}</Text>
+            <Text>Store Name: {contribution.store_name}</Text>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollViewContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
   },
   contributionContainer: {
+    width: 400, 
+    height: 300,
     marginBottom: 20,
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5
+    borderRadius: 5,
+    justifyContent: "center", 
+    alignItems: "center" 
   },
   image: {
     width: 200,
