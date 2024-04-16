@@ -24,6 +24,7 @@ import PressableButton from "./components/PressableButton";
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -221,10 +222,12 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={defaultHeaderOptions}>
-        {loggedIn ? AppStack : AuthStack}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ActionSheetProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={defaultHeaderOptions}>
+          {loggedIn ? AppStack : AuthStack}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ActionSheetProvider>
   );
 }

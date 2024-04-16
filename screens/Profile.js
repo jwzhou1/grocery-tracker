@@ -310,6 +310,7 @@ const styles = StyleSheet.create({
   },
   emailContainer: {
     flexDirection: "row",
+    alignItems: 'center',
   },
   emailText: {
     fontSize: 14,

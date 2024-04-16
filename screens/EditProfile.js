@@ -112,7 +112,6 @@ const EditProfile = ({ navigation }) => {
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
-        <Text style={styles.label}>Upload New Avatar: </Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
       <View style={styles.buttonContainer}>
@@ -136,8 +135,7 @@ export default EditProfile;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: "10%",
-    alignItems: 'center'
+    alignItems: 'center',
   },
   input: {
     height: 50,
@@ -150,8 +148,6 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#2B2A4C',
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
     fontWeight: 'bold',
     marginTop: "5%",
     fontSize: 18,

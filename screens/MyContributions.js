@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { ref, getDownloadURL } from "firebase/storage";
 import { auth, database, storage } from "../firebase/firebaseSetup";
 
+// Next steps:
+// 1.improve UI
 export default function MyContributions() {
   const [contributions, setContributions] = useState([]);
 
   useEffect(() => {
     const fetchContributions = async () => {
-      if (!auth.currentUser) return;
-    
-      const userUid = auth.currentUser.uid;
-      const userQuery = query(collection(database, "users", userUid, "contribution_list"));
-    
+      const contributionsData = [];
+      const userId = auth.currentUser.uid;
       try {
-        const querySnapshot = await getDocs(userQuery);
-        const contributionsData = [];
+        const querySnapshot = await getDocs(collection(database, "users", userId, "contribution_list"));
     
         for (const doc of querySnapshot.docs) {
           const contributionData = doc.data();
-    
+          // Convert timestamp to date string
+          const date = contributionData.date.toDate(); 
+          const dateString = date.toLocaleString();
           // Get image download URL
-          if (contributionData.imageUri) {
-            const imageRef = ref(storage, contributionData.imageUri);
-            const imageDownloadURL = await getDownloadURL(imageRef);
-    
-            // Convert timestamp to date string
-            const date = contributionData.date.toDate(); 
-            const dateString = date.toLocaleString();
-    
+          const imageRef = ref(storage, contributionData.uploadUri);
+          const imageDownloadURL = await getDownloadURL(imageRef);
+          
+          if (imageDownloadURL) {
             contributionsData.push({
               ...contributionData,
               imageURL: imageDownloadURL,
-              date: dateString 
+              date: dateString
             });
           } else {
-            contributionsData.push(contributionData);
+            contributionsData.push({
+              ...contributionData,
+              date: dateString
+            });
           }
         }
     
@@ -45,11 +44,9 @@ export default function MyContributions() {
         console.error("Error fetching contributions:", error);
       }
     };
-    
-
     fetchContributions();
   }, []);
-  console.log("contributions", contributions)
+  //console.log("contributions", contributions)
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>

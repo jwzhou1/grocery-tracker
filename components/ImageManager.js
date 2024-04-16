@@ -1,11 +1,34 @@
-import { View, Text, StyleSheet, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, Image, Button } from "react-native";
 import PressableButton from "./PressableButton";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 export default function ImageManager({ receiveImageURI }) {
+  const { showActionSheetWithOptions } = useActionSheet();
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
   const [imageUri, setImageUri] = useState("");
+
+  const showModal = () => {
+    const options = ['Take an Image', 'Upload from Library', 'Cancel'];
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions({
+      options,
+      cancelButtonIndex,
+      
+    }, (selectedIndex) => {
+      switch (selectedIndex) {
+        case 0:
+          takeImageHandler();
+          break;
+
+        case 1:
+          pickImageHandler();
+          break;
+      }
+    });
+  }
 
   async function verifyPermission() {
     if (status.granted) {
@@ -65,12 +88,10 @@ export default function ImageManager({ receiveImageURI }) {
 
   return (
     <View style={styles.container}>
-      <PressableButton pressedFunction={takeImageHandler} customStyle={styles.button}>
-        <Text style={styles.buttonText}>Take an Image</Text>
+      <PressableButton pressedFunction={showModal} customStyle={styles.button}>
+        <Text style={styles.buttonText}>Change Avatar</Text>
       </PressableButton>
-      <PressableButton pressedFunction={pickImageHandler} customStyle={styles.button}>
-        <Text style={styles.buttonText}>Upload from Library</Text>
-        </PressableButton>
+
       {imageUri && (
         <Image
           style={styles.image}
@@ -86,6 +107,7 @@ export default function ImageManager({ receiveImageURI }) {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 5,
+    alignItems: 'center'
   },
   button: {
     backgroundColor: "#00796b",

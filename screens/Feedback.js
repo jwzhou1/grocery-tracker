@@ -4,9 +4,12 @@ import PressableButton from '../components/PressableButton';
 import * as ImagePicker from 'expo-image-picker';
 import { addToContributionList } from '../firebase/firebaseHelper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { auth, storage, database } from '../firebase/firebaseSetup';
+import { useActionSheet } from '@expo/react-native-action-sheet';
+import { auth, storage } from '../firebase/firebaseSetup';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
+// Next steps:
+// 3.improve UI (layout, detail, snackbar)
 export default function Feedback({ route, navigation }) {
   const { product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
@@ -14,8 +17,29 @@ export default function Feedback({ route, navigation }) {
   const [newPrice, setNewPrice] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-console.log("selectedPrice", selectedPrice);
-console.log("product", product);
+  const { showActionSheetWithOptions } = useActionSheet();
+
+  const showModal = () => {
+    const options = ['Take an Image', 'Upload from Library', 'Cancel'];
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions({
+      options,
+      cancelButtonIndex,
+      
+    }, (selectedIndex) => {
+      switch (selectedIndex) {
+        case 0:
+          takePhoto();
+          break;
+
+        case 1:
+          pickImage();
+          break;
+      }
+    });
+  }
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -37,6 +61,25 @@ console.log("product", product);
     }
 
     const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      uploadImage(result.assets[0].uri);
+    }
+  };
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Permission to access media library was denied');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
@@ -70,26 +113,7 @@ console.log("product", product);
     }
   };
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Permission to access media library was denied');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      uploadImage(result.assets[0].uri);
-    }
-  };
-
-  const submitNewPrice = () => {
+  const submitNewPrice = async () => {
     if (newPrice.trim() === '') {
       Alert.alert('Error', 'Please enter a new price');
       return;
@@ -98,43 +122,35 @@ console.log("product", product);
       Alert.alert('Error', 'Please select a date');
       return;
     }
-    if (!imageUri) {
-      Alert.alert('Error', 'Please take a photo');
-      return;
-    }
-  
-  
+
     const updatedPrice = {
-      productId: selectedPrice.product_id,
+      product_name: product.name,
+      store_name: selectedPrice.store_name,
       price: parseFloat(newPrice),
       date: selectedDate,
-      uploadUri: uploadUri, 
+      uploadUri: uploadUri,
     };
-  
-    console.log("imageUri", uploadUri);
 
     const userId = auth.currentUser.uid;
-    addToContributionList(userId, selectedPrice.product_id, updatedPrice.price, updatedPrice.date, updatedPrice.uploadUri, product.name,selectedPrice.store_name)
-      .then(() => {
-        Alert.alert('Success', 'New price and photo have been submitted successfully');
-        navigation.goBack();
-      })
-      .catch(error => {
-        console.error('Error adding to contribution list:', error);
-        Alert.alert('Error', 'Failed to submit new price and photo');
-      });
+    try {
+      await addToContributionList(userId, updatedPrice)
+      Alert.alert('Success', 'New price and photo have been submitted successfully');
+      navigation.goBack();
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Error', 'Failed to submit new price and photo');
+    }
   };
-
 
   return (
     <View style={styles.container}>
       {/* Product Image */}
-      <PressableButton pressedFunction={takePhoto} customStyle={styles.imageContainer}>
+      <PressableButton pressedFunction={showModal} customStyle={styles.imageContainer}>
         <View style={styles.imageBox}>
           {imageUri ? (
             <Image style={styles.image} source={{ uri: imageUri }} />
           ) : (
-            <Text style={styles.placeholderText}>Take a Photo</Text>
+            <Text style={styles.placeholderText}>Add a Photo</Text>
           )}
         </View>
       </PressableButton>
@@ -142,7 +158,7 @@ console.log("product", product);
       {/* Product Information */}
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Product Name: {product.name}</Text>
-        <Text style={styles.label}>Unit: {product.quantity} {product.unit}</Text>
+        <Text style={styles.label}>Unit: {product.unit}</Text>
         <Text style={styles.label}>Store: {selectedPrice.store_name}</Text>
 
         <Text style={styles.label}>New Price:</Text>
@@ -166,7 +182,6 @@ console.log("product", product);
           onConfirm={confirmDate}
           onCancel={hideDatePicker}
         />
-
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
@@ -238,5 +253,26 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalButton: {
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    width: '100%',
+    backgroundColor: '#309797',
+    alignItems: 'center',
   },
 });
