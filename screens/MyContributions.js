@@ -51,6 +51,9 @@ export default function MyContributions() {
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
       <View style={styles.container}>
+        {contributions.length === 0 && 
+        <Text>Make some contribution today!</Text>}
+        
         {contributions.map((contribution, index) => (
           <View key={index} style={styles.contributionContainer}>
             {contribution.imageURL && (
@@ -69,7 +72,7 @@ export default function MyContributions() {
 
 const styles = StyleSheet.create({
   scrollViewContainer: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },

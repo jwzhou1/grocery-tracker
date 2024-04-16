@@ -1,6 +1,5 @@
 import React from "react";
-import { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet } from 'react-native';
+import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -22,7 +21,7 @@ import Notification from "./screens/Notification";
 import ProductDetail from "./screens/ProductDetail";
 import SearchHeader from "./components/SearchHeader";
 import PressableButton from "./components/PressableButton";
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -147,27 +146,9 @@ const AppStack = (
     <Stack.Screen
       name="Product Detail"
       component={ProductDetail}
-      options={({ route, navigation }) => {
-        const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
-        
-        return {
-          headerShown: true,
-          headerBackTitleVisible: false,
-          headerRight: () => (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <PressableButton 
-                pressedFunction={() => navigation.navigate("Shopping List Stack")}
-              >
-                <Ionicons name="cart-outline" size={28} color={Colors.headerText} />
-              </PressableButton>
-              {numItems !== 0 && (
-                <View style={styles.badgeContainer}>
-                  <Text style={styles.badgeText}>{numItems}</Text>
-                </View>
-                )}
-            </View>
-          ),
-        };
+      options={{
+        headerShown: true,
+        headerBackTitleVisible: false
       }}
     />
     <Stack.Screen
@@ -248,22 +229,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  badgeContainer: {
-    position: 'absolute',
-    backgroundColor: 'red',
-    borderRadius: 10,
-    width: 22,
-    height: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: -5,
-    right: -5,
-  },
-  badgeText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 11
-  }
-})

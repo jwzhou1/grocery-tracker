@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
 import { View, StyleSheet, Text, Image, Alert, Modal, FlatList } from 'react-native';
 import PressableButton from '../components/PressableButton';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { addToShoppingList } from '../firebase/firebaseHelper';
 import { auth } from '../firebase/firebaseSetup';
 import Colors from '../styles/Colors';
+import { ShoppingListContext } from "../utils/ShoppingListContext";
 
 // Next steps:
 // 1.add historical trend chart
@@ -13,11 +14,32 @@ import Colors from '../styles/Colors';
 // 3.set up notification when price drops
 const ProductDetail = ({ route, navigation }) => {
   const { productId, product, prices, priceToShow } = route.params;
+  const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState(priceToShow);
   const [latestPrices, setLatestPrices] = useState({});
   const minPrice = Math.min(...prices.map(price => price.data.price));
   const maxPrice = Math.max(...prices.map(price => price.data.price));
+
+  // dynamically update headerRight
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <PressableButton 
+            pressedFunction={() => navigation.navigate("Shopping List Stack")}
+          >
+            <Ionicons name="cart-outline" size={28} color={Colors.headerText} />
+          </PressableButton>
+          {numItems !== 0 && (
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>{numItems}</Text>
+            </View>
+          )}
+        </View>
+      ),
+    });
+  }, [navigation, numItems]);
   
   useEffect(() => {
     // display the latest price for each store in modal
@@ -257,6 +279,22 @@ const styles = StyleSheet.create({
     width: 3,
     height: 15,
     backgroundColor: 'black',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 22,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: -5,
+    right: -5,
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 11
   }
 });
 
