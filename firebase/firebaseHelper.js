@@ -12,7 +12,7 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { database, auth } from "./firebaseSetup";
+import { database } from "./firebaseSetup";
 
 // support searching products by name
 export async function searchFromDB(keyword) {
@@ -104,7 +104,7 @@ export async function addToShoppingList(userId, productId, name, image_url, alt_
 
     // Check if the item exists in the shopping list
     if (itemDoc.exists()) {
-      if (itemDoc.data.store_name === store_name) {
+      if (itemDoc.data().store_name === store_name) {
         // update its quantity
         await updateDoc(itemRef, { quantity: increment(1) });
       } else {

@@ -1,54 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Text, Image, FlatList } from "react-native";
-import { getPricesFromDB } from "../firebase/firebaseHelper";
 import { doc, updateDoc, deleteDoc, collection, onSnapshot, increment } from "firebase/firestore";
 import { auth, database } from "../firebase/firebaseSetup";
 import PressableButton from "../components/PressableButton";
 import LoadingScreen from "./LoadingScreen";
 import { MaterialIcons } from "@expo/vector-icons";
+import { ShoppingListContext } from "../utils/ShoppingListContext";
 
 // Next steps:
 // 1.group items by store
-// 3.improve UI (layout, detail, snackbar)
+// 2.improve UI (layout, detail, snackbar)
 export default function ShoppingList({ navigation }) {
   const userId = auth.currentUser.uid
-  const [shoppingList, setShoppingList] = useState([]);
-  const [loading, setLoading] = useState(true); // set to true initially to adapt to firestore listener
-  const [quantities, setQuantities] = useState({});
-
-  useEffect(() => {
-    // set up a listener to get realtime data from firestore
-    const unsubscribe = onSnapshot(collection(database, `users/${userId}/shopping_list`),
-      async (snapshot) => {
-        if (snapshot.empty) {
-          setLoading(false)
-        }
-
-        let promises = [];
-        snapshot.forEach((doc) => {
-          const productData = doc.data();
-          const productId = doc.id;
-          // fetch prices for the current product and collect the promise
-          promises.push(getPricesFromDB(productId).then(prices => 
-            ({ product: productData, id: productId, prices: prices, 
-              priceToShow: prices.filter((price) => price.data.store_name === productData.store_name).at(0).data })));
-          setQuantities(prevQuantities => ({ ...prevQuantities, [productId]: productData.quantity }));
-        });
-        // wait for all promises to resolve
-        const productWithPrices = await Promise.all(promises);
-        setShoppingList(productWithPrices);
-        setLoading(false)
-      },
-      (error) => {
-        console.log(error.message);
-        setLoading(false)
-      }
-    );
-    return () => {
-      console.log("unsubscribe");
-      unsubscribe();
-    };
-  }, []);
+  const { shoppingList, loading, quantities, setQuantities } = useContext(ShoppingListContext);
 
   const navigateToProductDetail = (item) => {
     navigation.navigate("Product Detail", 

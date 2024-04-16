@@ -9,7 +9,7 @@ import { auth, storage } from '../firebase/firebaseSetup';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 // Next steps:
-// 3.improve UI (layout, detail, snackbar)
+// 1.improve UI (layout, detail, snackbar)
 export default function Feedback({ route, navigation }) {
   const { product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
@@ -253,26 +253,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalButton: {
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    width: '100%',
-    backgroundColor: '#309797',
-    alignItems: 'center',
   },
 });

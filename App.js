@@ -1,5 +1,6 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -25,6 +26,7 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { ShoppingListProvider, ShoppingListContext } from "./utils/ShoppingListContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -145,15 +147,28 @@ const AppStack = (
     <Stack.Screen
       name="Product Detail"
       component={ProductDetail}
-      options={({ route, navigation }) => ({
-        headerShown: true,
-        headerBackTitleVisible: false,
-        headerRight: () => (
-          <PressableButton pressedFunction={() => navigation.navigate("Shopping List Stack")}>
-            <Ionicons name="cart-outline" size={24} color={Colors.headerText} />
-          </PressableButton>
-        )
-      })}
+      options={({ route, navigation }) => {
+        const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
+        
+        return {
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerRight: () => (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <PressableButton 
+                pressedFunction={() => navigation.navigate("Shopping List Stack")}
+              >
+                <Ionicons name="cart-outline" size={28} color={Colors.headerText} />
+              </PressableButton>
+              {numItems !== 0 && (
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{numItems}</Text>
+                </View>
+                )}
+            </View>
+          ),
+        };
+      }}
     />
     <Stack.Screen
       name="Feedback"
@@ -222,12 +237,33 @@ export default function App() {
   }, []);
 
   return (
-    <ActionSheetProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={defaultHeaderOptions}>
-          {loggedIn ? AppStack : AuthStack}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ActionSheetProvider>
+    <NavigationContainer>
+      <ShoppingListProvider>
+        <ActionSheetProvider>
+          <Stack.Navigator screenOptions={defaultHeaderOptions}>
+            {loggedIn ? AppStack : AuthStack}
+          </Stack.Navigator>
+        </ActionSheetProvider>
+      </ShoppingListProvider>
+    </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  badgeContainer: {
+    position: 'absolute',
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 22,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: -5,
+    right: -5,
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 11
+  }
+})
