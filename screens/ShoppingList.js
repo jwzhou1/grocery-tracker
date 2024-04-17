@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, StyleSheet, Text, Image, FlatList } from "react-native";
-import { doc, updateDoc, deleteDoc, collection, onSnapshot, increment } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc, collection, increment } from "firebase/firestore";
 import { auth, database } from "../firebase/firebaseSetup";
 import PressableButton from "../components/PressableButton";
 import LoadingScreen from "./LoadingScreen";

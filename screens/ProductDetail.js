@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { View, StyleSheet, Text, Image, Alert, Modal, FlatList } from 'react-native';
+import { View, StyleSheet, Text, Image, Alert, Modal, FlatList, ScrollView, Dimensions } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,19 +7,27 @@ import { addToShoppingList } from '../firebase/firebaseHelper';
 import { auth } from '../firebase/firebaseSetup';
 import Colors from '../styles/Colors';
 import { ShoppingListContext } from "../utils/ShoppingListContext";
+import { LineChart } from "react-native-gifted-charts";
 
 // Next steps:
-// 1.add historical trend chart
-// 2.improve UI (layout, detail, snackbar)
-// 3.set up notification when price drops
+// 1.improve UI (layout, detail, snackbar)
 const ProductDetail = ({ route, navigation }) => {
+  const windowWidth = Dimensions.get('window').width;
   const { productId, product, prices, priceToShow } = route.params;
   const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState(priceToShow);
   const [latestPrices, setLatestPrices] = useState({});
+  const [historyPrices, setHistoryPrices] = useState([])
   const minPrice = Math.min(...prices.map(price => price.data.price));
   const maxPrice = Math.max(...prices.map(price => price.data.price));
+
+  const chartData = historyPrices.map(price => ({
+    label: price.data.date.toDate().toLocaleDateString('default', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
+    value: price.data.price,
+    dataPointText: "$"+price.data.price,
+    labelTextStyle: {color: 'gray', fontSize: 12}
+  }));
 
   // dynamically update headerRight
   useLayoutEffect(() => {
@@ -42,7 +50,7 @@ const ProductDetail = ({ route, navigation }) => {
   }, [navigation, numItems]);
   
   useEffect(() => {
-    // display the latest price for each store in modal
+    // keep the latest price for each store in more options modal
     function getLatestPrices() {
       const priceArray = []
       const storePrices = {}
@@ -53,11 +61,19 @@ const ProductDetail = ({ route, navigation }) => {
           priceArray.push(price)
         }
       });
+      priceArray.sort((a, b) => a.data.price - b.data.price) // sort the options in ascending prices
       setLatestPrices(priceArray)
     }
     getLatestPrices()
     setSelectedPrice(priceToShow) // update the state when navigating from shopping list
   }, [priceToShow])
+
+  useEffect(() => {
+    // filter all prices history for the selected store
+    const priceArray = prices.filter((price) => price.data.store_name === selectedPrice.store_name)
+    priceArray.sort((a, b) => a.data.date - b.data.date) // sort the history prices in ascending dates
+    setHistoryPrices(priceArray)
+  }, [selectedPrice])
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
@@ -67,7 +83,7 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Image
         style={styles.image}
         source={{ uri: product.image_url || 'https://via.placeholder.com/150' }}
@@ -120,6 +136,42 @@ const ProductDetail = ({ route, navigation }) => {
           <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
         </PressableButton>
 
+        {/* Price Trends Chart */}
+        <View style={styles.chartContainer}>
+          {chartData.length > 1 ?
+          <LineChart
+            curved 
+            areaChart
+            data={chartData}
+            // line options
+            thickness={3}
+            color="lightgray"
+            // layout options
+            width={windowWidth*0.8}
+            scrollToEnd={true}
+            initialSpacing={20}
+            endSpacing={40}
+            maxValue={maxPrice*1.3}
+            noOfSections={3}
+            // area options
+            startFillColor='#75BEBB'
+            endFillColor='#D9F0EE'
+            endOpacity={0.2}
+            // data point options
+            dataPointsColor={'rgba(100, 100, 100, 0.5)'} // datapoint color
+            textColor={'black'} // datapoint text color
+            textShiftX={-10}
+            textShiftY={-5}
+            // axis options
+            xAxisColor="white"
+            yAxisColor="white"
+            yAxisTextStyle={{color: 'gray', fontSize: 12}}
+            formatYLabel={(label)=>'$'+label}
+            hideRules
+          /> :
+          <Text>There is not enough data to show historical trends</Text>}
+        </View>
+
         {/* More Buying Options Modal */}
         <Modal visible={showMoreOptions} transparent={true} animationType="fade">
           <View style={styles.modalContainer}>
@@ -149,7 +201,7 @@ const ProductDetail = ({ route, navigation }) => {
           </View>
         </Modal>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -284,7 +336,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: 'red',
     borderRadius: 10,
-    width: 22,
+    width: 20,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
@@ -295,6 +347,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '600',
     fontSize: 11
+  },
+  chartContainer: {
+    marginVertical: 10,
+    alignItems: 'center'
   }
 });
 

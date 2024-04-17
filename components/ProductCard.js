@@ -48,8 +48,8 @@ export default function ProductCard({ productId, product, prices }) {
             <Text style={styles.price}>${priceToShow.unit_price}/{product.unit}</Text> :
             // otherwise show both price & unit price
             <>
-            <Text style={styles.price}>${priceToShow.price}</Text>
-            <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>
+              <Text style={styles.price}>${priceToShow.price}</Text>
+              <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>
             </>}
           </View>
         </View>
