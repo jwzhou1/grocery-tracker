@@ -11,7 +11,7 @@ initializeApp({
 const db = getFirestore();
 
 const workbook = XLSX.readFile('sample_data.xlsx');
-const sheetName = workbook.SheetNames[2]; // change if need
+const sheetName = workbook.SheetNames[3]; // change if need
 const worksheet = workbook.Sheets[sheetName];
 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 createProductToDB(data)

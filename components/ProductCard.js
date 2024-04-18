@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
+const windowWidth = Dimensions.get('window').width;
 
 export default function ProductCard({ productId, product, prices }) {
   const navigation = useNavigation()
@@ -38,7 +39,7 @@ export default function ProductCard({ productId, product, prices }) {
     <PressableButton pressedFunction={navigateToProductDetail}>
       {prices.at(0) &&
       <View style={styles.productCard}>
-        <Image source={{ uri: product.image_url || "https://via.placeholder.com/150" }} style={styles.image} />
+        <Image source={{ uri: product.image_url || "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png" }} style={styles.image} />
         <View style={styles.detailsContainer}>
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.category}>{product.category}</Text>
@@ -60,30 +61,27 @@ export default function ProductCard({ productId, product, prices }) {
 
 const styles = StyleSheet.create({
   productCard: {
-    flexDirection: 'column',
-    alignSelf: 'center',
-    width: '80%',
-    margin: 5,
-    borderWidth: 1,
+    width: windowWidth*0.5,
+    //borderWidth: 1,
     borderColor: '#CCCCCC',
-    borderRadius: 10,
-    overflow: 'hidden',
+    //overflow: 'hidden',
   },
   image: {
-    width: '50%',
-    height: 150,
+    width: windowWidth*0.44,
+    height: windowWidth*0.44,
     alignSelf: 'center'
   },
   detailsContainer: {
-    padding: 10,
+    paddingHorizontal: '6%',
+    paddingVertical: '5%'
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontWeight: '500',
   },
   category: {
     color: '#666666',

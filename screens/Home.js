@@ -7,7 +7,7 @@ export default function Home({ navigation }) {
   const selectedCategory = currentCategory;
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContent}>
+    <ScrollView>
       <View style={styles.container}>
         <CategoryCard />
         {/* Hot Deal Banner */}
@@ -25,9 +25,6 @@ export default function Home({ navigation }) {
 };
 
 const styles = StyleSheet.create({
-  scrollViewContent: {
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     alignItems: 'center',

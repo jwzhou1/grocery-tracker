@@ -55,7 +55,7 @@ export default function ShoppingList({ navigation }) {
           return (
             <PressableButton pressedFunction={() => navigateToProductDetail(item)}>
               <View style={styles.itemContainer}>
-                <Image style={styles.image} source={{ uri: item.product.image_url || 'https://via.placeholder.com/150' }} />
+                <Image style={styles.image} source={{ uri: item.product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }} />
                 <View style={styles.infoContainer}>
                   <Text style={styles.productName}>{item.product.name}</Text>
                   <Text style={styles.price}>Price: ${item.priceToShow.price}</Text>

@@ -7,6 +7,7 @@ export default function SearchResult({ headerText, data }) {
     <View style={styles.container}>
       <Text style={styles.title}>{headerText}</Text>
       <FlatList
+        contentContainerStyle={{marginBottom: 109}}
         data={data}
         renderItem={({item}) => {
           return (
@@ -14,7 +15,7 @@ export default function SearchResult({ headerText, data }) {
           ) 
         }}
         keyExtractor={item => item.id}
-        //numColumns={2}
+        numColumns={2}
       />
     </View>
   )
@@ -23,10 +24,12 @@ export default function SearchResult({ headerText, data }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 30
   },
   title: {
     marginLeft: '5%',
-    marginVertical: 5,
+    marginTop: 5,
+    marginBottom: 10,
     fontSize: 16,
     fontWeight: 'bold',
   }

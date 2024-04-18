@@ -8,11 +8,12 @@ import { auth } from '../firebase/firebaseSetup';
 import Colors from '../styles/Colors';
 import { ShoppingListContext } from "../utils/ShoppingListContext";
 import { LineChart } from "react-native-gifted-charts";
+const windowWidth = Dimensions.get('window').width;
 
 // Next steps:
 // 1.improve UI (layout, detail, snackbar)
-const ProductDetail = ({ route, navigation }) => {
-  const windowWidth = Dimensions.get('window').width;
+// 2.add 2/3/6 month filter
+export default function ProductDetail({ route, navigation }) {
   const { productId, product, prices, priceToShow } = route.params;
   const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -83,14 +84,14 @@ const ProductDetail = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        style={styles.image}
-        source={{ uri: product.image_url || 'https://via.placeholder.com/150' }}
-      />
-      <View>
-        <Text style={styles.unitPrice}>{product.brand}</Text>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image
+          style={styles.image}
+          source={{ uri: product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }}
+        />
         {/* Product brand, name and unit price */}
+        <Text style={styles.unitPrice}>{product.brand}</Text>
         <View style={styles.rowContainer}>
           {product.alt_name ? 
           <Text style={styles.productName}>{product.name}{'\n'}({product.alt_name})</Text> :
@@ -110,6 +111,7 @@ const ProductDetail = ({ route, navigation }) => {
         </PressableButton>
 
         {/* Price Range Bar */}
+        <Text style={styles.date}>Price range (across different stores)</Text>
         <View style={styles.priceRangeContainer}>
           <View style={styles.priceRangeFiller}>
             <LinearGradient
@@ -122,21 +124,12 @@ const ProductDetail = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.priceLabelsContainer}>
-          <Text style={{color: 'green'}}>${minPrice}</Text>
-          <Text style={{color: 'red'}}>${maxPrice}</Text>
+          <Text style={{color: 'green', fontSize: 14}}>${minPrice}</Text>
+          <Text style={{color: 'red', fontSize: 14}}>${maxPrice}</Text>
         </View>
-        
-        {/* Add to List Button */}
-        <PressableButton customStyle={styles.addButton} pressedFunction={addHandler}>
-          <Text style={styles.buttonText}>Add to List</Text>
-        </PressableButton>
-
-        {/* Feedback Link */}
-        <PressableButton customStyle={styles.feedbackLink} pressedFunction={() => navigation.navigate('Feedback', { product, selectedPrice })}>
-          <Text style={styles.feedbackText}>Not agree on the price? Provide feedback.</Text>
-        </PressableButton>
 
         {/* Price Trends Chart */}
+        <Text style={styles.date}>Historical trend (same-store)</Text>
         <View style={styles.chartContainer}>
           {chartData.length > 1 ?
           <LineChart
@@ -148,6 +141,7 @@ const ProductDetail = ({ route, navigation }) => {
             color="lightgray"
             // layout options
             width={windowWidth*0.8}
+            height={windowWidth*0.5}
             scrollToEnd={true}
             initialSpacing={20}
             endSpacing={40}
@@ -200,20 +194,36 @@ const ProductDetail = ({ route, navigation }) => {
             </View>
           </View>
         </Modal>
+      </ScrollView>
+
+      {/* Add to List and Feedback Button */}
+      <View style={styles.bottomBar}>
+        <PressableButton
+          customStyle={[styles.bottomBarButton, styles.feedbackButton]}
+          pressedFunction={() => navigation.navigate('Feedback', { product, selectedPrice })}
+        >
+          <Text style={styles.feedbackText}>Provide Feedback</Text>
+        </PressableButton>
+        <PressableButton
+          customStyle={[styles.bottomBarButton, styles.addButton]}
+          pressedFunction={addHandler}
+        >
+          <Text style={styles.buttonText}>Add to List</Text>
+        </PressableButton>
       </View>
-    </ScrollView>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1, // avoid overflow
     backgroundColor: '#FFF',
-    padding: 20,
+    paddingHorizontal: 20,
   },
   image: {
-    width: 150,
-    height: 150,
+    width: windowWidth*0.75,
+    height: windowWidth*0.625,
     alignSelf: 'center',
   },
   rowContainer: {
@@ -238,28 +248,60 @@ const styles = StyleSheet.create({
     color: '#666666'
   },
   date: {
-    color: '#666666'
+    color: 'gray',
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 5
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 30,
+    backgroundColor: '#FFF',
+    shadowColor: '#000',
+    shadowOffset: { // ios
+      width: 0,
+      height: -3,
+    },
+    shadowOpacity: 0.2, // ios
+    shadowRadius: 4, // ios
+    elevation: 5, // android
+  },
+  bottomBarButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addButton: {
     backgroundColor: Colors.header,
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginVertical: 20,
+    marginLeft: 10,
+  },
+  feedbackButton: {
+    backgroundColor: 'white',
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: 'gray'
+  },
+  feedbackText: {
+    color: 'black',
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
-  },
-  feedbackLink: {
-    alignSelf: 'center'
-  },
-  feedbackText: {
-    color: Colors.header,
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   moreOptionsLink: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   moreOptionsLinkText: {
     color: Colors.header,
@@ -309,7 +351,7 @@ const styles = StyleSheet.create({
   priceRangeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
+    marginVertical: 5
   },
   priceRangeFiller: {
     height: 7,
@@ -318,7 +360,8 @@ const styles = StyleSheet.create({
   },
   priceLabelsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginBottom: 20
   },
   gradientFiller: {
     flex: 1,
@@ -349,9 +392,7 @@ const styles = StyleSheet.create({
     fontSize: 11
   },
   chartContainer: {
-    marginVertical: 10,
+    marginBottom: windowWidth*0.3,
     alignItems: 'center'
   }
 });
-
-export default ProductDetail;

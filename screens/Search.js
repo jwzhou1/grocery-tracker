@@ -26,7 +26,7 @@ export default function Search({ route }) {
   useEffect(() => {
     async function fetchCategory() {
       if (category) {
-        setHeaderText(`View all results for ${category}`)
+        setHeaderText(`View all results for "${category}"`)
         setSubmitted(true)
         setLoading(true)
         // fetch all products from category
