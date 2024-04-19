@@ -11,8 +11,9 @@ import { LineChart } from "react-native-gifted-charts";
 const windowWidth = Dimensions.get('window').width;
 
 // Next steps:
-// 1.improve UI (layout, detail, snackbar)
-// 2.add 2/3/6 month filter
+// 1.improve UI (modal, toast)
+// 2.tap and zoomin photo
+// 3.add 2/3/6 month filter
 export default function ProductDetail({ route, navigation }) {
   const { productId, product, prices, priceToShow } = route.params;
   const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
@@ -92,7 +93,7 @@ export default function ProductDetail({ route, navigation }) {
         />
         {/* Product brand, name and unit price */}
         <Text style={styles.unitPrice}>{product.brand}</Text>
-        <View style={styles.rowContainer}>
+        <View style={[styles.rowContainer, {marginBottom: 5}]}>
           {product.alt_name ? 
           <Text style={styles.productName}>{product.nameToShow}{'\n'}({product.alt_name})</Text> :
           <Text style={styles.productName}>{product.nameToShow}</Text>}
@@ -105,7 +106,7 @@ export default function ProductDetail({ route, navigation }) {
         <Text style={{color: 'gray'}}>{product.size}</Text>}
         
         {/* Prices */}
-        <View style={styles.rowContainer}>
+        <View style={[styles.rowContainer, {marginVertical: 5}]}>
           <Text style={styles.price}>${selectedPrice.price} at {selectedPrice.store_name}</Text>
           <Text style={styles.date}>Last update: {selectedPrice.date.toDate().toLocaleDateString("zh-cn", {timeZone: 'UTC'})}</Text>
         </View>
@@ -168,7 +169,7 @@ export default function ProductDetail({ route, navigation }) {
             formatYLabel={(label)=>'$'+label}
             hideRules
           /> :
-          <Text>There is not enough data to show historical trends</Text>}
+          <Text>There is not enough data to show historical trend</Text>}
         </View>
 
         {/* More Buying Options Modal */}
@@ -205,7 +206,7 @@ export default function ProductDetail({ route, navigation }) {
       <View style={styles.bottomBar}>
         <PressableButton
           customStyle={[styles.bottomBarButton, styles.feedbackButton]}
-          pressedFunction={() => navigation.navigate('Feedback', { product, selectedPrice })}
+          pressedFunction={() => navigation.navigate('Feedback', { productId, product, selectedPrice })}
         >
           <Text style={styles.feedbackText}>Provide Feedback</Text>
         </PressableButton>
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 5
+    //marginVertical: 5
   },
   productName: {
     fontSize: 20,
@@ -397,6 +398,8 @@ const styles = StyleSheet.create({
     fontSize: 11
   },
   chartContainer: {
+    flex: 1,
+    justifyContent: 'center',
     marginBottom: windowWidth*0.3,
     alignItems: 'center'
   }

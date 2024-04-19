@@ -9,9 +9,9 @@ import { auth, storage } from '../firebase/firebaseSetup';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 // Next steps:
-// 1.improve UI (layout, detail, snackbar)
+// 1.improve UI (layout, detail, toast)
 export default function Feedback({ route, navigation }) {
-  const { product, selectedPrice } = route.params;
+  const { productId, product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
   const [uploadUri, setUploadUri] = useState(null);
   const [newPrice, setNewPrice] = useState('');
@@ -124,7 +124,9 @@ export default function Feedback({ route, navigation }) {
     }
 
     const updatedPrice = {
+      product_id: productId,
       product_name: product.nameToShow,
+      size: product.size,
       store_name: selectedPrice.store_name,
       price: parseFloat(newPrice),
       date: selectedDate,

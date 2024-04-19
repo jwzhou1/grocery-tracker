@@ -18,12 +18,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL, deleteObject } from "firebase/storage";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchWeatherData, getUserLocation } from "../components/weatherAPI";
+//import { fetchWeatherData, getUserLocation } from "../components/weatherAPI";
 
 const Profile = ({ navigation }) => {
   const user = auth.currentUser;
   const [imageURL, setImageURL] = useState("");
-  const [weatherData, setWeatherData] = useState(null);
+  //const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -115,9 +115,9 @@ const Profile = ({ navigation }) => {
     navigation.navigate("Edit Profile");
   };
 
-  const handleWatchListPress = () => {
-    navigation.navigate("Watch List");
-  };
+  // const handleWatchListPress = () => {
+  //   navigation.navigate("Watch List");
+  // };
 
   const handleMyContributionsPress = () => {
     navigation.navigate("My Contributions");
@@ -171,7 +171,7 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {weatherData && (
+      {/* {weatherData && (
         <View style={styles.weatherContainer}>
           <Text style={styles.weatherText}>
             Tomorrow's Weather: {weatherData.timezoneAbbreviation}
@@ -192,7 +192,7 @@ const Profile = ({ navigation }) => {
             %
           </Text>
         </View>
-      )}
+      )} */}
       <View style={styles.userInfoContainer}>
         {imageURL ? (
           <View>
@@ -247,7 +247,7 @@ const Profile = ({ navigation }) => {
           <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => handleWatchListPress()}
           style={styles.linkButton}
         >
@@ -260,7 +260,7 @@ const Profile = ({ navigation }) => {
             <Text style={styles.text}> My Watch List</Text>
           </View>
           <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           onPress={() => handleMyContributionsPress()}

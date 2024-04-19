@@ -2,6 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, ImageBackground, ScrollView } from 'react-native';
 import CategoryCard from '../components/CategoryCard';
 
+// Next steps:
+// 1.add random product cards(with latest prices)
+// 2.improve UI
 export default function Home({ navigation }) {
   const currentCategory = "Produce";
   const selectedCategory = currentCategory;

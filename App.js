@@ -25,7 +25,11 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { ShoppingListProvider, ShoppingListContext } from "./utils/ShoppingListContext";
+import { ShoppingListProvider } from "./utils/ShoppingListContext";
+
+// Next steps:
+// 1.move search bar to the header of Search screen
+// 2.add delete options to the headerRight of ShoppingList
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

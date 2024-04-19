@@ -9,8 +9,8 @@ import { ShoppingListContext } from "../utils/ShoppingListContext";
 const windowWidth = Dimensions.get('window').width;
 
 // Next steps:
-// 1.group items by store
-// 2.improve UI (layout, detail, snackbar)
+// 1.group items by store, add total price
+// 2.add delete snackbar
 export default function ShoppingList({ navigation }) {
   const userId = auth.currentUser.uid
   const { shoppingList, loading, quantities, setQuantities } = useContext(ShoppingListContext);
@@ -90,27 +90,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-    padding: 20,
+    paddingHorizontal: 20,
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ececec',
+    paddingVertical: '2%'
   },
   image: {
     width: 80,
     height: 80,
-    marginRight: 20,
+    marginRight: "5%",
   },
   infoContainer: {
     flex: 1,
   },
   productName: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "500",
   },
   size: {
-    color: 'gray'
+    color: 'gray',
+    marginVertical: "1%"
   },
   price: {
     fontSize: 14,
@@ -122,6 +125,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     width: windowWidth*0.3,
+    marginTop: "2%",
     backgroundColor: '#ececec',
     left: "-2%" // offset for radius
   },

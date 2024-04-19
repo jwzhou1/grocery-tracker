@@ -69,7 +69,7 @@ async function createProductToDB(data) {
     const priceData = {
       date: new Date(Date.UTC(0, 0, date - 1)), // convert excel serial number to normal date
       price: parseFloat(price),
-      unit_price: unitPrice || '',
+      unit_price: unitPrice || parseFloat(price)/quantity || '', // NEED TESTING
       store_name: source || '',
       restrictions: restrictions || '',
     };
