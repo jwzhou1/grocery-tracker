@@ -124,7 +124,7 @@ export default function Feedback({ route, navigation }) {
     }
 
     const updatedPrice = {
-      product_name: product.name,
+      product_name: product.nameToShow,
       store_name: selectedPrice.store_name,
       price: parseFloat(newPrice),
       date: selectedDate,
@@ -134,11 +134,11 @@ export default function Feedback({ route, navigation }) {
     const userId = auth.currentUser.uid;
     try {
       await addToContributionList(userId, updatedPrice)
-      Alert.alert('Success', 'New price and photo have been submitted successfully');
+      Alert.alert('Success', 'Thank you for the feedback. You can view it in Profile > My Contributions');
       navigation.goBack();
     } catch (error) {
       console.log(error)
-      Alert.alert('Error', 'Failed to submit new price and photo');
+      Alert.alert('Error', 'Failed to submit new price');
     }
   };
 

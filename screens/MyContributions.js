@@ -5,7 +5,7 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { auth, database, storage } from "../firebase/firebaseSetup";
 
 // Next steps:
-// 1.improve UI
+// 1.handle loading, improve UI
 export default function MyContributions() {
   const [contributions, setContributions] = useState([]);
 
@@ -19,13 +19,11 @@ export default function MyContributions() {
         for (const doc of querySnapshot.docs) {
           const contributionData = doc.data();
           // Convert timestamp to date string
-          const date = contributionData.date.toDate(); 
-          const dateString = date.toLocaleString();
+          const date = contributionData.date.toDate().toLocaleDateString("zh-cn", {timeZone: 'UTC'}); 
           // Get image download URL
-          const imageRef = ref(storage, contributionData.uploadUri);
-          const imageDownloadURL = await getDownloadURL(imageRef);
-          
-          if (imageDownloadURL) {
+          if (contributionData.uploadUri) {
+            const imageRef = ref(storage, contributionData.uploadUri);
+            const imageDownloadURL = await getDownloadURL(imageRef);
             contributionsData.push({
               ...contributionData,
               imageURL: imageDownloadURL,
@@ -34,11 +32,10 @@ export default function MyContributions() {
           } else {
             contributionsData.push({
               ...contributionData,
-              date: dateString
+              date: date
             });
           }
         }
-    
         setContributions(contributionsData);
       } catch (error) {
         console.error("Error fetching contributions:", error);
@@ -53,7 +50,7 @@ export default function MyContributions() {
       <View style={styles.container}>
         {contributions.length === 0 && 
         <Text>Make some contribution today!</Text>}
-        
+
         {contributions.map((contribution, index) => (
           <View key={index} style={styles.contributionContainer}>
             {contribution.imageURL && (

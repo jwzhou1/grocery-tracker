@@ -4,9 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
 const windowWidth = Dimensions.get('window').width;
 
-export default function ProductCard({ productId, product, prices }) {
+export default function ProductCard({ productId, productData, prices }) {
   const navigation = useNavigation()
   const [priceToShow, setPriceToShow] = useState({})
+  const [product, setProduct] = useState(productData)
 
   useEffect(() => {
     const getLatestCheapestPrice = () => {
@@ -29,7 +30,20 @@ export default function ProductCard({ productId, product, prices }) {
       setPriceToShow(prices.at(minPriceIndex).data)
     }
     getLatestCheapestPrice()
-  })
+    
+    // extract size info from product name
+    const strArray = productData.name.split("-")
+    let sizeInfo = strArray.length > 1 ? strArray.slice(-1)[0] : "NA"
+    let productName;
+    if (sizeInfo === "NA") {
+      sizeInfo = productData.unit ? `per ${productData.unit}` : "each"
+    } else {
+      productName = productData.name.split(`-${sizeInfo}`)[0]
+    }
+    const updatedProduct = {...productData, size: sizeInfo, nameToShow: productName || productData.name}
+    setProduct(updatedProduct)
+    //console.log(updatedProduct.name, updatedProduct.size)
+  }, [productData])
 
   const navigateToProductDetail = () => {
     navigation.navigate('Product Detail', { productId, product, prices, priceToShow });
@@ -41,8 +55,8 @@ export default function ProductCard({ productId, product, prices }) {
       <View style={styles.productCard}>
         <Image source={{ uri: product.image_url || "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png" }} style={styles.image} />
         <View style={styles.detailsContainer}>
-          <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.category}>{product.category}</Text>
+          <Text style={styles.name}>{product.nameToShow}</Text>
+          <Text style={styles.category}>{product.size}</Text>
           <View style={styles.priceRow}>
             {product.unit && product.quantity === 1 ? 
             // if loose, show unit price only
@@ -50,7 +64,8 @@ export default function ProductCard({ productId, product, prices }) {
             // otherwise show both price & unit price
             <>
               <Text style={styles.price}>${priceToShow.price}</Text>
-              <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>
+              {priceToShow.unit_price &&
+              <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>}
             </>}
           </View>
         </View>
@@ -62,8 +77,6 @@ export default function ProductCard({ productId, product, prices }) {
 const styles = StyleSheet.create({
   productCard: {
     width: windowWidth*0.5,
-    //borderWidth: 1,
-    borderColor: '#CCCCCC',
     //overflow: 'hidden',
   },
   image: {
@@ -84,7 +97,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   category: {
+    fontSize: 12,
     color: '#666666',
+    marginVertical: '1%'
   },
   price: {
     color: '#009900',

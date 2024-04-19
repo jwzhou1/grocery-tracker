@@ -95,7 +95,7 @@ export async function searchCategoriesFromDB(category) {
   }
 }
 
-export async function addToShoppingList(userId, productId, name, image_url, alt_name, brand, unit, store_name) {
+export async function addToShoppingList(userId, productId, nameToShow, size, image_url, alt_name, brand, unit, store_name) {
   try {
     // Get a reference to the shoppinglist
     const listRef = collection(database, `users/${userId}/shopping_list`);
@@ -115,7 +115,7 @@ export async function addToShoppingList(userId, productId, name, image_url, alt_
     } else {
       // create a new doc and set quantity to 1
       await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), 
-        { name: name, image_url: image_url, alt_name: alt_name, brand: brand, unit: unit, store_name: store_name, quantity: 1 });
+        { nameToShow: nameToShow, size: size, image_url: image_url, alt_name: alt_name, brand: brand, unit: unit, store_name: store_name, quantity: 1 });
     }
   } catch (error) {
     console.log(error)

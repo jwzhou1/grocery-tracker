@@ -11,7 +11,7 @@ export default function SearchResult({ headerText, data }) {
         data={data}
         renderItem={({item}) => {
           return (
-            <ProductCard productId={item.id} product={item.data} prices={item.prices}/>
+            <ProductCard productId={item.id} productData={item.data} prices={item.prices}/>
           ) 
         }}
         keyExtractor={item => item.id}

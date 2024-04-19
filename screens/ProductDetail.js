@@ -78,8 +78,8 @@ export default function ProductDetail({ route, navigation }) {
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
-    Alert.alert('Success', `${product.name} is added to shopping list`); // replace with a snackbar later
-    await addToShoppingList(userId, productId, product.name, product.image_url, 
+    Alert.alert('Success', `${product.nameToShow} is added to shopping list`); // replace with a snackbar later
+    await addToShoppingList(userId, productId, product.nameToShow, product.size, product.image_url, 
       product.alt_name, product.brand, product.unit, selectedPrice.store_name);
   };
 
@@ -94,10 +94,15 @@ export default function ProductDetail({ route, navigation }) {
         <Text style={styles.unitPrice}>{product.brand}</Text>
         <View style={styles.rowContainer}>
           {product.alt_name ? 
-          <Text style={styles.productName}>{product.name}{'\n'}({product.alt_name})</Text> :
-          <Text style={styles.productName}>{product.name}</Text>}
-          <Text style={styles.unitPrice}>${selectedPrice.unit_price}/{product.unit}</Text>
+          <Text style={styles.productName}>{product.nameToShow}{'\n'}({product.alt_name})</Text> :
+          <Text style={styles.productName}>{product.nameToShow}</Text>}
+          {selectedPrice.unit_price &&
+          <Text style={styles.unitPrice}>${selectedPrice.unit_price}/{product.unit}</Text>}
         </View>
+
+        {/* Product size information */}
+        {product.size !== "each" && !product.size.includes("per") &&
+        <Text style={{color: 'gray'}}>{product.size}</Text>}
         
         {/* Prices */}
         <View style={styles.rowContainer}>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, StyleSheet, Text, Image, FlatList } from "react-native";
+import { View, StyleSheet, Text, Image, FlatList, Dimensions } from "react-native";
 import { doc, updateDoc, deleteDoc, collection, increment } from "firebase/firestore";
 import { auth, database } from "../firebase/firebaseSetup";
 import PressableButton from "../components/PressableButton";
 import LoadingScreen from "./LoadingScreen";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ShoppingListContext } from "../utils/ShoppingListContext";
+const windowWidth = Dimensions.get('window').width;
 
 // Next steps:
 // 1.group items by store
@@ -49,7 +50,6 @@ export default function ShoppingList({ navigation }) {
         <Text>Add something to your shopping list</Text>
       }
       <FlatList
-        // contentContainerStyle={}
         data={shoppingList}
         renderItem={({ item }) => {
           return (
@@ -57,28 +57,26 @@ export default function ShoppingList({ navigation }) {
               <View style={styles.itemContainer}>
                 <Image style={styles.image} source={{ uri: item.product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }} />
                 <View style={styles.infoContainer}>
-                  <Text style={styles.productName}>{item.product.name}</Text>
-                  <Text style={styles.price}>Price: ${item.priceToShow.price}</Text>
-                  <View style={styles.quantityControl}>
-                    <PressableButton
-                      customStyle={styles.controlButton}
-                      pressedFunction={() => quantityHandler(item.id, 1)}
-                    >
-                      <Text style={styles.buttonText}>+</Text>
-                    </PressableButton>
-                    <Text style={styles.quantity}>{quantities[item.id]}</Text>
-                    <PressableButton
-                      customStyle={styles.controlButton}
-                      pressedFunction={() => quantityHandler(item.id, -1)}
-                      disabled={quantities[item.id] === 1}
-                    >
-                      <Text style={styles.buttonText}>-</Text>
-                    </PressableButton>
+                  <Text style={styles.productName}>{item.product.nameToShow}</Text>
+                  <Text style={styles.size}>{item.product.size}</Text>
+                  
+                  <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 5}}>
+                    <View style={styles.quantityControl}>
+                      <PressableButton pressedFunction={() => quantityHandler(item.id, 1)} customStyle={styles.button}>
+                        <MaterialCommunityIcons name="plus" size={18} color="black" />
+                      </PressableButton>
+                      <Text style={styles.quantity}>{quantities[item.id]}</Text>
+                      {quantities[item.id] === 1 ?
+                      <PressableButton pressedFunction={() => deleteHandler(item.id)} customStyle={styles.button}>
+                        <Ionicons name="trash" size={18} color="black" />
+                      </PressableButton> :
+                      <PressableButton pressedFunction={() => quantityHandler(item.id, -1)} customStyle={styles.button}>
+                        <MaterialCommunityIcons name="minus" size={18} color="black" />
+                      </PressableButton>}
+                    </View>
                   </View>
                 </View>
-                <PressableButton pressedFunction={() => deleteHandler(item.id)}>
-                  <MaterialIcons name="delete" size={24} color="red" />
-                </PressableButton>
+                <Text style={styles.price}>${item.priceToShow.price}</Text>
               </View>
             </PressableButton>
           );
@@ -108,28 +106,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
+  size: {
+    color: 'gray'
+  },
   price: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   quantityControl: {
     flexDirection: "row",
+    justifyContent: 'space-between',
     alignItems: "center",
-    marginTop: 5,
-  },
-  controlButton: {
-    backgroundColor: "#309797",
-    padding: 5,
-    borderRadius: 3,
-    marginRight: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
+    borderRadius: 20,
+    width: windowWidth*0.3,
+    backgroundColor: '#ececec',
+    left: "-2%" // offset for radius
   },
   quantity: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: '500'
   },
+  button: {
+    padding: 10,
+    //borderWidth:1
+  }
 });
