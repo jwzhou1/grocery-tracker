@@ -22,7 +22,7 @@ export default function MyContributions() {
         for (const doc of snapshot.docs) {
           const contributionData = doc.data();
           // Convert timestamp to date string
-          const date = contributionData.date.toDate().toLocaleDateString("zh-cn", {timeZone: 'UTC'}); 
+          const date = contributionData.date.toDate().toLocaleDateString("zh-cn"); 
           // Get image download URL
           if (contributionData.uploadUri) {
             const imageRef = ref(storage, contributionData.uploadUri);
@@ -30,7 +30,7 @@ export default function MyContributions() {
             contributions.push({
               ...contributionData,
               imageURL: imageDownloadURL,
-              date: dateString
+              date: date
             });
           } else {
             contributions.push({
@@ -100,5 +100,6 @@ const styles = StyleSheet.create({
   image: {
     width: 80,
     height: 80,
+    marginRight: "5%",
   }
 });
