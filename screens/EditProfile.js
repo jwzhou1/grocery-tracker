@@ -7,8 +7,9 @@ import { auth, storage, database } from '../firebase/firebaseSetup';
 import { updateToUsersDB } from '../firebase/firebaseHelper';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
+import Colors from '../styles/Colors';
 
-const EditProfile = ({ navigation }) => {
+export default function EditProfile({ navigation }) {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
   const [imageUri, setImageUri] = useState('');
@@ -131,8 +132,6 @@ const EditProfile = ({ navigation }) => {
   );
 };
 
-export default EditProfile;
-
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
     color: '#2B2A4C',
     fontWeight: 'bold',
     marginTop: "5%",
-    fontSize: 18,
+    fontSize: 14,
     marginBottom: "2%",
   },
   buttonContainer: {
@@ -160,13 +159,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: 'white',
+    width: '25%',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'gray',
     marginHorizontal: 10,
   },
   buttonText: {
     color: 'black',
     fontSize: 16,
+    fontWeight: '500'
   }
 });

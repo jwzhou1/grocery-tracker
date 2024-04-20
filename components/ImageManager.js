@@ -3,6 +3,7 @@ import PressableButton from "./PressableButton";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from '@expo/react-native-action-sheet';
+import Colors from "../styles/Colors";
 
 export default function ImageManager({ receiveImageURI }) {
   const { showActionSheetWithOptions } = useActionSheet();
@@ -10,12 +11,9 @@ export default function ImageManager({ receiveImageURI }) {
   const [imageUri, setImageUri] = useState("");
 
   const showModal = () => {
-    const options = ['Take an Image', 'Upload from Library', 'Cancel'];
-    const cancelButtonIndex = 2;
-
     showActionSheetWithOptions({
-      options,
-      cancelButtonIndex,
+      options: ['Take an Image', 'Upload from Library', 'Cancel'],
+      cancelButtonIndex: 2,
       
     }, (selectedIndex) => {
       switch (selectedIndex) {
@@ -110,9 +108,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   button: {
-    backgroundColor: "#00796b",
+    backgroundColor: Colors.header,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 30,
     marginBottom: 10,
     alignItems: "center",
   },

@@ -7,9 +7,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import { auth, storage } from '../firebase/firebaseSetup';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import Colors from '../styles/Colors';
 
-// Next steps:
-// 1.improve UI (layout, detail, toast)
 export default function Feedback({ route, navigation }) {
   const { productId, product, selectedPrice } = route.params;
   const [imageUri, setImageUri] = useState(null);
@@ -20,12 +19,9 @@ export default function Feedback({ route, navigation }) {
   const { showActionSheetWithOptions } = useActionSheet();
 
   const showModal = () => {
-    const options = ['Take an Image', 'Upload from Library', 'Cancel'];
-    const cancelButtonIndex = 2;
-
     showActionSheetWithOptions({
-      options,
-      cancelButtonIndex,
+      options: ['Take an Image', 'Upload from Library', 'Cancel'],
+      cancelButtonIndex: 2,
       
     }, (selectedIndex) => {
       switch (selectedIndex) {
@@ -147,27 +143,36 @@ export default function Feedback({ route, navigation }) {
   return (
     <View style={styles.container}>
       {/* Product Image */}
-      <PressableButton pressedFunction={showModal} customStyle={styles.imageContainer}>
-        <View style={styles.imageBox}>
+      <View style={styles.imageContainer}>
+        <PressableButton pressedFunction={showModal} customStyle={styles.imageBox}>
           {imageUri ? (
             <Image style={styles.image} source={{ uri: imageUri }} />
           ) : (
             <Text style={styles.placeholderText}>Add a Photo</Text>
           )}
-        </View>
-      </PressableButton>
+        </PressableButton>
+      </View>
 
       {/* Product Information */}
       <View style={styles.infoContainer}>
-        <Text style={styles.label}>Product Name: {product.name}</Text>
-        <Text style={styles.label}>Unit: {product.unit}</Text>
-        <Text style={styles.label}>Store: {selectedPrice.store_name}</Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.label}>Product: </Text>
+          <Text style={styles.value}>{product.nameToShow}</Text>
+        </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.label}>Size:</Text>
+          <Text style={styles.value}>{product.size}</Text>
+        </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.label}>Store:</Text>
+          <Text style={styles.value}>{selectedPrice.store_name}</Text>
+        </View>
 
         <Text style={styles.label}>New Price:</Text>
         {/* Input for New Price */}
         <TextInput
           style={styles.input}
-          placeholder="Enter New Price"
+          placeholder="Enter price for the size of the product"
           keyboardType="numeric"
           value={newPrice}
           onChangeText={text => setNewPrice(text)}
@@ -187,13 +192,14 @@ export default function Feedback({ route, navigation }) {
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
-          <PressableButton customStyle={[styles.button, { backgroundColor: '#ccc' }]} pressedFunction={() => navigation.goBack()}>
+          <PressableButton customStyle={[styles.button, styles.cancelButton]} pressedFunction={() => navigation.goBack()}>
             <Text style={styles.buttonText}>Cancel</Text>
           </PressableButton>
-          <PressableButton customStyle={[styles.button, { backgroundColor: '#309797' }]} pressedFunction={submitNewPrice}>
-            <Text style={[styles.buttonText, { color: 'white' }]}>Submit</Text>
+          <PressableButton customStyle={[styles.button, styles.submitButton]} pressedFunction={submitNewPrice}>
+            <Text style={[styles.buttonText, {color: 'white'}]}>Submit</Text>
           </PressableButton>
         </View>
+        <Text style={styles.noteText}>Adding a photo of the price you found could expedite the processing.</Text>
       </View>
     </View>
   );
@@ -231,9 +237,18 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
   },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   label: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 10,
+  },
+  value: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'darkgreen'
   },
   input: {
     borderWidth: 1,
@@ -248,12 +263,27 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    padding: 15,
-    borderRadius: 5,
+    paddingVertical: 12,
+    borderRadius: 30,
     alignItems: 'center',
-    marginHorizontal: 5,
+    justifyContent: 'center',
+  },
+  submitButton: {
+    marginLeft: 10,
+    backgroundColor: Colors.header
+  },
+  cancelButton: {
+    marginRight: 10,
+    backgroundColor: '#ccc'
   },
   buttonText: {
     fontSize: 16,
+    fontWeight: '600'
   },
+  noteText: {
+    fontSize: 10, 
+    color:'gray', 
+    alignSelf: 'center',
+    marginVertical: 10
+  }
 });

@@ -25,6 +25,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { PaperProvider } from 'react-native-paper';
 import { ShoppingListProvider } from "./utils/ShoppingListContext";
 
 // Next steps:
@@ -224,11 +225,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <ShoppingListProvider>
-        <ActionSheetProvider>
-          <Stack.Navigator screenOptions={defaultHeaderOptions}>
-            {loggedIn ? AppStack : AuthStack}
-          </Stack.Navigator>
-        </ActionSheetProvider>
+        <PaperProvider>
+          <ActionSheetProvider>
+            <Stack.Navigator screenOptions={defaultHeaderOptions}>
+              {loggedIn ? AppStack : AuthStack}
+            </Stack.Navigator>
+          </ActionSheetProvider>
+        </PaperProvider>
       </ShoppingListProvider>
     </NavigationContainer>
   );

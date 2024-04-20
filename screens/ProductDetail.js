@@ -41,9 +41,14 @@ export default function ProductDetail({ route, navigation }) {
           >
             <Ionicons name="cart-outline" size={28} color={Colors.headerText} />
           </PressableButton>
-          {numItems !== 0 && (
+          {numItems !== 0 && numItems < 100 && (
             <View style={styles.badgeContainer}>
               <Text style={styles.badgeText}>{numItems}</Text>
+            </View>
+          )}
+          {numItems >= 100 && (
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>99+</Text>
             </View>
           )}
         </View>
@@ -169,7 +174,7 @@ export default function ProductDetail({ route, navigation }) {
             formatYLabel={(label)=>'$'+label}
             hideRules
           /> :
-          <Text>There is not enough data to show historical trend</Text>}
+          <Text style={{color: 'gray'}}>There is not enough data to show historical trend</Text>}
         </View>
 
         {/* More Buying Options Modal */}
@@ -231,6 +236,7 @@ const styles = StyleSheet.create({
     width: windowWidth*0.75,
     height: windowWidth*0.625,
     alignSelf: 'center',
+    marginBottom: 10
   },
   rowContainer: {
     flexDirection: 'row',

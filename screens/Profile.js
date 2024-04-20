@@ -49,7 +49,7 @@ const Profile = ({ navigation }) => {
       }
     );
     return () => {
-      console.log("unsubscribe");
+      //console.log("unsubscribe");
       unsubscribe();
     };
   }, []);
@@ -73,7 +73,6 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     async function getImageURL() {
-      //console.log("auth.currentUser", auth.currentUser);
       if (auth.currentUser) {
         const userUid = auth.currentUser.uid;
         try {
@@ -97,8 +96,6 @@ const Profile = ({ navigation }) => {
               const imageDownloadURL = await getDownloadURL(imageRef);
               console.log("imageDownloadURL", imageDownloadURL);
               setImageURL(imageDownloadURL);
-            } else {
-              console.log("imageUri is empty.");
             }
           } else {
             console.log("user document does not exist.");
