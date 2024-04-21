@@ -21,6 +21,6 @@ const styles = StyleSheet.create({
     opacity: 0.5
   },
   disabled: {
-    backgroundColor: 'grey'
+    //backgroundColor: 'grey'
   }
 })

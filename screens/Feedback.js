@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'darkgreen'
+    color: '#309777'
   },
   input: {
     borderWidth: 1,

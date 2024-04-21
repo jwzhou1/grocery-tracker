@@ -27,6 +27,7 @@ import * as Notifications from "expo-notifications";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { PaperProvider } from 'react-native-paper';
 import { ShoppingListProvider } from "./utils/ShoppingListContext";
+import Toast from 'react-native-toast-message';
 
 // Next steps:
 // 1.move search bar to the header of Search screen
@@ -233,6 +234,7 @@ export default function App() {
           </ActionSheetProvider>
         </PaperProvider>
       </ShoppingListProvider>
+      <Toast />
     </NavigationContainer>
   );
 }

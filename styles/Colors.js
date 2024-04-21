@@ -1,7 +1,7 @@
 const Colors = {
     'header': '#309797',
     'headerText': 'white',
-    //'screenBackground': '#C5DFF8',
+    'secondary': '#979730',
     'entry':'#7895CB',
     'entryPressed': '#4A55A2',
     'iconFocused': '#FFF78A',

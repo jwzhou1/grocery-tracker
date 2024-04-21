@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginVertical: '1%'
   },
   price: {
-    color: '#009900',
+    color: 'green',
     fontWeight: 'bold',
   },
 });

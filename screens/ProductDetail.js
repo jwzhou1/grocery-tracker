@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { View, StyleSheet, Text, Image, Alert, Modal, FlatList, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, Image, Modal, FlatList, ScrollView, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,19 +8,18 @@ import { auth } from '../firebase/firebaseSetup';
 import Colors from '../styles/Colors';
 import { ShoppingListContext } from "../utils/ShoppingListContext";
 import { LineChart } from "react-native-gifted-charts";
+import Toast from 'react-native-toast-message'
 const windowWidth = Dimensions.get('window').width;
 
-// Next steps:
-// 1.improve UI (modal, toast)
-// 2.tap and zoomin photo
-// 3.add 2/3/6 month filter
+// Next steps: add 1/3/6 month filter
 export default function ProductDetail({ route, navigation }) {
   const { productId, product, prices, priceToShow } = route.params;
-  const { numItems } = useContext(ShoppingListContext); // using the context to show number of items
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(priceToShow);
-  const [latestPrices, setLatestPrices] = useState({});
-  const [historyPrices, setHistoryPrices] = useState([])
+  const { numItems } = useContext(ShoppingListContext); // using the context to show number of items on badge
+  const [modalVisible, setModalVisible] = useState(false); // image modal
+  const [showMoreOptions, setShowMoreOptions] = useState(false); // more buying options modal
+  const [selectedPrice, setSelectedPrice] = useState(priceToShow); // price at selected store
+  const [latestPrices, setLatestPrices] = useState({}); // latest prices of each store
+  const [historyPrices, setHistoryPrices] = useState([]) // all historical prices of the selected store
   const minPrice = Math.min(...prices.map(price => price.data.price));
   const maxPrice = Math.max(...prices.map(price => price.data.price));
 
@@ -84,18 +83,42 @@ export default function ProductDetail({ route, navigation }) {
 
   async function addHandler() {
     const userId = auth.currentUser.uid;
-    Alert.alert('Success', `${product.nameToShow} is added to shopping list`); // replace with a snackbar later
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: `${product.nameToShow} is added to shopping list`,
+      visibilityTime: 3000,
+      topOffset: 50
+    });
     await addToShoppingList(userId, productId, product.nameToShow, product.size, product.image_url, 
       product.alt_name, product.brand, product.unit, selectedPrice.store_name);
+  };
+
+  const handleImagePress = () => {
+    setModalVisible(!modalVisible);
   };
 
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image
-          style={styles.image}
-          source={{ uri: product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }}
-        />
+        <TouchableWithoutFeedback onPress={handleImagePress}>
+          <Image
+            style={styles.image}
+            source={{ uri: product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }}
+          />
+        </TouchableWithoutFeedback>
+
+        <Modal visible={modalVisible} animationType='fade'>
+          <TouchableWithoutFeedback onPress={handleImagePress}>
+            <View style={styles.modalImageContainer}>
+              <Image
+                style={styles.modalImage}
+                source={{ uri: product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
         {/* Product brand, name and unit price */}
         <Text style={styles.unitPrice}>{product.brand}</Text>
         <View style={[styles.rowContainer, {marginBottom: 5}]}>
@@ -117,8 +140,12 @@ export default function ProductDetail({ route, navigation }) {
         </View>
 
         {/* More Buying Options Button */}
-        <PressableButton customStyle={styles.moreOptionsLink} pressedFunction={() => setShowMoreOptions(true)}>
-          <Text style={styles.moreOptionsLinkText}>More Buying Options</Text>
+        <PressableButton 
+          customStyle={styles.moreOptionsLink} 
+          pressedFunction={() => setShowMoreOptions(true)}
+          disabled={latestPrices.length === 1}
+        >
+          <Text style={[styles.moreOptionsLinkText, {color: latestPrices.length === 1 ? 'darkgray' : Colors.header}]}>More Buying Options</Text>
         </PressableButton>
 
         {/* Price Range Bar */}
@@ -179,31 +206,40 @@ export default function ProductDetail({ route, navigation }) {
 
         {/* More Buying Options Modal */}
         <Modal visible={showMoreOptions} transparent={true} animationType="fade">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>More Buying Options</Text>
-              <FlatList
-                data={latestPrices}
-                renderItem={({ item }) => (
-                  <PressableButton
-                    customStyle={[styles.moreOptionItem, item.data === selectedPrice && styles.selectedItem]}
-                    pressedFunction={() => {
-                      setSelectedPrice(item.data);
-                      setShowMoreOptions(false);
-                    }}
-                  >
-                    <View style={styles.rowContainer}>
-                      <Text style={styles.moreOptionText}>${item.data.price} at {item.data.store_name}</Text>
-                      {item.data === selectedPrice && <MaterialIcons style={{marginRight: 5}} name="check-circle" size={24} color="green" />}
-                    </View>
+          <TouchableWithoutFeedback onPress={() => setShowMoreOptions(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+
+                <View style={[styles.rowContainer, {marginBottom: "3%"}]}>
+                  <Text style={styles.modalTitle}>More Buying Options</Text>
+                  <PressableButton pressedFunction={() => setShowMoreOptions(false)}>
+                    <Ionicons name="close-outline" size={28} color={'black'} />
                   </PressableButton>
-                )}
-              />
-              <PressableButton customStyle={styles.closeModalButton} pressedFunction={() => setShowMoreOptions(false)}>
-                <Text style={styles.closeModalButtonText}>Close</Text>
-              </PressableButton>
+                </View>
+                
+                <FlatList
+                  data={latestPrices}
+                  renderItem={({ item }) => (
+                    <PressableButton
+                      customStyle={[styles.moreOptionItem, item.data === selectedPrice && styles.selectedItem]}
+                      pressedFunction={() => {
+                        setSelectedPrice(item.data);
+                        setShowMoreOptions(false);
+                      }}
+                    >
+                      <View style={[styles.rowContainer, {marginVertical: "2%"}]}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                          <Text style={styles.moreOptionText}>${item.data.price} at {item.data.store_name}</Text>
+                          {item.data === selectedPrice && <MaterialIcons style={{marginLeft: 5}} name="check-circle" size={20} color="green" />}
+                        </View>
+                        <Text style={[styles.date, {marginBottom: 0}]}>{item.data.date.toDate().toLocaleDateString("zh-cn", {timeZone: 'UTC'})}</Text>
+                      </View>
+                    </PressableButton>
+                  )}
+                />
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       </ScrollView>
 
@@ -232,6 +268,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     paddingHorizontal: 20,
   },
+  modalImageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  modalImage: {
+    width: windowWidth,
+    height: windowWidth,
+  },
   image: {
     width: windowWidth*0.75,
     height: windowWidth*0.625,
@@ -242,7 +288,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    //marginVertical: 5
   },
   productName: {
     fontSize: 20,
@@ -293,7 +338,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addButton: {
-    backgroundColor: Colors.header,
+    backgroundColor: Colors.secondary,
     marginLeft: 10,
   },
   feedbackButton: {
@@ -329,14 +374,12 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#FFF',
     borderRadius: 10,
-    padding: 20,
+    padding: 15,
     width: '80%',
-    maxHeight: '70%',
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   moreOptionItem: {
     paddingVertical: 10,
@@ -347,18 +390,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
   moreOptionText: {
-    fontSize: 16,
-  },
-  closeModalButton: {
-    backgroundColor: Colors.header,
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  closeModalButtonText: {
-    color: 'white',
-    fontSize: 16,
+    fontSize: 15,
   },
   priceRangeContainer: {
     flexDirection: 'row',

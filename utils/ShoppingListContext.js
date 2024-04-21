@@ -55,7 +55,7 @@ export const ShoppingListProvider = ({ children }) => {
   }, [auth.currentUser]);
 
   return (
-    <ShoppingListContext.Provider value={{ numItems, shoppingList, loading, quantities, setQuantities }}>
+    <ShoppingListContext.Provider value={{ numItems, shoppingList, setShoppingList, loading, quantities, setQuantities }}>
       {children}
     </ShoppingListContext.Provider>
   );
