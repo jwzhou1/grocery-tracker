@@ -1,24 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, ScrollView } from 'react-native';
+import { View, StyleSheet, ImageBackground, ScrollView, TouchableWithoutFeedback, Linking, Dimensions } from 'react-native';
 import CategoryCard from '../components/CategoryCard';
+const windowWidth = Dimensions.get('window').width;
 
-// Next steps:
 // 1.add random product cards(with latest prices)
-// 2.improve UI
 export default function Home({ navigation }) {
-  const currentCategory = "Produce";
-  const selectedCategory = currentCategory;
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <CategoryCard />
-        {/* Hot Deal Banner */}
-        <Text style={styles.hotDealText}>Hot Deal</Text>
-        <View style={styles.bannerContainer}>
-          <ImageBackground source={require('../images/hot_deal/save-on-foods.jpg')} style={styles.bannerImage} />
-        </View>
-        {/* Vertical posters */}
+        {/* Example Banner */}
+        <TouchableWithoutFeedback onPress={() => Linking.openURL('https://www.saveonfoods.com')}>
+          <View style={styles.bannerContainer}>
+            <ImageBackground source={require('../images/hot_deal/save-on-foods.jpg')} style={styles.bannerImage} />
+          </View>
+        </TouchableWithoutFeedback>
+
         <View style={styles.postersContainer}>
           <ImageBackground source={require('../images/hot_deal/walmart.jpg')} style={styles.posterImage} />
         </View>
@@ -39,7 +37,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   bannerImage: {
-    width: 450,
+    width: windowWidth,
     height: 150,
   },
   hotDealText: {

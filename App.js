@@ -31,7 +31,6 @@ import Toast from 'react-native-toast-message';
 
 // Next steps:
 // 1.move search bar to the header of Search screen
-// 2.add delete options to the headerRight of ShoppingList
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { View, StyleSheet, Text, Image, Modal, FlatList, ScrollView, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, Text, Image, Modal, FlatList, ScrollView, Dimensions, TouchableWithoutFeedback, Platform } from 'react-native';
 import PressableButton from '../components/PressableButton';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +10,7 @@ import { ShoppingListContext } from "../utils/ShoppingListContext";
 import { LineChart } from "react-native-gifted-charts";
 import Toast from 'react-native-toast-message'
 const windowWidth = Dimensions.get('window').width;
+const os = Platform.OS;
 
 // Next steps: add 1/3/6 month filter
 export default function ProductDetail({ route, navigation }) {
@@ -88,10 +89,19 @@ export default function ProductDetail({ route, navigation }) {
       text1: 'Success',
       text2: `${product.nameToShow} is added to shopping list`,
       visibilityTime: 3000,
-      topOffset: 50
+      topOffset: os === 'ios' ? 50 : 20
     });
-    await addToShoppingList(userId, productId, product.nameToShow, product.size, product.image_url, 
-      product.alt_name, product.brand, product.unit, selectedPrice.store_name);
+    const productData = {
+      productId: productId,
+      nameToShow: product.nameToShow,
+      size: product.size,
+      image_url: product.image_url,
+      alt_name: product.alt_name,
+      brand: product.brand,
+      unit: product.unit,
+      store_name: selectedPrice.store_name
+    }
+    await addToShoppingList(userId, productData);
   };
 
   const handleImagePress = () => {

@@ -86,9 +86,7 @@ export default function ImageManager({ receiveImageURI }) {
 
   return (
     <View style={styles.container}>
-      <PressableButton pressedFunction={showModal} customStyle={styles.button}>
-        <Text style={styles.buttonText}>Change Avatar</Text>
-      </PressableButton>
+      <Button onPress={showModal} title="Change Avatar"></Button>
 
       {imageUri && (
         <Image
@@ -119,7 +117,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
   },
 });

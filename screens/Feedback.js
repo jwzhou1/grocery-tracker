@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#309777'
+    color: Colors.header
   },
   input: {
     borderWidth: 1,

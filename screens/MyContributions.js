@@ -4,6 +4,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { ref, getDownloadURL } from "firebase/storage";
 import { auth, database, storage } from "../firebase/firebaseSetup";
 import LoadingScreen from "./LoadingScreen";
+import EmptyScreen from "./EmptyScreen";
 const windowHeight = Dimensions.get('window').height;
 
 export default function MyContributions() {
@@ -56,7 +57,7 @@ export default function MyContributions() {
     <View style={styles.container}>
       {loading && <LoadingScreen/>}
       {contributions.length === 0 && !loading &&
-      <Text>Make some contribution today!</Text>}
+      <EmptyScreen text='Make some contribution today!' icon='price-tag'/>}
       <FlatList
         data={contributions}
         renderItem={({ item }) => {

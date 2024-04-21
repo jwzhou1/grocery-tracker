@@ -1,7 +1,6 @@
 import {
   collection,
   addDoc,
-  deleteDoc,
   doc,
   setDoc,
   getDocs,
@@ -95,30 +94,30 @@ export async function searchCategoriesFromDB(category) {
   }
 }
 
-export async function addToShoppingList(userId, productId, nameToShow, size, image_url, alt_name, brand, unit, store_name) {
+export async function addToShoppingList(userId, productData) {
   try {
     // Get a reference to the shoppinglist
     const listRef = collection(database, `users/${userId}/shopping_list`);
-    const itemRef = doc(listRef, productId)
+    const itemRef = doc(listRef, productData.productId)
     const itemDoc = await getDoc(itemRef);
 
     // Check if the item exists in the shopping list
     if (itemDoc.exists()) {
-      if (itemDoc.data().store_name === store_name) {
+      if (itemDoc.data().store_name === productData.store_name) {
         // update its quantity
         await updateDoc(itemRef, { quantity: increment(1) });
       } else {
         // update its store_name
-        await updateDoc(itemRef, { store_name: store_name });
+        await updateDoc(itemRef, { store_name: productData.store_name });
       }
       
     } else {
       // create a new doc and set quantity to 1
-      await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), 
-        { nameToShow: nameToShow, size: size, image_url: image_url, alt_name: alt_name, brand: brand, unit: unit, store_name: store_name, quantity: 1 });
+      await setDoc(doc(database, `users/${userId}/shopping_list/${productData.productId}`), 
+        { ...productData, quantity: 1 });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 

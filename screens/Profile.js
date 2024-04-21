@@ -94,7 +94,7 @@ const Profile = ({ navigation }) => {
             if (imageUri) {
               const imageRef = ref(storage, imageUri);
               const imageDownloadURL = await getDownloadURL(imageRef);
-              console.log("imageDownloadURL", imageDownloadURL);
+              //console.log("imageDownloadURL", imageDownloadURL);
               setImageURL(imageDownloadURL);
             }
           } else {

@@ -76,8 +76,8 @@ export default function Search({ route }) {
     <View style={styles.container}>
       <View style={styles.searchBar}>
         <SearchBar handleSearch={handleSearch} setSubmitted={setSubmitted} autoFocus={focus}/>
-        {submitted && !loading && !showResult && <Text>No results</Text>}
       </View>
+      {submitted && !loading && !showResult && <Text style={styles.title}>No results</Text>}
       {submitted && loading && <LoadingScreen />}
       {submitted && !loading && showResult && <SearchResult headerText={headerText} data={queryResult}/>}
     </View>
@@ -94,4 +94,11 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
   },
+  title: {
+    marginLeft: '5%',
+    marginTop: 5,
+    marginBottom: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
 });

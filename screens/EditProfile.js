@@ -115,17 +115,19 @@ export default function EditProfile({ navigation }) {
         <Text style={styles.label}>Email: {email}</Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
+
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <PressableButton customStyle={styles.button} pressedFunction={() => {
+        <PressableButton customStyle={[styles.button, styles.cancelButton]} pressedFunction={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </PressableButton>
+        <PressableButton customStyle={[styles.button, styles.submitButton]} pressedFunction={() => {
           handleSave();
           if (imageUri) {
             uploadImage(imageUri);
           }
         }}>
-          <Text style={styles.buttonText}>Save</Text>
-        </PressableButton>
-        <PressableButton customStyle={styles.button} pressedFunction={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Cancel</Text>
+          <Text style={[styles.buttonText, {color: 'white'}]}>Save</Text>
         </PressableButton>
       </View>
     </View>
@@ -135,6 +137,7 @@ export default function EditProfile({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    padding: 20
   },
   input: {
     height: 50,
@@ -154,23 +157,26 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    margin: 20,
   },
   button: {
-    backgroundColor: 'white',
-    width: '25%',
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 30,
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'gray',
-    marginHorizontal: 10,
+    justifyContent: 'center',
+  },
+  submitButton: {
+    marginLeft: 10,
+    backgroundColor: Colors.header
+  },
+  cancelButton: {
+    marginRight: 10,
+    backgroundColor: '#ccc'
   },
   buttonText: {
-    color: 'black',
     fontSize: 16,
-    fontWeight: '500'
-  }
+    fontWeight: '600'
+  },
 });

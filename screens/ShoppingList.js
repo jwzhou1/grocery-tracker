@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { View, StyleSheet, Text, Image, FlatList, Dimensions } from "react-native";
 import { doc, updateDoc, deleteDoc, collection, increment } from "firebase/firestore";
+import { addToShoppingList } from "../firebase/firebaseHelper";
 import { auth, database } from "../firebase/firebaseSetup";
 import PressableButton from "../components/PressableButton";
 import LoadingScreen from "./LoadingScreen";
+import EmptyScreen from "./EmptyScreen";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ShoppingListContext } from "../utils/ShoppingListContext";
 import { Snackbar } from "react-native-paper";
@@ -12,36 +14,41 @@ const windowWidth = Dimensions.get('window').width;
 export default function ShoppingList({ navigation }) {
   const userId = auth.currentUser.uid
   const { shoppingList, setShoppingList, loading, quantities, setQuantities } = useContext(ShoppingListContext);
-  const [deletedItems, setDeletedItems] = useState([]);
+  const [deletedItem, setDeletedItem] = useState(null);
   const [isSnackbarVisible, setSnackbarVisible] = useState(false);
 
-  useEffect(() => {
-    // delete the item from firestore
-    if (deletedItems.length > 0 && !isSnackbarVisible) {
-      try {
-        deletedItems.map(async (deletedItem) => {
-          await deleteDoc(doc(database, `users/${userId}/shopping_list/${deletedItem.id}`));
-        })
-        setDeletedItems([]);
-        setSnackbarVisible(false);
-        
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  }, [deletedItems, isSnackbarVisible])
-
-  // remove the item from local state
   const deleteHandler = async (item) => {
+    // remove the item from local state & save a copy
     setShoppingList(shoppingList => shoppingList.filter((i) => i.id != item.id))
-    setDeletedItems(deletedItems => [...deletedItems, item])
+    setDeletedItem(item)
     setSnackbarVisible(true)
+    try {
+      await deleteDoc(doc(database, `users/${userId}/shopping_list/${item.id}`));
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  // restore the item
-  const handleUndoDelete = () => {
-    setShoppingList(shoppingList => [...shoppingList, deletedItems.pop()])
+  const handleUndoDelete = async () => {
+    // restore the item from local state
+    setShoppingList(shoppingList => [...shoppingList, deletedItem])
     setSnackbarVisible(false)
+    try {
+      const productData = {
+        productId: deletedItem.id,
+        nameToShow: deletedItem.product.nameToShow,
+        size: deletedItem.product.size,
+        image_url: deletedItem.product.image_url,
+        alt_name: deletedItem.product.alt_name,
+        brand: deletedItem.product.brand,
+        unit: deletedItem.product.unit,
+        store_name: deletedItem.priceToShow.store_name
+      }
+      await addToShoppingList(userId, productData);
+      setDeletedItem(null)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const navigateToProductDetail = (item) => {
@@ -122,7 +129,7 @@ export default function ShoppingList({ navigation }) {
     <View style={styles.container}>
       {loading && <LoadingScreen />}
       {shoppingList.length === 0 && !loading &&
-        <Text>Add something to your shopping list</Text>
+        <EmptyScreen text='Add something to your shopping list' icon='shopping-bag'/>
       }
       <FlatList
         data={groupShoppingListByStore()}
@@ -149,9 +156,9 @@ export default function ShoppingList({ navigation }) {
           onPress: handleUndoDelete,
         }}
         onDismiss={() => setSnackbarVisible(false)}
-        duration={5000}
+        duration={6000}
       >
-        {deletedItems.length > 0 ? `Item "${deletedItems.slice(-1)[0].product.nameToShow}" deleted` : ''}
+        {deletedItem ? `Item "${deletedItem.product.nameToShow}" deleted` : ''}
       </Snackbar>
       {/* <View style={{height: 50}}></View> */}
     </View>
