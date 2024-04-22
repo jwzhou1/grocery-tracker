@@ -18,12 +18,12 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL, deleteObject } from "firebase/storage";
 import { Ionicons } from "@expo/vector-icons";
-import { fetchWeatherData, getUserLocation } from "../components/weatherAPI";
+//import { fetchWeatherData, getUserLocation } from "../components/weatherAPI";
 
 const Profile = ({ navigation }) => {
   const user = auth.currentUser;
   const [imageURL, setImageURL] = useState("");
-  const [weatherData, setWeatherData] = useState(null);
+  //const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -49,7 +49,7 @@ const Profile = ({ navigation }) => {
       }
     );
     return () => {
-      console.log("unsubscribe");
+      //console.log("unsubscribe");
       unsubscribe();
     };
   }, []);
@@ -73,20 +73,9 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     async function getImageURL() {
-      //console.log("auth.currentUser", auth.currentUser);
       if (auth.currentUser) {
-        const userUid = auth.currentUser.uid;
+        const userId = auth.currentUser.uid;
         try {
-          const userQuery = query(
-            collection(database, "users"),
-            where("uid", "==", userUid)
-          );
-          const querySnapshot = await getDocs(userQuery);
-
-          let userId;
-          querySnapshot.forEach((doc) => {
-            userId = doc.id;
-          });
           const userRef = doc(database, "users", userId);
           const userDocSnapshot = await getDoc(userRef);
           if (userDocSnapshot.exists()) {
@@ -95,10 +84,8 @@ const Profile = ({ navigation }) => {
             if (imageUri) {
               const imageRef = ref(storage, imageUri);
               const imageDownloadURL = await getDownloadURL(imageRef);
-              console.log("imageDownloadURL", imageDownloadURL);
+              //console.log("imageDownloadURL", imageDownloadURL);
               setImageURL(imageDownloadURL);
-            } else {
-              console.log("imageUri is empty.");
             }
           } else {
             console.log("user document does not exist.");
@@ -115,9 +102,9 @@ const Profile = ({ navigation }) => {
     navigation.navigate("Edit Profile");
   };
 
-  const handleWatchListPress = () => {
-    navigation.navigate("Watch List");
-  };
+  // const handleWatchListPress = () => {
+  //   navigation.navigate("Watch List");
+  // };
 
   const handleMyContributionsPress = () => {
     navigation.navigate("My Contributions");
@@ -171,7 +158,7 @@ const Profile = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {weatherData && (
+      {/* {weatherData && (
         <View style={styles.weatherContainer}>
           <Text style={styles.weatherText}>
             Tomorrow's Weather: {weatherData.timezoneAbbreviation}
@@ -192,7 +179,7 @@ const Profile = ({ navigation }) => {
             %
           </Text>
         </View>
-      )}
+      )} */}
       <View style={styles.userInfoContainer}>
         {imageURL ? (
           <View>
@@ -247,7 +234,7 @@ const Profile = ({ navigation }) => {
           <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => handleWatchListPress()}
           style={styles.linkButton}
         >
@@ -260,7 +247,7 @@ const Profile = ({ navigation }) => {
             <Text style={styles.text}> My Watch List</Text>
           </View>
           <MaterialIcons name="keyboard-arrow-right" size={26} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           onPress={() => handleMyContributionsPress()}
@@ -310,6 +297,7 @@ const styles = StyleSheet.create({
   },
   emailContainer: {
     flexDirection: "row",
+    alignItems: 'center',
   },
   emailText: {
     fontSize: 14,

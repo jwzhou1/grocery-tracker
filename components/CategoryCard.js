@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../styles/Colors';
 
 export default function CategoryCard() {
   const navigation = useNavigation();
@@ -30,23 +29,23 @@ export default function CategoryCard() {
       <View style={styles.rowContainer}>
         {firstRowCategories.map((category, index) => (
           <TouchableOpacity key={index} style={styles.categoryContainer} onPress={() => handleCategoryPress(category.name)}>
-            {category.image ? (
-              <Image source={category.image} style={styles.image} />
-            ) : (
-              <View style={styles.circle} />
-            )}
-            <Text style={styles.categoryText}>{category.name}</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+          {category.image &&
+            <Image source={category.image} style={styles.image} />
+          }
+          </View>
+          <Text style={styles.categoryText}>{category.name}</Text>
+        </TouchableOpacity>
         ))}
       </View>
       <View style={styles.rowContainer}>
         {secondRowCategories.map((category, index) => (
           <TouchableOpacity key={index} style={styles.categoryContainer} onPress={() => handleCategoryPress(category.name)}>
-            {category.image ? (
+            <View style={styles.buttonContainer}>
+            {category.image &&
               <Image source={category.image} style={styles.image} />
-            ) : (
-              <View style={styles.circle} />
-            )}
+            }
+            </View>
             <Text style={styles.categoryText}>{category.name}</Text>
           </TouchableOpacity>
         ))}
@@ -57,42 +56,40 @@ export default function CategoryCard() {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    width: '90%',
-    backgroundColor: Colors.summaryBackground,
-    borderRadius: 10,
-    padding: 15,
     justifyContent: 'center',
-    shadowColor: 'gray',
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 10,
+    width: '100%',
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#FAFAFA'
   },
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    width: '100%',
+    marginVertical: "2%"
   },
   categoryContainer: {
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '30%',
+    //borderWidth: 1
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    borderRadius: 50,
+    marginBottom: 10,
+    backgroundColor: 'lightgray'
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 45,
+    height: 45,
     borderRadius: 25,
-    marginBottom: 5,
-  },
-  circle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'white',
-    marginBottom: 5,
   },
   categoryText: {
-    color: 'white',
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
 });

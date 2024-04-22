@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import PressableButton from './PressableButton';
+const windowWidth = Dimensions.get('window').width;
 
-export default function ProductCard({ productId, product, prices }) {
+export default function ProductCard({ productId, productData, prices }) {
   const navigation = useNavigation()
   const [priceToShow, setPriceToShow] = useState({})
+  const [product, setProduct] = useState(productData)
 
   useEffect(() => {
     const getLatestCheapestPrice = () => {
@@ -28,7 +30,20 @@ export default function ProductCard({ productId, product, prices }) {
       setPriceToShow(prices.at(minPriceIndex).data)
     }
     getLatestCheapestPrice()
-  })
+    
+    // extract size info from product name
+    const strArray = productData.name.split("-")
+    let sizeInfo = strArray.length > 1 ? strArray.slice(-1)[0] : "NA"
+    let productName;
+    if (sizeInfo === "NA") {
+      sizeInfo = productData.unit ? `per ${productData.unit}` : "each"
+    } else {
+      productName = productData.name.split(`-${sizeInfo}`)[0]
+    }
+    const updatedProduct = {...productData, size: sizeInfo, nameToShow: productName || productData.name}
+    setProduct(updatedProduct)
+    //console.log(updatedProduct.name, updatedProduct.size)
+  }, [productData])
 
   const navigateToProductDetail = () => {
     navigation.navigate('Product Detail', { productId, product, prices, priceToShow });
@@ -38,18 +53,19 @@ export default function ProductCard({ productId, product, prices }) {
     <PressableButton pressedFunction={navigateToProductDetail}>
       {prices.at(0) &&
       <View style={styles.productCard}>
-        <Image source={{ uri: product.image_url || "https://via.placeholder.com/150" }} style={styles.image} />
+        <Image source={{ uri: product.image_url || "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png" }} style={styles.image} />
         <View style={styles.detailsContainer}>
-          <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.category}>{product.category}</Text>
+          <Text style={styles.name}>{product.nameToShow}</Text>
+          <Text style={styles.category}>{product.size}</Text>
           <View style={styles.priceRow}>
             {product.unit && product.quantity === 1 ? 
             // if loose, show unit price only
             <Text style={styles.price}>${priceToShow.unit_price}/{product.unit}</Text> :
             // otherwise show both price & unit price
             <>
-            <Text style={styles.price}>${priceToShow.price}</Text>
-            <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>
+              <Text style={styles.price}>${priceToShow.price}</Text>
+              {priceToShow.unit_price &&
+              <Text style={styles.category}>${priceToShow.unit_price}/{product.unit}</Text>}
             </>}
           </View>
         </View>
@@ -60,36 +76,33 @@ export default function ProductCard({ productId, product, prices }) {
 
 const styles = StyleSheet.create({
   productCard: {
-    flexDirection: 'column',
-    alignSelf: 'center',
-    width: '80%',
-    margin: 5,
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 10,
-    overflow: 'hidden',
+    width: windowWidth*0.5,
+    //overflow: 'hidden',
   },
   image: {
-    width: '50%',
-    height: 150,
+    width: windowWidth*0.44,
+    height: windowWidth*0.44,
     alignSelf: 'center'
   },
   detailsContainer: {
-    padding: 10,
+    paddingHorizontal: '6%',
+    paddingVertical: '5%'
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontWeight: '500',
   },
   category: {
+    fontSize: 12,
     color: '#666666',
+    marginVertical: '1%'
   },
   price: {
-    color: '#009900',
+    color: 'green',
     fontWeight: 'bold',
   },
 });

@@ -21,9 +21,16 @@ import Notification from "./screens/Notification";
 import ProductDetail from "./screens/ProductDetail";
 import SearchHeader from "./components/SearchHeader";
 import PressableButton from "./components/PressableButton";
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import Colors from "./styles/Colors";
 import * as Notifications from "expo-notifications";
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { PaperProvider } from 'react-native-paper';
+import { ShoppingListProvider } from "./utils/ShoppingListContext";
+import Toast from 'react-native-toast-message';
+
+// Next steps:
+// 1.move search bar to the header of Search screen
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -144,15 +151,10 @@ const AppStack = (
     <Stack.Screen
       name="Product Detail"
       component={ProductDetail}
-      options={({ route, navigation }) => ({
+      options={{
         headerShown: true,
-        headerBackTitleVisible: false,
-        headerRight: () => (
-          <PressableButton pressedFunction={() => navigation.navigate("Shopping List Stack")}>
-            <Ionicons name="cart-outline" size={24} color={Colors.headerText} />
-          </PressableButton>
-        )
-      })}
+        headerBackTitleVisible: false
+      }}
     />
     <Stack.Screen
       name="Feedback"
@@ -222,9 +224,16 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={defaultHeaderOptions}>
-        {loggedIn ? AppStack : AuthStack}
-      </Stack.Navigator>
+      <ShoppingListProvider>
+        <PaperProvider>
+          <ActionSheetProvider>
+            <Stack.Navigator screenOptions={defaultHeaderOptions}>
+              {loggedIn ? AppStack : AuthStack}
+            </Stack.Navigator>
+          </ActionSheetProvider>
+        </PaperProvider>
+      </ShoppingListProvider>
+      <Toast />
     </NavigationContainer>
   );
 }

@@ -1,16 +1,59 @@
-#   APP Name: Grocery Price Tracker
+#  Grocery Price Tracker
 
-#### Introducing Grocery Price Tracker: your ultimate companion for grocery shopping. Track historical prices to uncover true bargains, and receive notifications when prices drop. Plan your trips efficiently with our customizable shopping list feature. Can't find an item? Simply snap a picture and contribute its price. Effortlessly navigate through various categories and stay updated with hot deals from nearby supermarkets. With detailed product insights and an intuitive interface, making informed decisions has never been easier. Plus, your feedback ensures accurate pricing for all. Revolutionize your grocery shopping experience – download Grocery Price Tracker now!
+Introducing Grocery Price Tracker: your ultimate companion for grocery shopping. Track historical prices to uncover true bargains, and receive notifications when prices drop. Plan your trips efficiently with our customizable shopping list feature. Can't find an item? Simply snap a picture and contribute its price. Effortlessly navigate through various categories and stay updated with hot deals from nearby supermarkets. With detailed product insights and an intuitive interface, making informed decisions has never been easier. Plus, your feedback ensures accurate pricing for all. Revolutionize your grocery shopping experience – download Grocery Price Tracker now!
 
 ###    Authors: Liyao Zhang, Jiawei Zhou
-###    Iteration 1 adds following key functionalities: 
-1. Authentication
-2. Location use
-3. Camera use
+###    Firebase and Google Map API setup:
+```
+  apiKey: "AIzaSyAVMvcs51ldmoFJsJ6BS8J445NdPdG3gCc"
+  authDomain: "grocery-tracker-40a3b.firebaseapp.com"
+  projectId: "grocery-tracker-40a3b"
+  storageBucket: "grocery-tracker-40a3b.appspot.com"
+  messagingSenderId: "179121607754"
+  appId: "1:179121607754:web:0b62158ca1cc7c32ac02b3"
+  GOOGLE_MAPS_API_KEY: "AIzaSyBUvWpC05hBwN4qdeW7W6PDvk9lq71Rj9M"
+```
 
-###    Iteration 2 adds following key functionalities: 
-1. External API use
-2. Notification
+###    Firebase Rules:
+####   Firestore Database
+```
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /products/{document=**} {
+      allow read: if true;
+    }
+    match /prices/{document=**} {
+      allow read: if true;
+    }
+    // Allow read and write access to user info only for the authenticated users
+    match /users/{userId} {
+      allow read, write: if request.auth != null;
+      
+      // Allow read and write access to the user's shopping_list
+      match /shopping_list/{document=**} {
+        allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      	allow create: if request.auth != null;
+      }
+
+      // Allow read and write access to the user's contribution_list
+      match /contribution_list/{document=**} {
+        allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      	allow create: if request.auth != null;
+      }
+    }
+  }
+}
+```
+####   Storage:
+```
+  match /{allPaths=**} {
+      allow read;
+      allow create, write, delete;
+    }
+```
 
 ###    Data Model and Collections:
 ####   1. Users Collection (Contribution: Jiawei Zhou):
@@ -70,9 +113,6 @@ This is a sub collection in Products Collection. Each document in the Prices sub
 2. **Read:**
    For each searched product, another query will be executed based on the product_id. And all price history will be returned.
 
-3. **Update:**
-   Users can contribute to the price collection by adding a new price they found in store. However, this operation is not implemented yet.
-
 ### Screens
 #### Auth Stack Screens (Contribution: Jiawei Zhou):
  <img src="images/screen_images/signup-screen.jpg" alt="Signup" width="200"> <img src="images/screen_images/login-screen.jpg" alt="Login" width="200">
@@ -101,30 +141,49 @@ On the home screen, the top displays the user's current location, requiring perm
 User can search products by their names(exact full name). However, due to limitations of Firebase, there is no support for full-text search yet. If user wants to have a better search experience, we may need to incorporate third-party search services like Typesense to achieve that. There are currently around 100 products ready for search. Please refer to the second workbook of utils/sample_data.xlsx for a comprehensive list of products. 
 
 Also, users can view all results for a specific category by tapping a category icon at home page.
+
 <img src="images/screen_images/search-category.png" alt="Alt text" width="200">
 
 **Product Detail Screen (Contribution: Liyao Zhang):**
 
-<img src="images/screen_images/productdetail1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/productdetail2.jpg" alt="Alt text" width="200"> 
+<img src="images/screen_images/productdetail1.jpg" alt="Alt text" width="200"> 
 
-After tapping on the product preview card, you will navigate to a product detail screen where more information will be displayed, such as unit prices, stores, price range, and the option to add the product to your shopping list. On the product detail screen, you can click 'More Buying Options' to view different purchasing choices. However, the CRUD operations on user's lists(watch list, my contributions) have not been implemented in this iteration due to time constraints.
+After tapping on the product preview card, you will navigate to a product detail screen where more information will be displayed, such as unit prices, stores, price range, price historical trend in the same store, and the option to add the product to your shopping list. There is also a 'Provide Feedback' button to help the app manager verify the price if you do not agree with the price shown. Additionally, you can navigate to the shopping list by clicking the shopping list icon in the top right corner of the screen.
+
+<img src="images/screen_images/productdetail2.jpg" alt="Alt text" width="200"> 
+
+On the product detail screen, you can click 'More Buying Options' to view different purchasing choices. Since Frozen Beef Short Ribs do not have additional buying options in our database, the 'More Buying Options' feature is disabled here. We use Ginger as an example to demonstrate the 'More Buying Options' functionality.
 
 <img src="images/screen_images/productdetail3.jpg" alt="Alt text" width="200"> <img src="images/screen_images/productdetail4.jpg" alt="Alt text" width="200"> 
 
-You can also click the 'Add to List' button, which will add the product to the shopping list. If it is added successfully, a popup will appear.
+You can also click the 'Add to List' button, which will add the product to the logged-in user's shopping list. If it is added successfully, a popup will appear.
 
 **Feedback Screen (Contribution: Liyao Zhang, Jiawei Zhou):**
-**(still under implementation)**
+####     Camera use
+<img src="images/screen_images/feedback1.jpg" alt="Alt text" width="200">
 
-<img src="images/screen_images/feedback.png" alt="Alt text" width="200">
+If users do not agree with the price, they can click the 'Provide Feedback' button on the product screen to navigate to the Feedback screen and contribute a new price record for that product. 
 
-If users don't agree on the price, they will be directed to the Feedback screen to contribute a new price record for that product. Users can only submit a new price they found at the same store. They need to specify the new price and the date they found it. Please note that the submit button is currently not operational, as it will be implemented in the next iteration.
+<img src="images/screen_images/feedback2.jpg" alt="Alt text" width="200">   
+
+Users can only submit a new price they found at the same store. Users should upload an image from their local library or take a picture to provide proof of the new price.
+
+<img src="images/screen_images/feedback3.jpg" alt="Alt text" width="200"> <img src="images/screen_images/feedback4.jpg" alt="Alt text" width="200">
+
+Users also need to specify the new price and the date when they found it. When a user clicks the submit button, the price will be uploaded to the contribution screen.
+
+**My Contributions Screen (Contribution: Liyao Zhang, Jiawei Zhou):**
+
+<img src="images/screen_images/contribution1.jpg" alt="Alt text" width="200">
+
+Users can access their contributions on the profile screen. After clicking in, they will see their contributions. Here, users can view their contributed price, contribution date, the image they took or uploaded, and the store name. Users can also see the status of their contribution, which is currently pending. If the app manager approves this contribution, the status will change. However, the approval process is not implemented yet.
+
 
 **Shopping List Screen (Contribution: Liyao Zhang):**
 
 <img src="images/screen_images/shoppinglist1.jpg" alt="Alt text" width="200"> <img src="images/screen_images/shoppinglist2.jpg" alt="Alt text" width="200"> 
 
-Now let's go to the shopping list screen to check whether the product has been added. We can see that the product has indeed been added to the shopping list. On the shopping list screen, you can increase the quantity by pressing the '+' button or decrease it by pressing the '-' button. You can also remove this product from your shopping list by tapping the 'trash' icon.
+Now, let's go to the shopping list screen to review the list. The shopping list is organized by store name. On this screen, you can increase the quantity by pressing the '+' button or decrease it by pressing the '-' button. You can also remove a product from your shopping list by tapping the 'trash' icon. In the top right corner, you can see the total price for each product. When you click the '+' or '-' symbol to adjust the quantity, the total price will change accordingly.
 
 **Profile Screen (Contribution: Jiawei Zhou):**  
 
@@ -142,7 +201,7 @@ The Edit Profile Screen presents the current user's email information at the top
 
 After uploading a photo, the user's uploaded image will be displayed on the screen. Similarly, after taking a photo, the image captured by the user's camera will also be displayed. After users click on "Save" to update their profile picture, and they will be redirected back to the Profile Screen.
 
-<img src="images/screen_images/profile-screen2.jpg" alt="Alt text" width="200"> <img src="images/screen_images/profile-screen3.jpg" alt="Alt text" width="200">
+<img src="images/screen_images/profile-screen2.jpg" alt="Alt text" width="200"> 
 
 After saving the changes, users can view the updated profile picture on the Profile Screen.
 

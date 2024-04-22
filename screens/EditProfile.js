@@ -7,8 +7,9 @@ import { auth, storage, database } from '../firebase/firebaseSetup';
 import { updateToUsersDB } from '../firebase/firebaseHelper';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
+import Colors from '../styles/Colors';
 
-const EditProfile = ({ navigation }) => {
+export default function EditProfile({ navigation }) {
   const user = auth.currentUser;
   const [email, setEmail] = useState('');
   const [imageUri, setImageUri] = useState('');
@@ -112,32 +113,31 @@ const EditProfile = ({ navigation }) => {
     <View>
       <View style={styles.container}>
         <Text style={styles.label}>Email: {email}</Text>
-        <Text style={styles.label}>Upload New Avatar: </Text>
         <ImageManager receiveImageURI={receiveImageURI} />
       </View>
+
+      {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <PressableButton customStyle={styles.button} pressedFunction={() => {
+        <PressableButton customStyle={[styles.button, styles.cancelButton]} pressedFunction={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </PressableButton>
+        <PressableButton customStyle={[styles.button, styles.submitButton]} pressedFunction={() => {
           handleSave();
           if (imageUri) {
             uploadImage(imageUri);
           }
         }}>
-          <Text style={styles.buttonText}>Save</Text>
-        </PressableButton>
-        <PressableButton customStyle={styles.button} pressedFunction={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Cancel</Text>
+          <Text style={[styles.buttonText, {color: 'white'}]}>Save</Text>
         </PressableButton>
       </View>
     </View>
   );
 };
 
-export default EditProfile;
-
 const styles = StyleSheet.create({
   container: {
-    marginBottom: "10%",
-    alignItems: 'center'
+    alignItems: 'center',
+    padding: 20
   },
   input: {
     height: 50,
@@ -150,27 +150,33 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#2B2A4C',
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
     fontWeight: 'bold',
     marginTop: "5%",
-    fontSize: 18,
+    fontSize: 14,
     marginBottom: "2%",
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    margin: 20,
   },
   button: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginHorizontal: 10,
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitButton: {
+    marginLeft: 10,
+    backgroundColor: Colors.header
+  },
+  cancelButton: {
+    marginRight: 10,
+    backgroundColor: '#ccc'
   },
   buttonText: {
-    color: 'black',
     fontSize: 16,
-  }
+    fontWeight: '600'
+  },
 });

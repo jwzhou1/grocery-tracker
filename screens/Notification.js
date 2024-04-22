@@ -4,9 +4,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { scheduleDailyNotification, cancelNotification } from '../components/NotificationManager';
 import { useEffect } from 'react';
 import { database, auth } from '../firebase/firebaseSetup';
-import { collection,  getDocs, query, where,doc, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { updateToUsersDB } from '../firebase/firebaseHelper';
-import { isTimestamp } from 'firebase/firestore';
 import Colors from '../styles/Colors';
 
 const NotificationSetting = () => {
@@ -140,7 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: '5%',
     textAlign: 'center',
-    color: Colors.settingText,
     fontWeight: 'bold',
   },
 });

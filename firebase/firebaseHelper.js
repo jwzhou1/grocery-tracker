@@ -1,7 +1,6 @@
 import {
   collection,
   addDoc,
-  deleteDoc,
   doc,
   setDoc,
   getDocs,
@@ -12,7 +11,7 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { database, auth } from "./firebaseSetup";
+import { database } from "./firebaseSetup";
 
 // support searching products by name
 export async function searchFromDB(keyword) {
@@ -95,46 +94,36 @@ export async function searchCategoriesFromDB(category) {
   }
 }
 
-export async function addToShoppingList(userId, productId, name, image_url, alt_name, brand, unit, store_name) {
+export async function addToShoppingList(userId, productData) {
   try {
     // Get a reference to the shoppinglist
     const listRef = collection(database, `users/${userId}/shopping_list`);
-    const itemRef = doc(listRef, productId)
+    const itemRef = doc(listRef, productData.productId)
     const itemDoc = await getDoc(itemRef);
 
     // Check if the item exists in the shopping list
     if (itemDoc.exists()) {
-      if (itemDoc.data.store_name === store_name) {
+      if (itemDoc.data().store_name === productData.store_name) {
         // update its quantity
         await updateDoc(itemRef, { quantity: increment(1) });
       } else {
         // update its store_name
-        await updateDoc(itemRef, { store_name: store_name });
+        await updateDoc(itemRef, { store_name: productData.store_name });
       }
       
     } else {
       // create a new doc and set quantity to 1
-      await setDoc(doc(database, `users/${userId}/shopping_list/${productId}`), 
-        { name: name, image_url: image_url, alt_name: alt_name, brand: brand, unit: unit, store_name: store_name, quantity: 1 });
+      await setDoc(doc(database, `users/${userId}/shopping_list/${productData.productId}`), 
+        { ...productData, quantity: 1 });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 };
 
-
-export async function addToContributionList(userId, productId, newPrice, date, imageUri,name,store_name) {
+export async function addToContributionList(userId, updatedPrice) {
   try {
-    const listRef = collection(database, `users/${userId}/contribution_list`);
-    const itemRef = doc(listRef, productId);
-    const itemDoc = await getDoc(itemRef);
-
-    if (itemDoc.exists()) {
-      await updateDoc(itemRef, { price: newPrice, date: date, imageUri: imageUri, productName: name, store_name: store_name});
-    } else {
-      await setDoc(doc(database, `users/${userId}/contribution_list/${productId}`), 
-        { productId: productId, price: newPrice, date: date, imageUri: imageUri, productName: name, store_name: store_name});
-    }
+    await addDoc(collection(database, `users/${userId}/contribution_list`), updatedPrice)
   } catch (error) {
     console.log(error);
   }
