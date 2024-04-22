@@ -74,18 +74,8 @@ const Profile = ({ navigation }) => {
   useEffect(() => {
     async function getImageURL() {
       if (auth.currentUser) {
-        const userUid = auth.currentUser.uid;
+        const userId = auth.currentUser.uid;
         try {
-          const userQuery = query(
-            collection(database, "users"),
-            where("uid", "==", userUid)
-          );
-          const querySnapshot = await getDocs(userQuery);
-
-          let userId;
-          querySnapshot.forEach((doc) => {
-            userId = doc.id;
-          });
           const userRef = doc(database, "users", userId);
           const userDocSnapshot = await getDoc(userRef);
           if (userDocSnapshot.exists()) {
