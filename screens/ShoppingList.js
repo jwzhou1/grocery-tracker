@@ -102,6 +102,7 @@ export default function ShoppingList({ navigation }) {
           <Image style={styles.image} source={{ uri: item.product.image_url || 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png' }} />
           <View style={styles.infoContainer}>
             <Text style={styles.productName}>{item.product.nameToShow}</Text>
+            {item.priceToShow.restrictions && <Text style={styles.restrictions}>{item.priceToShow.restrictions}</Text>}
             <Text style={styles.size}>{item.product.size}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 5}}>
               <View style={styles.quantityControl}>
@@ -206,6 +207,11 @@ const styles = StyleSheet.create({
   size: {
     color: 'gray',
     marginVertical: "1%"
+  },
+  restrictions: {
+    color: 'red',
+    fontSize: 12,
+    fontWeight: '500',
   },
   quantityControl: {
     flexDirection: "row",
