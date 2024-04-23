@@ -14,6 +14,7 @@ export default function Feedback({ route, navigation }) {
   const [imageUri, setImageUri] = useState(null);
   const [uploadUri, setUploadUri] = useState(null);
   const [newPrice, setNewPrice] = useState('');
+  const [newRestrictions, setNewRestrictions] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const { showActionSheetWithOptions } = useActionSheet();
@@ -126,6 +127,7 @@ export default function Feedback({ route, navigation }) {
       store_name: selectedPrice.store_name,
       price: parseFloat(newPrice),
       date: selectedDate,
+      restrictions: newRestrictions,
       uploadUri: uploadUri,
     };
 
@@ -169,13 +171,20 @@ export default function Feedback({ route, navigation }) {
         </View>
 
         <Text style={styles.label}>New Price:</Text>
-        {/* Input for New Price */}
         <TextInput
           style={styles.input}
           placeholder="Enter price for the size of the product"
           keyboardType="numeric"
           value={newPrice}
           onChangeText={text => setNewPrice(text)}
+        />
+
+        <Text style={styles.label}>Restrictions:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="[optional]"
+          value={newRestrictions}
+          onChangeText={text => setNewRestrictions(text)}
         />
 
         <Text style={styles.label}>Date:</Text>

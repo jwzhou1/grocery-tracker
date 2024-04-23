@@ -11,7 +11,7 @@ initializeApp({
 const db = getFirestore();
 
 const workbook = XLSX.readFile('sample_data.xlsx');
-const sheetName = workbook.SheetNames[3]; // change if need
+const sheetName = workbook.SheetNames[2]; // change if need
 const worksheet = workbook.Sheets[sheetName];
 const data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 createProductToDB(data)
@@ -69,7 +69,7 @@ async function createProductToDB(data) {
     const priceData = {
       date: new Date(Date.UTC(0, 0, date - 1)), // convert excel serial number to normal date
       price: parseFloat(price),
-      unit_price: unitPrice || parseFloat(price)/quantity || '', // NEED TESTING
+      unit_price: unitPrice || (quantity && parseFloat(price)/quantity) || '', // NEED TESTING
       store_name: source || '',
       restrictions: restrictions || '',
     };

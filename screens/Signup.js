@@ -98,27 +98,19 @@ export default function Signup({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F2FFE9",
+    backgroundColor: "#FFF9E6",
+    justifyContent: 'center'
   },
   header: {
-    flex: 1,
     width: "80%",
-    justifyContent: "flex-end",
     alignSelf: "center",
-    padding: 5,
-    alignItems: "flex-start",
   },
   footer: {
-    flex: 4,
-    backgroundColor: "#F2FFE9",
-    alignItems: "center",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 10,
+    width: "100%",
     paddingVertical: 30,
+    alignItems: "center",
   },
   text_header: {
-    color: "#000",
     fontWeight: "bold",
     fontSize: 30,
   },
@@ -130,10 +122,8 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderRadius: 5,
     padding: 10,
-    color: "#000",
   },
   label: {
-    color: "#000",
     alignSelf: "flex-start",
     marginLeft: "10%",
     fontWeight: "bold",
@@ -141,7 +131,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   buttonDefault: {
-    backgroundColor: "#F2FFE9",
     width: "80%",
     padding: 10,
     alignItems: "center",
@@ -151,7 +140,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   buttonText: {
-    color: "#000",
     fontWeight: "bold",
     fontSize: 20,
   }

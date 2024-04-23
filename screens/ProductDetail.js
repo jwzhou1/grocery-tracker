@@ -149,6 +149,9 @@ export default function ProductDetail({ route, navigation }) {
           <Text style={styles.date}>Last update: {selectedPrice.date.toDate().toLocaleDateString("zh-cn", {timeZone: 'UTC'})}</Text>
         </View>
 
+        {/* Restrictions */}
+        {selectedPrice.restrictions && <Text style={[styles.date, {color: 'red'}]}>{selectedPrice.restrictions}</Text>}
+
         {/* More Buying Options Button */}
         <PressableButton 
           customStyle={styles.moreOptionsLink} 
