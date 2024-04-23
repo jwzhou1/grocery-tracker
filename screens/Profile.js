@@ -13,7 +13,6 @@ import {
 } from "firebase/firestore";
 import { database } from "../firebase/firebaseSetup";
 import { auth, storage } from "../firebase/firebaseSetup";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { ref, getDownloadURL, deleteObject } from "firebase/storage";
@@ -96,7 +95,7 @@ const Profile = ({ navigation }) => {
       }
     }
     getImageURL();
-  }, []);
+  }, [auth.currentUser]);
 
   const handleEditProfilePress = () => {
     navigation.navigate("Edit Profile");

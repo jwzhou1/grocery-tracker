@@ -3,7 +3,6 @@ import { View, StyleSheet, ImageBackground, ScrollView, TouchableWithoutFeedback
 import CategoryCard from '../components/CategoryCard';
 const windowWidth = Dimensions.get('window').width;
 
-// 1.add random product cards(with latest prices)
 export default function Home({ navigation }) {
 
   return (

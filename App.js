@@ -28,9 +28,10 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { PaperProvider } from 'react-native-paper';
 import { ShoppingListProvider } from "./utils/ShoppingListContext";
 import Toast from 'react-native-toast-message';
+import algoliasearch from 'algoliasearch/lite';
+import { InstantSearch } from 'react-instantsearch';
 
-// Next steps:
-// 1.move search bar to the header of Search screen
+const searchClient = algoliasearch("6TSZQ8JRSK", "20a8e1b328ca1d34db9af5d50c7eb07d");
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -227,9 +228,11 @@ export default function App() {
       <ShoppingListProvider>
         <PaperProvider>
           <ActionSheetProvider>
-            <Stack.Navigator screenOptions={defaultHeaderOptions}>
-              {loggedIn ? AppStack : AuthStack}
-            </Stack.Navigator>
+            <InstantSearch searchClient={searchClient} indexName="product_name">
+              <Stack.Navigator screenOptions={defaultHeaderOptions}>
+                {loggedIn ? AppStack : AuthStack}
+              </Stack.Navigator>
+            </InstantSearch>
           </ActionSheetProvider>
         </PaperProvider>
       </ShoppingListProvider>
