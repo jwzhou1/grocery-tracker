@@ -2,6 +2,8 @@
 
 Introducing Grocery Price Tracker: your ultimate companion for grocery shopping. Track historical prices to uncover true bargains, and receive notifications when prices drop. Plan your trips efficiently with our customizable shopping list feature. Can't find an item? Simply snap a picture and contribute its price. Effortlessly navigate through various categories and stay updated with hot deals from nearby supermarkets. With detailed product insights and an intuitive interface, making informed decisions has never been easier. Plus, your feedback ensures accurate pricing for all. Revolutionize your grocery shopping experience – download Grocery Price Tracker now!
 
+Demo video link: https://youtu.be/TEGK52yTMwo
+
 ###    Authors: Liyao Zhang, Jiawei Zhou
 ###    Firebase and Google Map API setup:
 ```
